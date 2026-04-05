@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  --background: #07090d;
+  --panel: #0f131a;
+  --panel-2: #131925;
+  --muted: #8e99ab;
+  --foreground: #f5f7fb;
+  --accent: #7dd3fc;
+  --accent-2: #22d3ee;
+  --line: rgba(255, 255, 255, 0.08);
+  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-display: "Avenir Next Condensed", "Franklin Gothic Medium", "Arial Narrow", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top, rgba(27, 73, 89, 0.28), transparent 24%),
+    linear-gradient(180deg, #091018 0%, #07090d 40%, #05070b 100%);
+  color: var(--foreground);
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--foreground);
+  background:
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(34, 211, 238, 0.1), transparent 26%);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(125, 211, 252, 0.22);
+}
+
+.glass-panel {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
+  backdrop-filter: blur(24px);
+}
+
+.grid-fade {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-position: center;
+  background-size: 44px 44px;
+  mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+}
