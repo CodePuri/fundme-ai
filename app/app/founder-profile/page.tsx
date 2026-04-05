@@ -44,6 +44,9 @@ export default function FounderProfilePage() {
         <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
           Your Profile
         </h1>
+        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-zinc-500">
+          Programs do not just read the startup. They read the founder too. Keep this sharp.
+        </p>
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">

@@ -22,7 +22,7 @@ export default function ApplicationsPage() {
         <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
           In Progress
         </h1>
-        <p className="mt-4 text-[14px] text-zinc-500">Pick up where you left off.</p>
+        <p className="mt-4 text-[14px] text-zinc-500">Your drafts live here. Edit them, finish them, and move them forward.</p>
       </div>
 
       <div className="overflow-hidden rounded-[16px] border border-zinc-800 bg-black">

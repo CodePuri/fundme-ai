@@ -122,6 +122,9 @@ export default function StartupProfilePage() {
         <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
           Your Startup
         </h1>
+        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-zinc-500">
+          Built from your uploaded material. Edit anything. This powers your matches and drafts.
+        </p>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">

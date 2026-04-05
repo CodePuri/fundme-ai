@@ -191,6 +191,9 @@ export default function OnboardingPage() {
             <Panel className="w-full max-w-[620px]">
               <PanelHeader className="block">
                 <PanelTitle className="text-[42px] tracking-[-0.04em]">Let&apos;s build your profile.</PanelTitle>
+                <PanelDescription>
+                  We use this to understand your startup and match you to the right programs.
+                </PanelDescription>
               </PanelHeader>
               <PanelBody className="grid gap-5">
                 <Field>
@@ -238,6 +241,9 @@ export default function OnboardingPage() {
               </button>
               <div className="mt-6 text-[28px] font-semibold tracking-[-0.03em]">
                 Tap to speak — just describe it naturally
+              </div>
+              <div className="mt-3 max-w-[620px] text-[15px] leading-7 text-zinc-500">
+                Describe what you are building naturally. We will structure it from there.
               </div>
               <button className="mt-4 text-[14px] text-zinc-500 transition-colors hover:text-white" onClick={() => setTypedOpen(true)} type="button">
                 prefer to type →

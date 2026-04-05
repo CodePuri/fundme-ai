@@ -215,7 +215,7 @@ export default function TrackerPage() {
         <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
           Tracker
         </h1>
-        <p className="mt-4 text-[14px] text-zinc-500">Every application. Every status. One place.</p>
+        <p className="mt-4 text-[14px] text-zinc-500">Every application, every deadline, every status in one place.</p>
       </div>
 
       <div className="grid gap-3 xl:grid-cols-7">
@@ -275,7 +275,7 @@ export default function TrackerPage() {
 
         {filteredPrograms.length === 0 ? (
           <div className="px-4 py-16 text-center text-[14px] text-zinc-500">
-            No programs matching your search
+            Nothing tracked yet.
           </div>
         ) : (
           filteredPrograms.map((program) => (
@@ -382,7 +382,7 @@ export default function TrackerPage() {
               ))}
               {availablePrograms.length === 0 ? (
                 <div className="rounded-[14px] border border-zinc-800 bg-zinc-950 px-4 py-8 text-center text-[14px] text-zinc-500">
-                  No programs matching your search
+                  No programs match your search. Try a broader term or clear your filters.
                 </div>
               ) : null}
             </div>

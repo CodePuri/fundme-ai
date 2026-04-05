@@ -4,10 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  CheckCircle,
+  Clock,
   FileText,
   Menu,
   Sparkles,
   Star,
+  Target,
   Upload,
   X,
 } from "lucide-react";
@@ -27,21 +30,42 @@ const motionTransition = {
 const howItWorks = [
   {
     step: "01",
-    title: "Drop whatever you have",
-    description: "A deck, a URL, a voice note, rough ideas. Don't clean it up first.",
+    title: "Upload what you have",
+    description:
+      "A deck, a URL, rough notes, old application answers, even half-finished thinking. Start messy.",
     icon: Upload,
   },
   {
     step: "02",
-    title: "We find where you fit",
-    description: "Scored across 50+ programs based on your actual stage, traction, and story.",
+    title: "See where you fit",
+    description:
+      "We rank the programs most worth your time based on your stage, sector, founder profile, traction, and gaps.",
     icon: Sparkles,
   },
   {
     step: "03",
-    title: "We write it in your voice",
-    description: "Every answer adapted to what that program actually cares about.",
+    title: "Draft faster",
+    description:
+      "Each application is tailored to what that specific program actually looks for, not generated from a generic template.",
     icon: FileText,
+  },
+];
+
+const founderOutcomes = [
+  {
+    title: "Go from upload to draft fast",
+    body: "Paste a URL or drop in your deck. We turn what you already have into tailored application answers in minutes.",
+    icon: Clock,
+  },
+  {
+    title: "Apply where the fit is real",
+    body: "See a ranked list of programs based on your startup, founder background, traction, and what each program actually cares about.",
+    icon: Target,
+  },
+  {
+    title: "Track everything in one place",
+    body: "Keep drafts, deadlines, statuses, and next steps in one workflow instead of scattered docs, tabs, and spreadsheets.",
+    icon: CheckCircle,
   },
 ];
 
@@ -99,39 +123,6 @@ const curatedPrograms = [
     domain: "microsoft.com",
     fallbackText: "MS",
     fallbackColor: "#0078D4",
-  },
-];
-
-const testimonials = [
-  {
-    name: "Neha Bansal",
-    role: "Founder, LedgerMint",
-    quote: "Fundme turned our rough memo into a program-ready story faster than any advisor ever did.",
-  },
-  {
-    name: "Rohan Shah",
-    role: "CEO, Draftloop",
-    quote: "We stopped rewriting the same answer for every accelerator and finally focused on the right ones.",
-  },
-  {
-    name: "Maya Fernandez",
-    role: "Founder, PulseGrid",
-    quote: "The match scores were brutally useful. We knew where we belonged and where not to waste time.",
-  },
-  {
-    name: "Jin Park",
-    role: "Co-founder, MarginOS",
-    quote: "Our credit applications were done before we finished editing the first accelerator draft.",
-  },
-  {
-    name: "Aarav Menon",
-    role: "Founder, Outboundly",
-    quote: "The tracker and Gmail sync made the whole process feel like a system instead of a scramble.",
-  },
-  {
-    name: "Sofia Almeida",
-    role: "CEO, ContractPilot",
-    quote: "Every application sounded like us. That was the difference between shipping and stalling.",
   },
 ];
 
@@ -321,9 +312,6 @@ export default function LandingPage() {
   const [name, setName] = useState("Arjun Mehta");
   const [startupLine, setStartupLine] = useState("");
 
-  const topRow = testimonials.slice(0, 3);
-  const bottomRow = testimonials.slice(3);
-
   async function completeAuth() {
     setLoading(true);
     await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -346,36 +334,30 @@ export default function LandingPage() {
         <div className="relative mx-auto flex min-h-screen max-w-[1120px] flex-col items-center justify-center px-4 pt-28 text-center sm:px-6">
           <AnimatedGroup delay={0.04}>
             <div className="inline-flex items-center rounded-full border border-white/8 bg-zinc-900 px-4 py-2 text-[12px] text-zinc-300">
-              ⚡ Now open: YC W26 · Antler India · Google for Startups
+              Applications open for YC, Antler, Google for Startups India
             </div>
           </AnimatedGroup>
 
           <AnimatedGroup className="mt-8" delay={0.12}>
             <div className="instrument-serif text-[62px] leading-[0.9] tracking-[-0.06em] text-white sm:text-[104px]">
-              Drop your startup materials.
+              Stop pitching blind.
             </div>
           </AnimatedGroup>
 
           <AnimatedGroup className="max-w-[980px]" delay={0.2}>
             <div className="instrument-serif text-[58px] leading-[0.9] tracking-[-0.06em] text-zinc-400 sm:text-[98px]">
-              Find where to apply.
+              Start applying where you actually fit.
             </div>
           </AnimatedGroup>
 
-          <AnimatedGroup className="max-w-[980px]" delay={0.28}>
-            <div className="instrument-serif text-[56px] leading-[0.9] tracking-[-0.06em] text-zinc-600 sm:text-[92px]">
-              Draft faster.
-            </div>
-          </AnimatedGroup>
-
-          <AnimatedGroup className="mt-5 max-w-2xl" delay={0.36}>
+          <AnimatedGroup className="mt-5 max-w-2xl" delay={0.28}>
             <p className="text-[18px] leading-8 text-zinc-400">
-              Upload whatever you have. We read it, match you to programs that actually fit, and
-              write your applications — tailored to what each program is really looking for.
+              Drop in your deck, URL, or notes. Fundme.ai matches you to the right programs,
+              drafts tailored applications for each one, and keeps everything in one place.
             </p>
           </AnimatedGroup>
 
-          <AnimatedGroup className="mt-8 w-full max-w-[860px]" delay={0.44}>
+          <AnimatedGroup className="mt-8 w-full max-w-[860px]" delay={0.36}>
             <form
               className="liquid-glass mx-auto flex w-full overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a]/95"
               onSubmit={(event) => {
@@ -386,7 +368,7 @@ export default function LandingPage() {
               <motion.input
                 className="h-16 flex-1 border-0 bg-transparent px-5 text-[15px] text-white outline-none placeholder:text-zinc-500 focus:ring-2 focus:ring-cyan-500/40"
                 onChange={(event) => setStartupLine(event.target.value)}
-                placeholder="What are you building? One line is enough to start."
+                placeholder="What are you building?"
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 value={startupLine}
                 whileFocus={{ scale: 1.01 }}
@@ -400,13 +382,13 @@ export default function LandingPage() {
               </motion.button>
             </form>
             <div className="mt-3 text-center text-sm text-zinc-500">
-              Free · No card needed · First draft in 3 min
+              Free to start · No card needed · Drafts in minutes
             </div>
           </AnimatedGroup>
 
-          <AnimatedGroup className="mt-6" delay={0.52}>
+          <AnimatedGroup className="mt-6" delay={0.44}>
             <div className="text-xs text-zinc-600">
-              Matching founders for YC, Antler, Google, AWS, Anthropic, and more.
+              For founders applying to accelerators, fellowships, incubators, and startup programs.
             </div>
           </AnimatedGroup>
         </div>
@@ -417,9 +399,13 @@ export default function LandingPage() {
           <section className="border-t border-zinc-900 py-24" id="how-it-works">
             <div className="mx-auto max-w-[1040px]">
               <div className="text-center">
+                <div className="text-[12px] uppercase tracking-[0.2em] text-cyan-500">How it works</div>
                 <h2 className="text-[42px] font-semibold leading-none tracking-[-0.05em] text-white">
-                  From messy notes to matched applications.
+                  From startup material to matched applications.
                 </h2>
+                <p className="mx-auto mt-4 max-w-[760px] text-[15px] leading-7 text-zinc-400">
+                  No long intake form. No rewriting the same company over and over. Just upload what you already have.
+                </p>
               </div>
 
               <div className="relative mt-14 grid gap-5 md:grid-cols-3">
@@ -446,15 +432,43 @@ export default function LandingPage() {
         </AnimatedGroup>
 
         <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.1}>
+          <section className="border-t border-zinc-900 py-24">
+            <div className="mx-auto max-w-[1040px]">
+              <div className="text-center">
+                <h2 className="text-[42px] font-semibold leading-none tracking-[-0.05em] text-white">
+                  What founders get.
+                </h2>
+                <p className="mx-auto mt-4 max-w-[620px] text-[15px] leading-7 text-zinc-400">
+                  Less rewriting. Better fit. Faster applications.
+                </p>
+              </div>
+
+              <div className="mt-12 grid gap-5 md:grid-cols-3">
+                {founderOutcomes.map((item, index) => (
+                  <AnimatedGroup className="relative" delay={index * 0.12} key={item.title}>
+                    <div className="rounded-xl border border-zinc-900 bg-[#0a0a0a] p-6">
+                      <item.icon className="size-5 text-zinc-300" />
+                      <div className="mt-6 text-[22px] font-semibold tracking-[-0.03em] text-white">
+                        {item.title}
+                      </div>
+                      <div className="mt-3 text-sm leading-relaxed text-zinc-400">{item.body}</div>
+                    </div>
+                  </AnimatedGroup>
+                ))}
+              </div>
+            </div>
+          </section>
+        </AnimatedGroup>
+
+        <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.1}>
           <section className="border-t border-zinc-900 py-24" id="top-opportunities">
             <div className="mx-auto max-w-[1040px]">
               <div className="text-[12px] uppercase tracking-[0.2em] text-cyan-500">Curated selection</div>
               <h2 className="mt-4 text-[42px] font-semibold leading-none tracking-[-0.05em] text-white">
-                Programs worth your time right now.
+                Programs worth your time.
               </h2>
               <p className="mt-4 max-w-[620px] text-[15px] leading-7 text-zinc-400">
-                Curated. Ranked. Updated weekly. Includes free credits from AWS, Anthropic, and
-                Microsoft.
+                Ranked by fit, not buried in a directory.
               </p>
 
               <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -504,53 +518,13 @@ export default function LandingPage() {
           </section>
         </AnimatedGroup>
 
-        <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.12}>
-          <section className="border-t border-zinc-900 py-24">
-            <div className="mx-auto max-w-[1040px]">
-              <h2 className="text-center text-[42px] font-semibold leading-none tracking-[-0.05em] text-white">
-                Founders shipping faster
-              </h2>
-
-              <div className="mt-12 space-y-4 overflow-hidden">
-                {[topRow, bottomRow].map((row, rowIndex) => (
-                  <div className="group overflow-hidden" key={rowIndex}>
-                    <div
-                      className={`testimonial-track flex min-w-max gap-4 ${
-                        rowIndex === 1 ? "testimonial-track-reverse" : ""
-                      } group-hover:[animation-play-state:paused]`}
-                    >
-                      {[...row, ...row, ...row].map((item, index) => (
-                        <div
-                          className="w-[320px] rounded-[22px] border border-zinc-900 bg-[#0a0a0a] p-5"
-                          key={`${item.name}-${index}`}
-                        >
-                          <div className="flex items-center gap-1 text-amber-400">
-                            {Array.from({ length: 5 }).map((_, starIndex) => (
-                              <Star className="size-3.5 fill-current" key={starIndex} />
-                            ))}
-                          </div>
-                          <p className="mt-4 text-[14px] leading-7 text-zinc-300">{item.quote}</p>
-                          <div className="mt-6">
-                            <div className="text-[14px] font-medium text-white">{item.name}</div>
-                            <div className="mt-1 text-[12px] text-zinc-500">{item.role}</div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-        </AnimatedGroup>
-
         <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.14}>
           <section className="border-t border-zinc-900 py-14">
             <div className="mx-auto grid max-w-[1040px] gap-6 md:grid-cols-3">
               {[
-                { value: "50+", label: "programs tracked" },
-                { value: "< 3 min", label: "to first draft" },
-                { value: "12 cities", label: "used by founders" },
+                { value: "1 upload", label: "to unlock your application base" },
+                { value: "50+", label: "programs tracked and ranked" },
+                { value: "1 place", label: "for every draft and deadline" },
               ].map((item, index) => (
                 <div
                   className={`px-4 text-center ${index < 2 ? "md:border-r md:border-zinc-800" : ""}`}
@@ -567,11 +541,11 @@ export default function LandingPage() {
         <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.16}>
           <section className="border-t border-zinc-900 py-24 text-center" id="final-cta">
             <div className="mx-auto max-w-[760px]">
-              <h2 className="text-[52px] font-semibold leading-none tracking-[-0.05em] text-white">
-                Your story deserves the right room.
+              <h2 className="instrument-serif text-[52px] italic leading-none tracking-[-0.05em] text-white">
+                One startup. Many applications.
               </h2>
               <p className="mt-5 text-[18px] leading-8 text-zinc-400">
-                Stop rewriting. Start applying.
+                Upload once. Match faster. Draft smarter.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <button
@@ -623,7 +597,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-12 flex flex-col justify-between gap-3 border-t border-zinc-800 pt-6 text-xs text-zinc-500 md:flex-row">
-            <div>© 2026 Fundme.ai. All rights reserved.</div>
+            <div>© 2026 Fundme.ai</div>
             <div>Built for VibeCon 2026 · Bengaluru</div>
           </div>
         </footer>
@@ -641,7 +615,7 @@ export default function LandingPage() {
               Sign in to continue
             </div>
             <div className="mt-2 text-[14px] leading-7 text-zinc-400">
-              Your startup materials stay private.
+              Your material stays private and editable.
             </div>
 
             <Button className="mt-8 w-full justify-center" onClick={completeAuth} size="lg">
@@ -697,31 +671,6 @@ export default function LandingPage() {
           </motion.div>
         </div>
       ) : null}
-
-      <style jsx global>{`
-        .testimonial-track {
-          animation: landing-marquee-left 28s linear infinite;
-        }
-        .testimonial-track-reverse {
-          animation-name: landing-marquee-right;
-        }
-        @keyframes landing-marquee-left {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-33.333%);
-          }
-        }
-        @keyframes landing-marquee-right {
-          from {
-            transform: translateX(-33.333%);
-          }
-          to {
-            transform: translateX(0);
-          }
-        }
-      `}</style>
     </main>
   );
 }

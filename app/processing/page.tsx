@@ -64,8 +64,11 @@ export default function ProcessingPage() {
         <div className="w-full max-w-[760px] text-center">
           <div className="text-[12px] text-zinc-500">Flowstate AI</div>
           <motion.h1 animate={{ opacity: 1, y: 0 }} className="fade-rise playfair-display mt-4 text-[52px] tracking-[-0.05em] sm:text-[62px]" initial={{ opacity: 0, y: 14 }}>
-            Finding where you belong...
+            Finding your best matches...
           </motion.h1>
+          <p className="mt-4 text-[15px] leading-7 text-zinc-500">
+            Turning your startup into an application-ready profile
+          </p>
 
           <div className="liquid-glass mx-auto mt-10 w-full max-w-[620px] rounded-[24px] p-6 text-left sm:p-7">
             <div className="flex flex-col gap-3">

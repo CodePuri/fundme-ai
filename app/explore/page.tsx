@@ -35,7 +35,7 @@ export default function ExplorePage() {
           All Programs
         </h1>
         <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-zinc-500">
-          Every accelerator, fellowship, and credit program we track.
+          Every accelerator, fellowship, and startup program we track. Filter by what matters.
         </p>
       </div>
 

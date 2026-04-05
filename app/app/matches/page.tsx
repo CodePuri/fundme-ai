@@ -76,9 +76,9 @@ export function MatchesContent() {
         <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
           Your Matches
         </h1>
-        <div className="playfair-display mt-3 text-[36px] leading-none tracking-[-0.04em] text-zinc-300">
-          Ranked by narrative strength and fit.
-        </div>
+        <p className="mt-4 max-w-[820px] text-[14px] leading-7 text-zinc-500">
+          Ranked by fit, timing, and narrative strength. Open any program to review your match and start drafting.
+        </p>
       </div>
 
       <Panel className="rounded-[18px] bg-[#0c0c0d] p-7 md:p-8">
@@ -101,7 +101,11 @@ export function MatchesContent() {
                 </div>
               </div>
             </div>
-            <PanelDescription className="mt-6 max-w-[700px]">{hero.why}</PanelDescription>
+            <PanelDescription className="mt-6 max-w-[700px]">
+              {hero.slug === "yc-w26"
+                ? "Clear founder-market fit, a sharp wedge, and enough early signal to make the story land fast."
+                : hero.why}
+            </PanelDescription>
           </div>
           <ScoreBlock score={hero.fitScore} signals={hero.signals} />
         </PanelHeader>
