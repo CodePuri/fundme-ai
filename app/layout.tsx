@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-[family-name:var(--font-sans)]">
         <DemoProvider>
           {children}
-          <Toaster position="top-right" richColors theme="dark" />
+          <Toaster position="top-right" theme="dark" />
         </DemoProvider>
       </body>
     </html>

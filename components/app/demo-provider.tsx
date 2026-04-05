@@ -35,6 +35,12 @@ type DemoState = {
   emailUpdatesApplied: boolean;
   selectedFiles: string[];
   lastSyncAt: string;
+  onboardingCompleted: boolean;
+  resumeBannerDismissed: boolean;
+  gmailConnectClicked: boolean;
+  gmailApplyClicked: boolean;
+  trackerNotificationVisible: boolean;
+  manualTrackerPrograms: Opportunity[];
 };
 
 type DemoContextValue = {
@@ -45,6 +51,15 @@ type DemoContextValue = {
     notes: string;
     files: string[];
   }) => void;
+  completeOnboarding: (payload: {
+    founderName: string;
+    founderRole: string;
+    notes: string;
+    files: string[];
+  }) => void;
+  dismissResumeBanner: () => void;
+  markTrackerVisited: () => void;
+  startNewIdea: () => void;
   updateStartupField: (field: keyof StartupProfile, value: string) => void;
   updateFounderField: (field: keyof FounderProfile, value: string | string[]) => void;
   cycleAnswerVariant: (questionId: string) => void;
@@ -53,26 +68,64 @@ type DemoContextValue = {
   updateOpportunityStatus: (slug: string, status: ProgramStatus) => void;
   connectGmail: () => void;
   applyEmailUpdates: () => void;
+  addTrackerProgram: (program: Opportunity) => void;
 };
 
-const STORAGE_KEY = "fundme-ai-demo-v1";
+const STORAGE_KEY = "fundme-ai-demo-v2";
+export const ONBOARDING_STEP_KEY = "onboardingStep";
+export const ONBOARDING_DRAFT_KEY = "onboardingDraft";
 
 const defaultState: DemoState = {
   isAuthenticated: false,
   gmailConnected: false,
-  uploadSourceUrl: "https://flowstate.ai",
+  uploadSourceUrl: "",
   founderNotes:
-    "Built after years of margin erosion in agency delivery. Focus on detecting scope drift from real communication and making recovery operationally easy.",
+    "We have 3 agencies in pilot. They're averaging $2,400/month in recovered revenue within the first 30 days.",
   startupProfile: defaultStartupProfile,
   founderProfile: defaultFounderProfile,
   opportunities: defaultOpportunities,
   ycQuestions,
   emailUpdatesApplied: false,
   selectedFiles: defaultStartupProfile.uploadedAssets,
-  lastSyncAt: "2026-04-04T16:05:00.000Z",
+  lastSyncAt: "2026-04-05T13:08:00.000Z",
+  onboardingCompleted: false,
+  resumeBannerDismissed: false,
+  gmailConnectClicked: false,
+  gmailApplyClicked: false,
+  trackerNotificationVisible: false,
+  manualTrackerPrograms: [],
 };
 
 const DemoContext = createContext<DemoContextValue | null>(null);
+
+function hydrateState(saved: Partial<DemoState>): DemoState {
+  const mergedOpportunities = defaultState.opportunities.map((opportunity) => {
+    const savedMatch = saved.opportunities?.find((item) => item.slug === opportunity.slug);
+    return savedMatch ? { ...opportunity, ...savedMatch } : opportunity;
+  });
+
+  const mergedQuestions = defaultState.ycQuestions.map((question) => {
+    const savedMatch = saved.ycQuestions?.find((item) => item.id === question.id);
+    return savedMatch ? { ...question, ...savedMatch } : question;
+  });
+
+  return {
+    ...defaultState,
+    ...saved,
+    startupProfile: {
+      ...defaultState.startupProfile,
+      ...saved.startupProfile,
+    },
+    founderProfile: {
+      ...defaultState.founderProfile,
+      ...saved.founderProfile,
+    },
+    opportunities: mergedOpportunities,
+    ycQuestions: mergedQuestions,
+    selectedFiles: saved.selectedFiles?.length ? saved.selectedFiles : defaultState.selectedFiles,
+    manualTrackerPrograms: saved.manualTrackerPrograms ?? [],
+  };
+}
 
 function updateBySlug(
   opportunities: Opportunity[],
@@ -94,7 +147,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      return JSON.parse(saved) as DemoState;
+      return hydrateState(JSON.parse(saved) as Partial<DemoState>);
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
       return defaultState;
@@ -104,6 +157,20 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }, [state]);
+
+  useEffect(() => {
+    function handleDemoReset(event: KeyboardEvent) {
+      if (event.shiftKey && event.key.toLowerCase() === "r") {
+        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        window.location.href = "/";
+      }
+    }
+
+    window.addEventListener("keydown", handleDemoReset);
+    return () => window.removeEventListener("keydown", handleDemoReset);
+  }, []);
 
   const value = useMemo<DemoContextValue>(
     () => ({
@@ -128,6 +195,52 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             uploadedAssets: files.length > 0 ? files : current.startupProfile.uploadedAssets,
           },
           lastSyncAt: new Date().toISOString(),
+        }));
+      },
+      completeOnboarding: ({ founderName, founderRole, notes, files }) => {
+        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        setState((current) => ({
+          ...current,
+          isAuthenticated: true,
+          onboardingCompleted: true,
+          resumeBannerDismissed: false,
+          founderNotes: notes,
+          selectedFiles: files,
+          startupProfile: {
+            ...current.startupProfile,
+            uploadedAssets: files,
+          },
+          founderProfile: {
+            ...current.founderProfile,
+            name: founderName,
+            role: founderRole,
+          },
+          lastSyncAt: new Date().toISOString(),
+        }));
+      },
+      dismissResumeBanner: () => {
+        setState((current) => ({
+          ...current,
+          resumeBannerDismissed: true,
+        }));
+      },
+      markTrackerVisited: () => {
+        setState((current) =>
+          current.trackerNotificationVisible
+            ? {
+                ...current,
+                trackerNotificationVisible: false,
+              }
+            : current,
+        );
+      },
+      startNewIdea: () => {
+        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        setState((current) => ({
+          ...current,
+          resumeBannerDismissed: false,
         }));
       },
       updateStartupField: (field, value) => {
@@ -164,7 +277,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
             };
           }),
         }));
-        toast.success("Generated a sharper draft variant.");
+        toast.success("Fundme rewrote this answer with a sharper YC angle.");
       },
       saveAnswer: (questionId, answer) => {
         setState((current) => ({
@@ -181,8 +294,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         }));
       },
       markReady: (questionId) => {
-        setState((current) => {
-          const updatedQuestions = current.ycQuestions.map((item) =>
+        setState((current) => ({
+          ...current,
+          ycQuestions: current.ycQuestions.map((item) =>
             item.id === questionId
               ? {
                   ...item,
@@ -190,18 +304,9 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
                   lastSaved: new Date().toISOString(),
                 }
               : item,
-          );
-
-          return {
-            ...current,
-            ycQuestions: updatedQuestions,
-            opportunities: updateBySlug(current.opportunities, "yc-w26", (item) => ({
-              ...item,
-              status: "Ready",
-            })),
-          };
-        });
-        toast.success("Question marked ready.");
+          ),
+        }));
+        toast.success("This answer is marked ready for founder review.");
       },
       updateOpportunityStatus: (slug, status) => {
         setState((current) => ({
@@ -217,21 +322,48 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         setState((current) => ({
           ...current,
           gmailConnected: true,
+          gmailConnectClicked: true,
+          trackerNotificationVisible: current.gmailApplyClicked ? true : current.trackerNotificationVisible,
           lastSyncAt: new Date().toISOString(),
         }));
-        toast.success("Gmail connected. 2 funding emails detected.");
+        toast.success("Gmail connected. Fundme found 2 application updates.");
       },
       applyEmailUpdates: () => {
         setState((current) => ({
           ...current,
           emailUpdatesApplied: true,
+          gmailApplyClicked: true,
+          trackerNotificationVisible: current.gmailConnectClicked ? true : current.trackerNotificationVisible,
           opportunities: current.opportunities.map((item) => {
             const match = gmailEmails.find((email) => email.programSlug === item.slug);
             return match ? { ...item, status: match.suggestedStatus } : item;
           }),
           lastSyncAt: new Date().toISOString(),
         }));
-        toast.success("Tracker updated from Gmail signals.");
+        toast.success("Tracker updated from the latest inbox signals.");
+      },
+      addTrackerProgram: (program) => {
+        setState((current) => {
+          if (
+            current.manualTrackerPrograms.some((item) => item.slug === program.slug) ||
+            current.opportunities.some((item) => item.slug === program.slug && item.tracked)
+          ) {
+            return current;
+          }
+
+          return {
+            ...current,
+            manualTrackerPrograms: [
+              ...current.manualTrackerPrograms,
+              {
+                ...program,
+                status: "Drafting",
+                tracked: true,
+              },
+            ],
+          };
+        });
+        toast.success("Program added to your tracker.");
       },
     }),
     [state],

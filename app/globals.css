@@ -1,16 +1,20 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap");
 @import "tailwindcss";
 
 :root {
-  --background: #07090d;
-  --panel: #0f131a;
-  --panel-2: #131925;
-  --muted: #8e99ab;
-  --foreground: #f5f7fb;
-  --accent: #7dd3fc;
-  --accent-2: #22d3ee;
-  --line: rgba(255, 255, 255, 0.08);
-  --font-sans: "Avenir Next", "Segoe UI", "Helvetica Neue", sans-serif;
-  --font-display: "Avenir Next Condensed", "Franklin Gothic Medium", "Arial Narrow", sans-serif;
+  --bg: #050505;
+  --surface: #0c0c0d;
+  --surface-elevated: #121214;
+  --border: rgba(255, 255, 255, 0.07);
+  --text-primary: #f5f5f5;
+  --text-muted: #8f8f97;
+  --text-faint: #50505a;
+  --accent-green: #22c55e;
+  --accent-amber: #f59e0b;
+  --accent-blue: #60a5fa;
+  --font-sans: "Geist Sans", "Inter", sans-serif;
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-editorial: "Playfair Display", Georgia, serif;
 }
 
 * {
@@ -18,20 +22,20 @@
 }
 
 html {
-  background:
-    radial-gradient(circle at top, rgba(27, 73, 89, 0.28), transparent 24%),
-    linear-gradient(180deg, #091018 0%, #07090d 40%, #05070b 100%);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--text-primary);
   scroll-behavior: smooth;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  color: var(--foreground);
   background:
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 30%),
-    radial-gradient(circle at bottom left, rgba(34, 211, 238, 0.1), transparent 26%);
+    radial-gradient(circle at top center, rgba(255, 255, 255, 0.04), transparent 28%),
+    var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
 }
 
 a {
@@ -39,21 +43,101 @@ a {
   text-decoration: none;
 }
 
+button,
+input,
+textarea {
+  font: inherit;
+}
+
 ::selection {
-  background: rgba(125, 211, 252, 0.22);
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-primary);
 }
 
-.glass-panel {
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03));
-  backdrop-filter: blur(24px);
+:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.34);
+  outline-offset: 2px;
 }
 
-.grid-fade {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-position: center;
-  background-size: 44px 44px;
-  mask-image: radial-gradient(circle at center, black 35%, transparent 80%);
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 24px 80px rgba(0, 0, 0, 0.35);
+}
+
+.page-frame {
+  margin: 0 auto;
+  width: min(100%, 1440px);
+}
+
+.eyebrow {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.display-face {
+  font-family: var(--font-display);
+}
+
+.playfair-display {
+  font-family: var(--font-editorial);
+}
+
+.app-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  background: #080809;
+  color: var(--text-primary);
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.app-input::placeholder {
+  color: var(--text-faint);
+}
+
+.app-input:focus {
+  border-color: rgba(255, 255, 255, 0.16);
+  background: #101011;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+  outline: none;
+}
+
+@keyframes fade-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-rise {
+  animation: fade-rise 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

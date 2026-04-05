@@ -1,81 +1,140 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 import { PageShell } from "@/components/app/page-shell";
 import { useDemo } from "@/components/app/demo-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Panel, PanelBody, PanelDescription, PanelHeader, PanelTitle } from "@/components/ui/panel";
+import { ProgramLogo } from "@/components/ui/program-logo";
+import { StatusBadge, statusTone } from "@/components/ui/status-badge";
 
-function FitBar({ score }: { score: number }) {
+function scoreColor(score: number) {
+  if (score >= 80) return "#22c55e";
+  if (score >= 65) return "#f59e0b";
+  return "#71717a";
+}
+
+function AnimatedScore({ score }: { score: number }) {
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    const start = performance.now();
+    const duration = 1200;
+    let frame = 0;
+
+    function tick(now: number) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - (1 - progress) ** 3;
+      setDisplay(Math.round(score * eased));
+      if (progress < 1) frame = window.requestAnimationFrame(tick);
+    }
+
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [score]);
+
+  return <>{display}</>;
+}
+
+function ScoreBlock({ score, signals }: { score: number; signals: string[] }) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/8">
-      <motion.div
-        animate={{ width: `${score}%` }}
-        className="h-full rounded-full bg-gradient-to-r from-cyan-300 to-emerald-300"
-        initial={{ width: 0 }}
-        transition={{ duration: 0.9, ease: "easeOut" }}
-      />
+    <div
+      className="relative text-right"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div className="text-[52px] font-semibold tracking-[-0.04em]" style={{ color: scoreColor(score) }}>
+        <AnimatedScore score={score} />
+      </div>
+      {hovered ? (
+        <div className="absolute right-0 top-full z-10 mt-2 w-[260px] rounded-[12px] border border-zinc-800 bg-zinc-950 p-4 text-left shadow-2xl">
+          <div className="text-[12px] font-medium text-white">Why this score</div>
+          <ul className="mt-3 list-disc pl-4 text-[12px] leading-6 text-zinc-400">
+            {signals.slice(0, 3).map((signal) => (
+              <li key={signal}>{signal}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </div>
   );
 }
 
 export default function MatchesPage() {
   const { state } = useDemo();
-  const matches = [...state.opportunities].sort((a, b) => b.fitScore - a.fitScore);
+  const [hero, ...rest] = [...state.opportunities].sort((a, b) => b.fitScore - a.fitScore);
 
   return (
     <PageShell>
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <div className="text-xs uppercase tracking-[0.24em] text-white/35">Ranked matches</div>
-          <h1 className="mt-3 font-[family-name:var(--font-display)] text-4xl font-semibold">
-            Where Flowstate AI should apply next
-          </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-white/56">
-            Opportunities are ranked for speed, fit, and founder narrative strength. The YC path is
-            intentionally the hero route in this demo.
-          </p>
+      <div>
+        <div className="eyebrow">Your Matches</div>
+        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
+          Your Matches
+        </h1>
+        <div className="playfair-display mt-3 text-[36px] leading-none tracking-[-0.04em] text-zinc-300">
+          Ranked by narrative strength and fit.
         </div>
-        <Link href="/app/programs/yc-w26">
-          <Button>Open Y Combinator</Button>
-        </Link>
       </div>
 
-      <div className="grid gap-4">
-        {matches.map((item, index) => (
-          <motion.div
-            animate={{ opacity: 1, y: 0 }}
-            className="glass-panel rounded-[28px] p-6"
-            initial={{ opacity: 0, y: 16 }}
-            key={item.slug}
-            transition={{ delay: index * 0.05 }}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-4">
+      <Panel className="rounded-[18px] bg-[#0c0c0d] p-6">
+        <PanelHeader>
+          <div className="max-w-[780px]">
+            <div className="flex items-center gap-3">
+              <ProgramLogo domain={hero.domain} size={48} slug={hero.slug} />
               <div>
-                <div className="flex flex-wrap items-center gap-3">
-                  <div className="text-2xl font-semibold text-white">{item.name}</div>
-                  <Badge>{item.type}</Badge>
-                  <Badge>{item.category}</Badge>
-                  <Badge>{item.status}</Badge>
+                <div className="display-face text-[42px] leading-none tracking-[-0.04em] text-white">
+                  {hero.name}
                 </div>
-                <div className="mt-3 max-w-2xl text-sm leading-7 text-white/58">{item.why}</div>
-              </div>
-              <div className="min-w-36 text-right">
-                <div className="text-sm text-white/40">{item.fitLabel}</div>
-                <div className="mt-2 text-4xl font-semibold text-cyan-200">{item.fitScore}</div>
-                <div className="text-xs uppercase tracking-[0.22em] text-white/32">Fit score</div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge size="sm">{hero.type}</Badge>
+                  <StatusBadge className="text-[11px]" tone="green">
+                    Strong Match
+                  </StatusBadge>
+                  <StatusBadge className="text-[11px]" tone={statusTone(hero.status)}>
+                    {hero.status}
+                  </StatusBadge>
+                </div>
               </div>
             </div>
-            <FitBar score={item.fitScore} />
-            <div className="mt-5 flex flex-wrap items-center justify-between gap-4 text-sm text-white/48">
-              <div>Deadline {item.deadline}</div>
-              <Link href={`/app/programs/${item.slug}`}>
-                <Button variant="secondary">View program</Button>
-              </Link>
-            </div>
-          </motion.div>
+            <PanelDescription className="mt-6 max-w-[700px]">{hero.why}</PanelDescription>
+          </div>
+          <ScoreBlock score={hero.fitScore} signals={hero.signals} />
+        </PanelHeader>
+      </Panel>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        {rest.map((item) => (
+          <Panel key={item.slug}>
+            <PanelHeader>
+              <div className="flex items-start gap-3">
+                <ProgramLogo domain={item.domain} size={36} slug={item.slug} />
+                <div>
+                  <PanelTitle className="text-[24px]">{item.name}</PanelTitle>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <Badge size="sm">{item.type}</Badge>
+                    <StatusBadge className="text-[11px]" tone={statusTone(item.status)}>
+                      {item.status}
+                    </StatusBadge>
+                  </div>
+                </div>
+              </div>
+              <ScoreBlock score={item.fitScore} signals={item.signals} />
+            </PanelHeader>
+            <PanelBody>
+              <PanelDescription>{item.why}</PanelDescription>
+              <div className="mt-5 flex items-center justify-between gap-4 text-[13px] text-zinc-500">
+                <span>{item.deadline}</span>
+                <Link href={`/app/programs/${item.slug}`}>
+                  <Button variant="ghost">View</Button>
+                </Link>
+              </div>
+            </PanelBody>
+          </Panel>
         ))}
       </div>
     </PageShell>
