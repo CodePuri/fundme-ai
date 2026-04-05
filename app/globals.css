@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Geist+Sans:wght@400;500;600;700&family=Cormorant+Garamond:wght@500;600;700&family=Instrument+Serif:ital@0;1&family=Playfair+Display:ital,wght@0,700;1,700&display=swap");
 @import "tailwindcss";
 
 :root {
@@ -15,6 +15,7 @@
   --font-sans: "Geist Sans", "Inter", sans-serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-editorial: "Playfair Display", Georgia, serif;
+  --font-instrument: "Instrument Serif", Georgia, serif;
 }
 
 * {
@@ -88,6 +89,10 @@ textarea {
 
 .playfair-display {
   font-family: var(--font-editorial);
+}
+
+.instrument-serif {
+  font-family: var(--font-instrument);
 }
 
 .app-input {

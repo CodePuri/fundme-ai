@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Compass,
   FileText,
   Menu,
   Sparkles,
@@ -16,6 +15,7 @@ import { motion, useInView } from "framer-motion";
 
 import { useDemo } from "@/components/app/demo-provider";
 import { Button } from "@/components/ui/button";
+import { BrandLockup } from "@/components/ui/brand-lockup";
 import { LogoImage } from "@/components/ui/logo-image";
 
 const motionTransition = {
@@ -171,15 +171,6 @@ function AnimatedGroup({
   );
 }
 
-function BrandMark() {
-  return (
-    <div className="flex items-center gap-3">
-      <Compass className="size-5 text-cyan-500" />
-      <span className="text-[15px] font-semibold tracking-[-0.02em] text-white">Fundme.ai</span>
-    </div>
-  );
-}
-
 function HeroHeader({ onOpenAuth }: { onOpenAuth: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -202,7 +193,7 @@ function HeroHeader({ onOpenAuth }: { onOpenAuth: () => void }) {
       >
         <div className="page-frame flex items-center justify-between gap-4 px-4 py-4 sm:px-6 xl:px-8">
           <Link href="/">
-            <BrandMark />
+            <BrandLockup />
           </Link>
 
           <nav className="hidden items-center gap-8 md:flex">
@@ -348,7 +339,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-x-0 top-0 h-[540px] overflow-hidden [mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,transparent_70%)]">
-            <div className="absolute inset-0 blur-[10px] opacity-30 [background-image:repeating-linear-gradient(120deg,transparent_0%,transparent_8%,rgba(59,130,246,0.18)_10%,rgba(165,180,252,0.14)_15%,rgba(221,214,254,0.12)_20%,transparent_26%)]" />
+            <div className="absolute left-1/2 top-[-120px] h-[420px] w-[720px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[90px]" />
           </div>
         </div>
 
@@ -360,20 +351,31 @@ export default function LandingPage() {
           </AnimatedGroup>
 
           <AnimatedGroup className="mt-8" delay={0.12}>
-            <div className="playfair-display text-[60px] font-bold leading-[0.92] tracking-[-0.06em] sm:text-[88px]">
-              <div className="text-white">The room is full of the right founders.</div>
-              <div className="text-zinc-400">Make sure you&apos;re one of them.</div>
+            <div className="instrument-serif text-[62px] leading-[0.9] tracking-[-0.06em] text-white sm:text-[104px]">
+              Drop your startup materials.
             </div>
           </AnimatedGroup>
 
-          <AnimatedGroup className="mt-5 max-w-2xl" delay={0.2}>
+          <AnimatedGroup className="max-w-[980px]" delay={0.2}>
+            <div className="instrument-serif text-[58px] leading-[0.9] tracking-[-0.06em] text-zinc-400 sm:text-[98px]">
+              Find where to apply.
+            </div>
+          </AnimatedGroup>
+
+          <AnimatedGroup className="max-w-[980px]" delay={0.28}>
+            <div className="instrument-serif text-[56px] leading-[0.9] tracking-[-0.06em] text-zinc-600 sm:text-[92px]">
+              Draft faster.
+            </div>
+          </AnimatedGroup>
+
+          <AnimatedGroup className="mt-5 max-w-2xl" delay={0.36}>
             <p className="text-[18px] leading-8 text-zinc-400">
               Upload whatever you have. We read it, match you to programs that actually fit, and
               write your applications — tailored to what each program is really looking for.
             </p>
           </AnimatedGroup>
 
-          <AnimatedGroup className="mt-8 w-full max-w-[860px]" delay={0.28}>
+          <AnimatedGroup className="mt-8 w-full max-w-[860px]" delay={0.44}>
             <form
               className="liquid-glass mx-auto flex w-full overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a]/95"
               onSubmit={(event) => {
@@ -402,7 +404,7 @@ export default function LandingPage() {
             </div>
           </AnimatedGroup>
 
-          <AnimatedGroup className="mt-6" delay={0.36}>
+          <AnimatedGroup className="mt-6" delay={0.52}>
             <div className="text-xs text-zinc-600">
               Matching founders for YC, Antler, Google, AWS, Anthropic, and more.
             </div>
@@ -563,53 +565,6 @@ export default function LandingPage() {
         </AnimatedGroup>
 
         <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.16}>
-          <section className="border-t border-zinc-900 py-24">
-            <div className="mx-auto max-w-3xl">
-              <div className="grid gap-4 md:grid-cols-2">
-                <div className="rounded-xl border border-zinc-800 bg-[#0a0a0a] p-8">
-                  <div className="text-[34px] font-semibold tracking-[-0.04em] text-white">$0 forever</div>
-                  <div className="mt-4 space-y-3 text-[14px] text-zinc-400">
-                    <div>3 matches</div>
-                    <div>1 draft</div>
-                    <div>Basic profile</div>
-                    <div>Community support</div>
-                  </div>
-                  <button
-                    className="mt-8 rounded-full border border-zinc-800 px-5 py-3 text-[14px] text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
-                    onClick={() => setOpen(true)}
-                    type="button"
-                  >
-                    Start free →
-                  </button>
-                </div>
-
-                <div className="rounded-xl border border-cyan-500/50 bg-[#0a0a0a] p-8">
-                  <div className="mb-4 inline-flex rounded-full bg-cyan-500 px-3 py-1 text-[11px] font-medium text-black">
-                    Most popular
-                  </div>
-                  <div className="text-[34px] font-semibold tracking-[-0.04em] text-white">$29/month</div>
-                  <div className="mt-4 space-y-3 text-[14px] text-zinc-400">
-                    <div>Unlimited matches</div>
-                    <div>Unlimited drafts</div>
-                    <div>Full profile</div>
-                    <div>Gmail sync</div>
-                    <div>PDF export</div>
-                    <div>Priority support</div>
-                  </div>
-                  <button
-                    className="mt-8 rounded-full bg-white px-5 py-3 text-[14px] font-medium text-black transition-colors hover:bg-zinc-100"
-                    onClick={() => setOpen(true)}
-                    type="button"
-                  >
-                    Get started →
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </AnimatedGroup>
-
-        <AnimatedGroup className="mx-auto max-w-[1120px]" delay={0.18}>
           <section className="border-t border-zinc-900 py-24 text-center" id="final-cta">
             <div className="mx-auto max-w-[760px]">
               <h2 className="text-[52px] font-semibold leading-none tracking-[-0.05em] text-white">
@@ -640,7 +595,7 @@ export default function LandingPage() {
         <footer className="mx-auto max-w-[1120px] border-t border-zinc-800 bg-black px-8 py-16">
           <div className="grid gap-10 md:grid-cols-[1.3fr_1fr_1fr_1fr]">
             <div>
-              <BrandMark />
+              <BrandLockup />
               <p className="mt-5 max-w-[260px] text-[14px] leading-7 text-zinc-500">
                 The application layer for ambitious founders.
               </p>
@@ -661,7 +616,7 @@ export default function LandingPage() {
               title="Resources"
             />
             <FooterColumn
-              links={["About", "Pricing", "Privacy", "Terms", "Contact"]}
+              links={["About", "Privacy", "Terms", "Contact", "Support"]}
               onOpenAuth={() => setOpen(true)}
               title="Company"
             />
@@ -681,7 +636,7 @@ export default function LandingPage() {
             className="liquid-glass w-full max-w-[400px] rounded-xl p-6"
             initial={{ opacity: 0, scale: 0.96 }}
           >
-            <Compass className="size-6 text-cyan-500" />
+            <BrandLockup iconClassName="size-9" wordmarkClassName="text-[16px]" />
             <div className="mt-5 text-[24px] font-semibold tracking-[-0.03em] text-white">
               Sign in to continue
             </div>

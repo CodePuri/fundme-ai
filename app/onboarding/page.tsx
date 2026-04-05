@@ -216,7 +216,9 @@ export default function OnboardingPage() {
               <div className="eyebrow">What are you building?</div>
               <button
                 className={`relative flex size-20 items-center justify-center rounded-full border ${
-                  listening ? "border-white bg-white text-black" : "border-zinc-800 bg-zinc-950 text-white"
+                  listening
+                    ? "border-white bg-white text-black shadow-[0_0_0_10px_rgba(255,255,255,0.05)]"
+                    : "border-zinc-700 bg-zinc-950 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)]"
                 }`}
                 onClick={handleListen}
                 type="button"
@@ -232,7 +234,7 @@ export default function OnboardingPage() {
                     ))}
                   </div>
                 ) : null}
-                <Mic className="relative z-10 size-8" />
+                <Mic className="relative z-10 size-9" />
               </button>
               <div className="mt-6 text-[28px] font-semibold tracking-[-0.03em]">
                 Tap to speak — just describe it naturally

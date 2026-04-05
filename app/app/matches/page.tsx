@@ -65,7 +65,7 @@ function ScoreBlock({ score, signals }: { score: number; signals: string[] }) {
   );
 }
 
-export default function MatchesPage() {
+export function MatchesContent() {
   const { state } = useDemo();
   const [hero, ...rest] = [...state.opportunities].sort((a, b) => b.fitScore - a.fitScore);
 
@@ -81,7 +81,7 @@ export default function MatchesPage() {
         </div>
       </div>
 
-      <Panel className="rounded-[18px] bg-[#0c0c0d] p-6">
+      <Panel className="rounded-[18px] bg-[#0c0c0d] p-7 md:p-8">
         <PanelHeader>
           <div className="max-w-[780px]">
             <div className="flex items-center gap-3">
@@ -139,4 +139,8 @@ export default function MatchesPage() {
       </div>
     </PageShell>
   );
+}
+
+export default function MatchesPage() {
+  return <MatchesContent />;
 }

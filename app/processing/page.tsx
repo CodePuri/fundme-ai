@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { LoaderCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -17,7 +16,6 @@ const steps = [
 ];
 
 export default function ProcessingPage() {
-  const router = useRouter();
   const [elapsed, setElapsed] = useState(0);
 
   useEffect(() => {
@@ -26,7 +24,6 @@ export default function ProcessingPage() {
         const next = current + 100;
         if (next >= 5000) {
           window.clearInterval(timer);
-          router.push("/matches");
           return 5000;
         }
         return next;
@@ -34,7 +31,15 @@ export default function ProcessingPage() {
     }, 100);
 
     return () => window.clearInterval(timer);
-  }, [router]);
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      window.location.assign("/matches");
+    }, 5500);
+
+    return () => window.clearTimeout(timeout);
+  }, []);
 
   const activeIndex = useMemo(() => Math.min(steps.length - 1, Math.floor(elapsed / 1200)), [elapsed]);
 
@@ -56,13 +61,13 @@ export default function ProcessingPage() {
       </div>
 
       <div className="flex min-h-[calc(100vh-74px)] items-center justify-center px-4">
-        <div className="w-full max-w-[720px] text-center">
+        <div className="w-full max-w-[760px] text-center">
           <div className="text-[12px] text-zinc-500">Flowstate AI</div>
           <motion.h1 animate={{ opacity: 1, y: 0 }} className="fade-rise playfair-display mt-4 text-[52px] tracking-[-0.05em] sm:text-[62px]" initial={{ opacity: 0, y: 14 }}>
             Finding where you belong...
           </motion.h1>
 
-          <div className="liquid-glass mx-auto mt-10 min-w-[480px] rounded-[20px] p-5 text-left">
+          <div className="liquid-glass mx-auto mt-10 w-full max-w-[620px] rounded-[24px] p-6 text-left sm:p-7">
             <div className="flex flex-col gap-3">
               {steps.map((step, index) => {
                 const done = index < activeIndex || (elapsed >= 5000 && index === steps.length - 1);

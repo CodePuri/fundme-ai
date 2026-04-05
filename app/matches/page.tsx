@@ -1,5 +1,10 @@
-import { redirect } from "next/navigation";
+import { DashboardFrame } from "@/components/app/dashboard-frame";
+import { MatchesContent } from "@/app/app/matches/page";
 
 export default function MatchesRedirectPage() {
-  redirect("/app/matches");
+  return (
+    <DashboardFrame>
+      <MatchesContent />
+    </DashboardFrame>
+  );
 }

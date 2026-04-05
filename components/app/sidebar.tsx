@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { useDemo } from "@/components/app/demo-provider";
+import { BrandLockup } from "@/components/ui/brand-lockup";
 import { cn } from "@/lib/utils";
 
 type SidebarItem = {
@@ -59,8 +60,7 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-zinc-900 bg-black px-4 py-5 lg:flex">
       <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2" href="/">
-        <Compass className="size-5 text-cyan-500" />
-        <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">Fundme.ai</div>
+        <BrandLockup />
       </Link>
 
       <div className="mt-8 flex flex-col gap-6">
@@ -76,9 +76,9 @@ export function Sidebar() {
                 return (
                   <button
                     className={cn(
-                      "flex w-full items-center justify-between border-l-2 border-transparent px-3 py-2 text-[13px] text-zinc-500 transition-colors",
+                      "flex w-full items-center justify-between rounded-r-xl border-l-2 border-transparent px-3 py-2.5 text-[13px] text-zinc-500 transition-colors",
                       "hover:bg-zinc-950 hover:text-white",
-                      active && "border-l-white bg-zinc-950 text-white",
+                      active && "border-l-white bg-zinc-950 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]",
                     )}
                     key={href}
                     onClick={() => {
