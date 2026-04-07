@@ -60,7 +60,7 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-zinc-900 bg-black px-4 py-5 lg:flex">
       <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2" href="/">
-        <BrandLockup />
+        <BrandLockup surface="plate" />
       </Link>
 
       <div className="mt-8 flex flex-col gap-6">
