@@ -1,3 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024">
-  <image href="/fundme-logo.png" width="1536" height="1024" preserveAspectRatio="xMidYMid meet" />
+  <rect width="1536" height="1024" rx="140" fill="#ffffff" />
+  <image href="/fundme-logo.png" x="96" y="124" width="1344" height="776" preserveAspectRatio="xMidYMid meet" />
 </svg>
