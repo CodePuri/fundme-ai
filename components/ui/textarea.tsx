@@ -9,7 +9,7 @@ export function Textarea({
   return (
     <textarea
       className={cn(
-        "app-input min-h-32 rounded-[6px] px-3.5 py-3 text-sm leading-6",
+        "app-input min-h-32 rounded-[10px] px-3.5 py-3 text-sm leading-6",
         className,
       )}
       {...props}

@@ -147,18 +147,18 @@ export default function OnboardingPage() {
   }
 
   if (!hasHydrated) {
-    return <main className="min-h-screen bg-[#171513]" />;
+    return <main className="min-h-screen bg-[var(--bg)]" />;
   }
 
   return (
-    <main className="min-h-screen bg-[#171513] text-white">
+    <main className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]" data-theme="app">
       <TopNavbar />
 
       <div className="page-frame flex min-h-[calc(100vh-72px)] flex-col px-4 py-6 sm:px-6">
         {step > 1 ? (
           <div className="mb-6 flex flex-col gap-3">
             <button
-              className="w-fit text-[13px] text-zinc-500 hover:text-white"
+              className="w-fit text-[13px] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               onClick={() => setStep((current) => Math.max(1, current - 1))}
               type="button"
             >
@@ -179,7 +179,7 @@ export default function OnboardingPage() {
         <div className="flex justify-center gap-2 pb-8">
           {[1, 2, 3, 4].map((dot) => (
             <span
-              className={`size-2 rounded-full ${dot === step ? "bg-white" : dot < step ? "bg-zinc-500" : "bg-zinc-800"}`}
+              className={`size-2 rounded-full ${dot === step ? "bg-[var(--text-primary)]" : dot < step ? "bg-[var(--text-muted)]" : "bg-[var(--border-strong)]"}`}
               key={dot}
             />
           ))}
@@ -187,9 +187,9 @@ export default function OnboardingPage() {
 
         <div className="mx-auto flex w-full max-w-[880px] flex-1 items-center justify-center">
           {step === 1 ? (
-            <Panel className="w-full max-w-[620px] border-zinc-800 bg-black">
+            <Panel className="w-full max-w-[620px]">
               <PanelHeader className="block">
-                <PanelTitle className="text-[42px] tracking-[-0.04em] text-white">Let&apos;s build your profile.</PanelTitle>
+                <PanelTitle className="text-[42px] tracking-[-0.04em]">Let&apos;s build your profile.</PanelTitle>
               </PanelHeader>
               <PanelBody className="grid gap-5">
                 <Field>
@@ -216,8 +216,8 @@ export default function OnboardingPage() {
               <button
                 className={`relative flex size-20 items-center justify-center rounded-full border ${
                   listening
-                    ? "border-white bg-white text-black shadow-[0_0_0_10px_rgba(255,255,255,0.05)]"
-                    : "border-zinc-700 bg-zinc-950 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.04)]"
+                    ? "border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg)] shadow-[0_0_0_10px_color-mix(in_srgb,var(--text-primary)_5%,transparent)]"
+                    : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-sm"
                 }`}
                 onClick={handleListen}
                 type="button"
@@ -238,15 +238,15 @@ export default function OnboardingPage() {
               <div className="mt-6 text-[28px] font-semibold tracking-[-0.03em]">
                 Tap to speak and describe it naturally
               </div>
-              <button className="mt-4 text-[14px] text-zinc-500 transition-colors hover:text-white" onClick={() => setTypedOpen(true)} type="button">
+              <button className="mt-4 text-[14px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]" onClick={() => setTypedOpen(true)} type="button">
                 prefer to type →
               </button>
-              {doneFlash ? <div className="mt-6 text-[14px] text-green-400">Done ✓</div> : null}
+              {doneFlash ? <div className="mt-6 text-[14px] font-medium text-[var(--accent-green)]">Done ✓</div> : null}
 
               {typedOpen ? (
                 <motion.div animate={{ opacity: 1, y: 0 }} className="mt-10 w-full" initial={{ opacity: 0, y: 24 }}>
                   <Textarea
-                    className="min-h-[220px] rounded-[16px] border-zinc-800 bg-zinc-950 px-5 py-5 text-[15px] leading-8"
+                    className="min-h-[220px]"
                     onChange={(event) => setNotes(event.target.value)}
                     value={notes}
                   />
@@ -264,15 +264,15 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 3 ? (
-            <Panel className="w-full max-w-[720px] border-zinc-800 bg-black">
+            <Panel className="w-full max-w-[720px]">
               <PanelHeader className="block">
-                <PanelTitle className="text-[42px] tracking-[-0.04em] text-white">Attach your materials</PanelTitle>
+                <PanelTitle className="text-[42px] tracking-[-0.04em]">Attach your materials</PanelTitle>
                 <PanelDescription>A deck, memo, or doc. Optional.</PanelDescription>
               </PanelHeader>
               <PanelBody>
-                <div className="rounded-[16px] border border-dashed border-zinc-800 bg-zinc-950 px-5 py-10 text-center">
-                  <Upload className="mx-auto size-6 text-zinc-500" />
-                  <div className="mt-4 text-[14px] text-zinc-400">Optional file upload</div>
+                <div className="rounded-[16px] border border-dashed border-[var(--border-strong)] bg-[var(--surface-elevated)] px-5 py-10 text-center">
+                  <Upload className="mx-auto size-6 text-[var(--text-muted)]" />
+                  <div className="mt-4 text-[14px] text-[var(--text-muted)]">Optional file upload</div>
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-2">
@@ -282,7 +282,7 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="mt-8 flex items-center justify-between">
-                  <button className="text-[13px] text-zinc-500 transition-colors hover:text-white" onClick={() => setStep(4)} type="button">
+                  <button className="text-[13px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]" onClick={() => setStep(4)} type="button">
                     Skip I&apos;ll add these later
                   </button>
                   <Button onClick={() => setStep(4)} size="lg">
@@ -295,20 +295,20 @@ export default function OnboardingPage() {
           ) : null}
 
           {step === 4 ? (
-            <Panel className="w-full max-w-[720px] border-zinc-800 bg-black">
+            <Panel className="w-full max-w-[720px]">
               <PanelHeader className="block">
-                <PanelTitle className="text-[42px] tracking-[-0.04em] text-white">You&apos;re ready.</PanelTitle>
+                <PanelTitle className="text-[42px] tracking-[-0.04em]">You&apos;re ready.</PanelTitle>
                 <PanelDescription>We&apos;ll find your strongest program matches.</PanelDescription>
               </PanelHeader>
               <PanelBody>
-                <div className="overflow-hidden rounded-[14px] border border-zinc-800">
+                <div className="overflow-hidden rounded-[14px] border border-[var(--border)]">
                   {summaryRows.map(([label, value]) => (
                     <div
-                      className="grid grid-cols-[140px_1fr] border-b border-zinc-800 px-4 py-4 text-[14px] last:border-b-0"
+                      className="grid grid-cols-[140px_1fr] border-b border-[var(--border)] px-4 py-4 text-[14px] last:border-b-0"
                       key={label}
                     >
-                      <div className="text-zinc-500">{label}</div>
-                      <div className="text-white">{value}</div>
+                      <div className="text-[var(--text-muted)]">{label}</div>
+                      <div className="text-[var(--text-primary)]">{value}</div>
                     </div>
                   ))}
                 </div>

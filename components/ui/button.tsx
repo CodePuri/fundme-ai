@@ -20,7 +20,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function 
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-[4px] border text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-full border text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
         size === "sm" && "h-8 px-3 text-[12px]",
         size === "md" && "h-10 px-4",

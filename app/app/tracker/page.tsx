@@ -235,7 +235,7 @@ export default function TrackerPage() {
         <div className="relative flex-1">
           <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[var(--text-faint)]" />
           <input
-            className="app-input h-12 rounded-xl pl-11 pr-4 text-sm"
+            className="app-input h-12 rounded-[10px] pl-11 pr-4 text-sm"
             onChange={(event) => setSearch(event.target.value)}
             placeholder="Search programs..."
             value={search}
@@ -351,7 +351,7 @@ export default function TrackerPage() {
             <div className="relative mt-6">
               <Search className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-[var(--text-faint)]" />
               <input
-                className="app-input h-12 rounded-xl pl-11 pr-4 text-sm"
+                className="app-input h-12 rounded-[10px] pl-11 pr-4 text-sm"
                 onChange={(event) => setModalSearch(event.target.value)}
                 placeholder="Search programs..."
                 value={modalSearch}

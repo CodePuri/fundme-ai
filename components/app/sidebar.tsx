@@ -75,9 +75,9 @@ export function Sidebar() {
                 return (
                   <button
                     className={cn(
-                      "flex w-full items-center justify-between rounded-[14px] border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
-                      "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]",
-                      active && "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-[0_8px_24px_rgba(17,17,17,0.06)]",
+                      "flex w-full items-center justify-between rounded-[10px] border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
+                      "border-transparent text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]",
+                      active && "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-sm",
                     )}
                     key={href}
                     onClick={() => {

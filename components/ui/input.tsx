@@ -6,7 +6,7 @@ export function Input({ className, ...props }: React.InputHTMLAttributes<HTMLInp
   return (
     <input
       className={cn(
-        "app-input h-11 rounded-[6px] px-3.5 text-sm",
+        "app-input h-11 rounded-[10px] px-3.5 text-sm",
         className,
       )}
       {...props}
