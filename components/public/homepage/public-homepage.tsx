@@ -192,9 +192,8 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
 const floatingCards: {
   id: string;
   label: string;
-  shortMark: string;
-  bg: string;
-  textColor: string;
+  slug?: string;
+  mark?: "antler" | "aws";
   x: string;
   y: string;
   rotate: number;
@@ -202,21 +201,21 @@ const floatingCards: {
   side: "left" | "right";
 }[] = [
   /* ── Left column ── */
-  { id: "yc", label: "Y Combinator", shortMark: "YC", bg: "#ff6600", textColor: "#fff", x: "4%", y: "14%", rotate: -6, delay: 0, side: "left" },
-  { id: "antler", label: "Antler", shortMark: "A", bg: "#ff6c59", textColor: "#fff", x: "2%", y: "44%", rotate: 4, delay: 0.18, side: "left" },
-  { id: "gfs", label: "Google for Startups", shortMark: "GfS", bg: "#4285f4", textColor: "#fff", x: "6%", y: "74%", rotate: -3, delay: 0.32, side: "left" },
+  { id: "yc", label: "Y Combinator", slug: "y-combinator", x: "4%", y: "14%", rotate: -6, delay: 0, side: "left" },
+  { id: "antler", label: "Antler", mark: "antler", slug: "antler", x: "2%", y: "44%", rotate: 4, delay: 0.18, side: "left" },
+  { id: "gfs", label: "Google for Startups", slug: "google-for-startups", x: "6%", y: "74%", rotate: -3, delay: 0.32, side: "left" },
   /* ── Right column ── */
-  { id: "techstars", label: "Techstars", shortMark: "TS", bg: "#00a4e4", textColor: "#fff", x: "4%", y: "16%", rotate: 5, delay: 0.1, side: "right" },
-  { id: "aws", label: "AWS Activate", shortMark: "aws", bg: "#232f3e", textColor: "#fff", x: "2%", y: "46%", rotate: -4, delay: 0.24, side: "right" },
-  { id: "500", label: "500 Global", shortMark: "500", bg: "#e8483f", textColor: "#fff", x: "5%", y: "76%", rotate: 3, delay: 0.36, side: "right" },
+  { id: "techstars", label: "Techstars", slug: "techstars", x: "4%", y: "16%", rotate: 5, delay: 0.1, side: "right" },
+  { id: "aws", label: "AWS Activate", mark: "aws", slug: "aws-activate", x: "2%", y: "46%", rotate: -4, delay: 0.24, side: "right" },
+  { id: "500", label: "500 Global", slug: "500-global", x: "5%", y: "76%", rotate: 3, delay: 0.36, side: "right" },
 ];
 
-const trustLogos = [
-  { name: "Y Combinator", short: "YC" },
-  { name: "Antler", short: "Antler" },
-  { name: "Google for Startups", short: "GfS" },
-  { name: "Techstars", short: "Techstars" },
-  { name: "500 Global", short: "500" },
+const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" }[] = [
+  { name: "Y Combinator", slug: "y-combinator" },
+  { name: "Antler", mark: "antler" },
+  { name: "Google for Startups", slug: "google-for-startups" },
+  { name: "Techstars", slug: "techstars" },
+  { name: "500 Global", slug: "500-global" },
 ];
 
 function FloatingCard({
@@ -263,14 +262,11 @@ function FloatingCard({
         style={{ transform: `rotate(${card.rotate}deg)` }}
       >
         {/* Mark */}
-        <div
-          className="flex size-9 shrink-0 items-center justify-center rounded-[12px] border border-black/[0.06]"
-          style={{ background: card.bg, color: card.textColor }}
-        >
-          <span className="text-[12px] font-bold leading-none tracking-[-0.04em]" style={card.shortMark === "aws" ? { textTransform: "uppercase" as const, fontSize: 10 } : undefined}>
-            {card.shortMark}
-          </span>
-        </div>
+        <ProgramMark
+          program={{ id: card.id, name: card.label, slug: card.slug, mark: card.mark }}
+          size={36}
+          className="shadow-[0_4px_12px_rgba(18,15,11,0.06)]"
+        />
         {/* Label */}
         <div className="min-w-0 pr-1">
           <div className="text-[13px] font-semibold leading-tight tracking-[-0.02em] text-[#171513]">{card.label}</div>
@@ -319,16 +315,12 @@ function FloatingCardMid({
       }
     >
       <div
-        className="flex size-10 items-center justify-center rounded-[12px] border border-black/[0.06] bg-white/[0.88] shadow-[0_6px_20px_rgba(18,15,11,0.06)] backdrop-blur-sm"
+        className="flex size-12 items-center justify-center rounded-[14px] border border-black/[0.06] bg-white/[0.88] shadow-[0_6px_20px_rgba(18,15,11,0.06)] backdrop-blur-sm"
       >
-        <div
-          className="flex size-8 items-center justify-center rounded-[8px]"
-          style={{ background: card.bg, color: card.textColor }}
-        >
-          <span className="text-[10px] font-bold leading-none" style={card.shortMark === "aws" ? { textTransform: "uppercase" as const, fontSize: 8 } : undefined}>
-            {card.shortMark}
-          </span>
-        </div>
+        <ProgramMark
+          program={{ id: card.id, name: card.label, slug: card.slug, mark: card.mark }}
+          size={32}
+        />
       </div>
     </motion.div>
   );
@@ -434,14 +426,18 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
               <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
                 Programs already in the room
               </span>
-              <div className="flex items-center gap-5 sm:gap-6">
+              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
                 {trustLogos.map((logo) => (
-                  <span
-                    key={logo.short}
-                    className="text-[12px] font-semibold tracking-[-0.01em] text-[#b5ad9f] transition-colors duration-200 hover:text-[#8b8276] sm:text-[13px]"
-                  >
-                    {logo.name}
-                  </span>
+                  <div key={logo.name} className="group flex items-center gap-2">
+                    <ProgramMark
+                      program={{ name: logo.name, slug: logo.slug, mark: logo.mark }}
+                      size={20}
+                      className="opacity-60 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                    />
+                    <span className="text-[12px] font-semibold tracking-[-0.01em] text-[#b5ad9f] transition-colors duration-300 group-hover:text-[#8b8276] sm:text-[13px]">
+                      {logo.name}
+                    </span>
+                  </div>
                 ))}
               </div>
             </motion.div>
@@ -924,26 +920,26 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
       className="relative h-[650px] sm:h-[600px] lg:h-[700px]"
       style={{ clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%)" }}
     >
-      <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#171513] text-[#f6f1ea] flex flex-col justify-between overflow-hidden pt-8">
+      <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
         
         {/* Subtle Background Word */}
-        <div className="pointer-events-none absolute left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-[#24211e] select-none">
+        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-white/50 select-none mix-blend-soft-light filter blur-[2px]">
           FUNDME
         </div>
 
         {/* Top Marquee Band */}
         <div className="relative z-10 overflow-hidden py-3">
-          <div className="logo-rail-strip gap-10">
+          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-10">
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Founder application workflow</span>
-                <span className="text-[#453e36]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Matched to real programs</span>
-                <span className="text-[#453e36]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Tailored drafts</span>
-                <span className="text-[#453e36]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Deadlines tracked</span>
-                <span className="text-[#453e36]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[#d2c5b3]">•</span>
               </div>
             ))}
           </div>
@@ -952,12 +948,12 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
         {/* Main Content */}
         <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 sm:px-6 xl:px-8">
           <div className="flex flex-col items-center text-center">
-            <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-white">
+            <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#171513]">
               One startup.
               <br />
-              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#dfd6cb]">Many applications.</span>
+              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
             </h2>
-            <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#a59d93]">
+            <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#645d54]">
               Upload once. Match faster. Draft smarter.
             </p>
 
@@ -973,7 +969,7 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
                 <ArrowRight className="size-4" />
               </motion.button>
               <motion.a
-                className="inline-flex items-center gap-2 rounded-full border border-[#3b352e] bg-[#211f1c] px-6 py-4 text-[15px] font-medium text-[#dfd6cb] transition-colors hover:bg-[#2c2825]"
+                className="inline-flex items-center gap-2 rounded-full border border-[#d2c5b3] bg-white/70 backdrop-blur-sm px-6 py-4 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
                 href="#how-it-works"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
@@ -985,23 +981,23 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
         </div>
 
         {/* Bottom Strip */}
-        <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#292420]">
+        <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#e5d8c8]">
           <div className="flex items-center gap-2">
              <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
                 <Target className="size-5" />
              </div>
-             <span className="text-[20px] font-bold tracking-[-0.04em] text-white">Fundme.ai</span>
+             <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#a59d93]">
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#645d54]">
             {footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="transition-colors hover:text-white">
+              <a key={link.label} href={link.href} className="transition-colors hover:text-[#ff6b3d] font-medium">
                 {link.label}
               </a>
             ))}
           </div>
 
-          <div className="text-[12px] text-[#5e564d] sm:text-right">
+          <div className="text-[12px] text-[#8b8276] sm:text-right">
             © {new Date().getFullYear()} Fundme.ai. <br className="sm:hidden" /> Built for founders.
           </div>
         </div>
@@ -1032,8 +1028,8 @@ export function PublicHomepage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#171513] text-[#171513]" data-theme="public">
-      <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.4)] pb-8">
+    <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
+      <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] pb-8">
         <Header onOpenAuth={() => openAuth()} />
         <HomepageHero onOpenAuth={() => openAuth()} />
         <LogoRailSection />

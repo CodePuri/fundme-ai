@@ -91,47 +91,47 @@ export type GmailEmail = {
 };
 
 export const defaultStartupProfile: StartupProfile = {
-  companyName: "Flowstate AI",
-  tagline: "Real-time contract intelligence for agencies.",
-  stage: "Pre-seed",
-  sector: "B2B SaaS / LegalTech",
+  companyName: "Totem Interactive",
+  tagline: "Software development company building products across AI, apps, platforms.",
+  stage: "Seed",
+  sector: "AI & Digital Solutions",
   location: "Mumbai, India",
-  teamSize: "2",
-  traction: "87 signups, 3 pilots, and $2,400/month in recovered revenue in early accounts.",
+  teamSize: "12",
+  traction: "Building products across AI, SaaS, and digital ecosystem. Makers of Velocity.",
   problem:
-    "Agencies lose revenue from untracked scope creep because client requests shift in calls, email, and chat long before contracts are updated.",
+    "Product development and AI integration are highly fragmented, leading to slow execution for founders and enterprises.",
   solution:
-    "Flowstate AI detects scope creep in real time, quantifies commercial impact, and auto-generates change orders before free work ships.",
-  businessModel: "SaaS at $299/month per agency.",
+    "Totem Interactive builds rapid digital solutions and AI workflows to accelerate product scaling and business execution.",
+  businessModel: "B2B SaaS / Services.",
   competitiveEdge:
-    "We sit at the moment scope expands, between the conversation and the contract, instead of helping teams react after the damage is done.",
-  fundraisingAsk: "$500K pre-seed",
-  useOfFunds: "Product (60%), Sales (25%), Ops (15%)",
-  uploadedAssets: ["Flowstate_deck.pdf", "startup_memo.docx"],
-  missingInfo: ["Website URL", "Incorporation details", "Prior funding history", "Cofounder details"],
+    "We have deep execution experience blending AI with traditional software pipelines.",
+  fundraisingAsk: "$1M seed",
+  useOfFunds: "Product Expansion (60%), Go-To-Market (40%)",
+  uploadedAssets: ["totem_interactive_deck.pdf", "velocity_memo.docx"],
+  missingInfo: ["Prior funding history", "Cofounder details"],
 };
 
 export const defaultFounderProfile: FounderProfile = {
-  name: "Arjun Mehta",
-  role: "Founder & CEO",
+  name: "Aakash Puri",
+  role: "CEO & Founder",
   location: "Mumbai, India",
-  linkedIn: "linkedin.com/in/arjunmehta",
+  linkedIn: "https://www.linkedin.com/in/aakash-puri-a44aa594/",
   background:
-    "I ran a 12-person agency for 5 years and repeatedly watched profitable projects lose margin because scope changes were agreed to informally and documented too late.",
+    "I have extensive experience running technical teams and building software products across multiple domains including AI and platforms.",
   domainExpertise:
-    "Agency operations, contractual drift, change-order recovery, and selling workflow software to service businesses.",
+    "Software Development, AI Workflows, Product Strategy, and Operations.",
   previousStartupInfo:
-    "Built and operated an agency before Flowstate AI. This is my first venture-backed software company.",
+    "Makers of Velocity, an AI prompt-improvement product.",
   skills: [
     "Product Management",
-    "Go-to-market",
-    "Enterprise Sales",
-    "UX Thinking",
-    "Agency Ops",
+    "Digital Strategy",
+    "Enterprise Solutions",
+    "AI Integration",
+    "Team Leadership",
   ],
   credibility:
-    "I lived the exact problem for years, lost real money to it, and already have design partners validating the urgency of the workflow.",
-  missingInfo: ["LinkedIn verification", "Co-founder details"],
+    "Founded Totem Interactive in 2022 and shipped multiple complex digital products.",
+  missingInfo: ["Co-founder details"],
 };
 
 export const defaultOpportunities: Opportunity[] = [
@@ -487,80 +487,71 @@ const ycQuestionTemplate: ApplicationQuestion[] = [
   {
     id: "q1",
     question: "What does your company do in one sentence?",
-    answer: "AI detects scope creep, drafts change orders.",
+    answer: "Totem Interactive builds AI products, platforms, and digital solutions for enterprises.",
     variants: [
-      "AI catches scope creep and auto-drafts change orders.",
-      "We detect scope drift and create change-order paperwork instantly.",
+      "We accelerate business execution by building intelligent software and AI workflows.",
+      "Thinkalocity.ai acts as an AI workflow layer for smarter founder and business execution.",
     ],
     ready: false,
     lastSaved: "2026-04-05T12:12:00.000Z",
     sourceSnippets: [
-      "Flowstate_deck.pdf, slide 3: 'Detect scope creep in real time.'",
-      "startup_memo.docx: 'Draft change orders in under 60 seconds.'",
+      "totem_deck.pdf, slide 3: 'Building products across AI, platforms, and digital.'",
     ],
   },
   {
     id: "q2",
     question: "What is your company going to make?",
     answer:
-      "Flowstate AI monitors client conversations in real time. When a request exceeds original scope, Flowstate flags it, quantifies impact, and generates a change order in under 60 seconds. Built for agencies losing $3,200/month to scope creep.",
+      "We build products across AI, apps, platforms, games, AR/VR, and digital solutions. Our core focus is launching products like Velocity, an AI prompt-improvement tool, and Thinkalocity, an AI workflow layer.",
     variants: [
-      "Flowstate AI watches agency-client communication and catches scope changes the moment they appear. It measures revenue impact and drafts the exact change-order paperwork before teams give work away for free.",
-      "We are building a real-time detection layer for agency scope drift. When a request expands beyond contract terms, Flowstate flags it and auto-generates the commercial response.",
+      "We are building an AI workflow ecosystem that helps founders and businesses execute smarter through tools like Thinkalocity and Velocity.",
     ],
     ready: true,
     lastSaved: "2026-04-05T12:16:00.000Z",
     sourceSnippets: [
-      "Flowstate_deck.pdf, slide 4: 'Quantify impact and generate a change order in under 60 seconds.'",
-      "startup_memo.docx: 'Agencies lose thousands per month to hidden scope changes.'",
+      "startup_memo.docx: 'Makers of Velocity, an AI prompt-improvement product.'",
     ],
   },
   {
     id: "q3",
     question: "Who are your competitors and what do you understand that they do not?",
     answer:
-      "DocuSign and PandaDoc handle signing, not detection. Asana tracks tasks, not contractual drift. The real problem is the moment a client says 'can you just also...' and the agency says yes without knowing the cost. No one owns the detection layer.",
+      "Most development agencies lack deep, proprietary product layers (like Thinkalocity). We don't just build software; we build AI-native execution workflows.",
     variants: [
-      "Existing tools either manage signatures or track project execution. They do not catch the exact moment scope expands inside messy communication. That unowned detection layer is where margin disappears.",
-      "Competitors help document or manage work after the fact. We focus on the missing moment before the revenue is lost: when the client casually expands the ask and nobody updates the contract.",
+      "Traditional agencies are purely service-oriented. We exist at the intersection of product incubation and service execution.",
     ],
     ready: false,
     lastSaved: "2026-04-05T12:21:00.000Z",
     sourceSnippets: [
-      "Founder notes: 'The problem isn't signatures. It's the moment nobody flags drift.'",
-      "Flowstate_deck.pdf, slide 6: 'No one owns detection before the contract is updated.'",
+      "Founder notes: 'We ship actual AI products instead of just selling hours.'",
     ],
   },
   {
     id: "q4",
     question: "Why are you the right person to build this?",
     answer:
-      "I ran a 12-person agency for 5 years and lost $180K to scope creep. 87 signups from one LinkedIn post. 3 agencies in active pilots averaging $2,400/month in recovered revenue in the first 30 days.",
+      "I have been successfully operating Totem Interactive since 2022, securing strong talent in Mumbai, and shipping distinct AI products.",
     variants: [
-      "I built this after losing real agency margin to the exact workflow failure Flowstate now solves. That gives me direct customer language, urgency, and design-partner access.",
-      "My founder advantage is painful firsthand experience. I already know where agencies say yes too early, how revenue slips, and what output they will actually use to recover it.",
+      "With a strong background in software development and launching products like Velocity, I have the execution speed to build and scale Thinkalocity.",
     ],
     ready: false,
     lastSaved: "2026-04-05T12:24:00.000Z",
     sourceSnippets: [
-      "Founder Profile: 'Ran a 12-person agency for 5 years and lost $180K to scope creep.'",
-      "LinkedIn notes: '87 signups from one post.'",
+      "Founder Profile: 'Successfully shipped AI workflow products.'",
     ],
   },
   {
     id: "q5",
     question: "How do you make money?",
     answer:
-      "SaaS at $299/month per agency. One recovered scope incident pays for 6 months of Flowstate.",
+      "We generate revenue through high-end digital solutions, combined with potential SaaS subscriptions for our proprietary AI products.",
     variants: [
-      "We charge agencies $299 per month. The value proposition is immediate because one recovered scope incident usually covers multiple months of subscription cost.",
-      "Flowstate is sold as SaaS at $299 monthly per agency. The ROI is fast enough that the customer can justify the spend off a single saved project expansion.",
+      "A blended model of recurring SaaS revenue from tools like Thinkalocity, backed by robust enterprise execution contracts.",
     ],
     ready: false,
     lastSaved: "2026-04-05T12:27:00.000Z",
     sourceSnippets: [
-      "startup_memo.docx: '$299/month per agency.'",
-      "Flowstate_deck.pdf, slide 8: 'One recovered incident pays for months of product.'",
+      "startup_memo.docx: 'Blended B2B service and SaaS.'",
     ],
   },
 ];

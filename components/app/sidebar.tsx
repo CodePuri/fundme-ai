@@ -105,8 +105,8 @@ export function Sidebar() {
 
       <div className="mt-auto border-t border-[var(--border)] pt-4">
         <div className="rounded-[12px] bg-[var(--surface)] px-3 py-3">
-          <div className="text-[13px] font-medium text-[var(--text-primary)]">Arjun Mehta</div>
-          <div className="mt-1 text-[12px] text-[var(--text-muted)]">Flowstate AI</div>
+          <div className="text-[13px] font-medium text-[var(--text-primary)]">{state.founderProfile?.name || "Aakash Puri"}</div>
+          <div className="mt-1 text-[12px] text-[var(--text-muted)]">{state.startupProfile?.companyName || "Totem Interactive"}</div>
         </div>
       </div>
     </aside>

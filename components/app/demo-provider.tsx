@@ -56,6 +56,8 @@ type DemoContextValue = {
   completeOnboarding: (payload: {
     founderName: string;
     founderRole: string;
+    companyName: string;
+    linkedIn: string;
     notes: string;
     files: string[];
   }) => void;
@@ -123,7 +125,7 @@ const defaultState: DemoState = {
   gmailConnected: false,
   uploadSourceUrl: "",
   founderNotes:
-    "We have 3 agencies in pilot. They're averaging $2,400/month in recovered revenue within the first 30 days.",
+    "Totem Interactive is a Mumbai-based software development company building products across AI, apps, platforms, games, AR/VR, and digital solutions. Makers of Velocity, an AI prompt-improvement product. Founded in 2022.",
   startupProfile: defaultStartupProfile,
   founderProfile: defaultFounderProfile,
   opportunities: defaultOpportunities,
@@ -320,7 +322,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           lastSyncAt: new Date().toISOString(),
         }));
       },
-      completeOnboarding: ({ founderName, founderRole, notes, files }) => {
+      completeOnboarding: ({ founderName, founderRole, companyName, linkedIn, notes, files }) => {
         window.localStorage.removeItem(ONBOARDING_STEP_KEY);
         window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
         setState((current) => ({
@@ -332,12 +334,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           selectedFiles: files,
           startupProfile: {
             ...current.startupProfile,
+            companyName: companyName,
             uploadedAssets: files,
           },
           founderProfile: {
             ...current.founderProfile,
             name: founderName,
             role: founderRole,
+            linkedIn: linkedIn,
           },
           lastSyncAt: new Date().toISOString(),
         }));
