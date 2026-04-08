@@ -83,7 +83,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
           <div className="page-frame flex flex-col gap-4 px-4 py-4 sm:px-6 lg:flex-row lg:items-center xl:px-8">
             <div className="flex min-w-0 items-center justify-between gap-4 lg:w-[220px] lg:flex-none">
               <div className="truncate text-[18px] font-semibold tracking-[-0.02em] text-[var(--text-primary)]">
-                {pageTitle}
+                Welcome back, {state.founderProfile?.name?.split(" ")[0] || "Aakash"}
               </div>
               <div aria-label="Notifications" className="relative lg:hidden">
                 <Bell className="size-5 text-[var(--text-muted)]" />

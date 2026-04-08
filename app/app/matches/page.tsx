@@ -8,7 +8,7 @@ import { useDemo } from "@/components/app/demo-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody, PanelDescription, PanelHeader, PanelTitle } from "@/components/ui/panel";
-import { ProgramLogo } from "@/components/ui/program-logo";
+import { StartupProgramLogo } from "@/components/startup-programs/startup-program-logo";
 import { StatusBadge, statusTone } from "@/components/ui/status-badge";
 
 function scoreColor(score: number) {
@@ -85,7 +85,7 @@ export function MatchesContent() {
         <PanelHeader>
           <div className="max-w-[780px]">
             <div className="flex items-center gap-3">
-              <ProgramLogo domain={hero.domain} size={48} slug={hero.slug} />
+              <StartupProgramLogo name={hero.name} size={48} slug={hero.slug} />
               <div>
                 <div className="display-face text-[42px] leading-none tracking-[-0.04em] text-[var(--text-primary)]">
                   {hero.name}
@@ -126,7 +126,7 @@ export function MatchesContent() {
           <Panel key={item.slug}>
             <PanelHeader>
               <div className="flex items-start gap-3">
-                <ProgramLogo domain={item.domain} size={36} slug={item.slug} />
+                <StartupProgramLogo name={item.name} size={36} slug={item.slug} />
                 <div>
                   <PanelTitle className="text-[24px]">{item.name}</PanelTitle>
                   <div className="mt-2 flex flex-wrap gap-2">

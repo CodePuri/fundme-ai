@@ -7,7 +7,7 @@ import { useDemo } from "@/components/app/demo-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
-import { ProgramLogo } from "@/components/ui/program-logo";
+import { StartupProgramLogo } from "@/components/startup-programs/startup-program-logo";
 
 const applicationSlugs = ["yc-w26", "antler-india", "aws-activate"];
 
@@ -52,7 +52,7 @@ export default function ApplicationsPage() {
               key={program.slug}
             >
               <div className="flex items-center gap-3">
-                <ProgramLogo domain={program.domain} size={36} slug={program.slug} />
+                <StartupProgramLogo name={program.name} size={36} slug={program.slug} />
                 <div>
                 <div className="text-[var(--text-primary)]">{program.name}</div>
                 <div className="mt-2">

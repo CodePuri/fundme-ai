@@ -8,7 +8,7 @@ import { useDemo } from "@/components/app/demo-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody, PanelHeader, PanelTitle } from "@/components/ui/panel";
-import { ProgramLogo } from "@/components/ui/program-logo";
+import { StartupProgramLogo } from "@/components/startup-programs/startup-program-logo";
 import { StatusBadge, statusTone } from "@/components/ui/status-badge";
 import { type Opportunity } from "@/lib/demo-data";
 
@@ -296,7 +296,7 @@ export default function TrackerPage() {
               }}
             >
               <div className="flex items-center gap-3 text-[var(--text-primary)]">
-                <ProgramLogo domain={program.domain} size={36} slug={program.slug} />
+                <StartupProgramLogo name={program.name} size={36} slug={program.slug} />
                 <span>{program.name}</span>
               </div>
               <div>
@@ -365,7 +365,7 @@ export default function TrackerPage() {
                   key={program.slug}
                 >
                   <div className="flex items-center gap-3">
-                    <ProgramLogo domain={program.domain} size={36} slug={program.slug} />
+                    <StartupProgramLogo name={program.name} size={36} slug={program.slug} />
                     <div>
                     <div className="text-[15px] font-medium text-[var(--text-primary)]">{program.name}</div>
                     <div className="mt-1 text-[13px] text-[var(--text-faint)]">{program.type}</div>

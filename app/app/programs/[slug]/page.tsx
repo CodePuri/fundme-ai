@@ -90,15 +90,10 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            {startupProgram ? (
-              <StartupProgramLogo name={startupProgram.name} size={48} slug={startupProgram.slug} />
-            ) : (
-              <ProgramLogo domain={program.domain} size={48} slug={program.slug} />
-            )}
+            <StartupProgramLogo name={startupProgram?.name ?? program.name} size={48} slug={startupProgram?.slug ?? program.slug} />
             <div>
-              <h1 className="text-[38px] font-semibold tracking-[-0.05em]">{program.name}</h1>
+              <h1 className="display-face text-[42px] leading-none tracking-[-0.04em] text-[var(--text-primary)]">{program.name}</h1>
               <div className="mt-2 flex flex-wrap gap-2">
                 <Badge size="sm">{program.type}</Badge>
                 <Badge size="sm">{program.location}</Badge>
@@ -164,26 +159,6 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
         </div>
 
         <div className="flex flex-col gap-6">
-          <Panel>
-            <PanelHeader className="block">
-              <PanelTitle>Program overview</PanelTitle>
-            </PanelHeader>
-            <PanelDescription className="mt-4">{program.overview}</PanelDescription>
-          </Panel>
-
-          <Panel>
-            <PanelHeader className="block">
-              <PanelTitle>Requirements</PanelTitle>
-            </PanelHeader>
-            <PanelBody className="flex flex-col gap-3">
-              {(startupProgramContext?.requirements ?? program.requirements).map((item) => (
-                <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-4 text-[14px] text-[var(--text-muted)]" key={item}>
-                  {item}
-                </div>
-              ))}
-            </PanelBody>
-          </Panel>
-
           <div className="flex flex-col gap-3">
             {startupProgram ? (
               <a
@@ -213,6 +188,26 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
               </Link>
             )}
           </div>
+
+          <Panel>
+            <PanelHeader className="block">
+              <PanelTitle>Program overview</PanelTitle>
+            </PanelHeader>
+            <PanelDescription className="mt-4">{program.overview}</PanelDescription>
+          </Panel>
+
+          <Panel>
+            <PanelHeader className="block">
+              <PanelTitle>Requirements</PanelTitle>
+            </PanelHeader>
+            <PanelBody className="flex flex-col gap-3">
+              {(startupProgramContext?.requirements ?? program.requirements).map((item) => (
+                <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-4 text-[14px] text-[var(--text-muted)]" key={item}>
+                  {item}
+                </div>
+              ))}
+            </PanelBody>
+          </Panel>
         </div>
       </div>
     </PageShell>

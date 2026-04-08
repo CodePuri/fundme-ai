@@ -6,7 +6,6 @@ import { notFound } from "next/navigation";
 import { ApplicationWorkspaceView } from "@/components/application/application-workspace-view";
 import { useDemo } from "@/components/app/demo-provider";
 import { StartupProgramLogo } from "@/components/startup-programs/startup-program-logo";
-import { ProgramLogo } from "@/components/ui/program-logo";
 import { createApplicationQuestions } from "@/lib/demo-data";
 import { buildOpportunityFromStartupProgram, buildStartupProgramWorkspaceContext } from "@/lib/startup-program-workflow";
 import { getStartupProgramByWorkflowSlug } from "@/lib/startup-programs";
@@ -90,11 +89,7 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
       fitSummary={startupProgramContext?.fitSummary ?? program.why}
       gaps={startupProgramContext?.gaps ?? program.gaps}
       logo={
-        startupProgram ? (
-          <StartupProgramLogo name={startupProgram.name} size={52} slug={startupProgram.slug} />
-        ) : (
-          <ProgramLogo domain={program.domain} size={52} slug={program.slug} />
-        )
+        <StartupProgramLogo name={startupProgram?.name ?? program.name} size={52} slug={startupProgram?.slug ?? program.slug} />
       }
       onCycleAnswer={(questionId) => cycleAnswerVariant(program.slug, questionId)}
       onMarkReady={(questionId) => markReady(program.slug, questionId)}
