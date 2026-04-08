@@ -309,6 +309,12 @@ textarea {
   }
 }
 
+/* Class-based marquee pause (for JS reduced-motion support) */
+.animation-play-state-paused {
+  animation-play-state: paused !important;
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

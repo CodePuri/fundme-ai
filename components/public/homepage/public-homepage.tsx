@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, type ReactNode, useState } from "react";
+import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -12,12 +12,25 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 
 import { PublicAuthController } from "@/components/public/public-auth-controller";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { buildAuthEntryHref } from "@/lib/auth-intent";
 import { cn } from "@/lib/utils";
+import {
+  EASE_OUT,
+  fadeRise,
+  fadeRiseSmall,
+  fadeRiseWithDelay,
+  scaleIn,
+  staggerContainer,
+  hoverLift,
+  hoverLiftSmall,
+  tapCompress,
+  useCountUp,
+  useInViewOnce,
+} from "@/lib/animations";
 
 import {
   ecosystemPrograms,
@@ -31,25 +44,11 @@ import {
 } from "./homepage-data";
 import { ProgramMark } from "./program-mark";
 
-const EASE = [0.16, 1, 0.3, 1] as const;
+/* ─── Local variants ─────────────────────────────────────────── */
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 22 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.72, ease: EASE },
-  },
-};
+const heroStagger = staggerContainer(0.12, 0.15);
 
-const stagger = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.1,
-    },
-  },
-};
+const cardStagger = staggerContainer(0.1, 0);
 
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
@@ -64,17 +63,17 @@ const stepIcons = {
   draft: FilePenLine,
 } as const;
 
-/* ─── Utility ───────────────────────────────────────────────────── */
+/* ─── Utility ────────────────────────────────────────────────── */
 
-function SectionReveal({ children, className }: { children: ReactNode; className?: string }) {
+function SectionReveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
     <motion.div
       className={className}
       initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
-      transition={{ duration: 0.7, ease: EASE }}
-      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.7, ease: EASE_OUT, delay }}
+      viewport={{ once: true, amount: 0.15 }}
       whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
     >
       {children}
@@ -82,34 +81,64 @@ function SectionReveal({ children, className }: { children: ReactNode; className
   );
 }
 
-/* ─── 1. Header ─────────────────────────────────────────────────── */
+/* ─── CountUp display ────────────────────────────────────────── */
+
+function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
+  const shouldReduceMotion = useReducedMotion();
+  const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
+
+  return <>{shouldReduceMotion ? value : count}{suffix}</>;
+}
+
+/* ─── 1. Header ─────────────────────────────────────────────── */
 
 function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 40);
+  });
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#e7ddd0] bg-[#f6f1ea]/92 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-4 py-4 sm:px-6 xl:px-8">
+    <motion.header
+      animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 border-b bg-[#f6f1ea]/92 backdrop-blur-xl transition-[border-color,padding] duration-300",
+        scrolled ? "border-[#d9cbbd] py-2.5 sm:py-2.5" : "border-[#e7ddd0] py-4",
+      )}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: -16 }}
+      transition={{ duration: 0.6, ease: EASE_OUT }}
+    >
+      <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-4 sm:px-6 xl:px-8">
         <Link href="/" onClick={() => setMenuOpen(false)}>
           <BrandLockup />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
-            <Link className="text-[14px] text-[#5f584f] transition-colors hover:text-[#171513]" href={item.href} key={item.label}>
+            <Link
+              className="text-[14px] text-[#5f584f] transition-colors duration-200 hover:text-[#171513]"
+              href={item.href}
+              key={item.label}
+            >
               {item.label}
             </Link>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <button
+          <motion.button
             className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_10px_28px_rgba(255,107,61,0.22)] transition-colors hover:bg-[#f45d2e]"
             onClick={onOpenAuth}
             type="button"
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+            whileTap={shouldReduceMotion ? undefined : tapCompress}
           >
             Request Invite →
-          </button>
+          </motion.button>
         </div>
 
         <button
@@ -123,7 +152,12 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
       </div>
 
       {menuOpen ? (
-        <div className="border-t border-black/8 px-4 py-4 md:hidden">
+        <motion.div
+          animate={{ opacity: 1, y: 0 }}
+          className="border-t border-black/8 px-4 py-4 md:hidden"
+          initial={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.25, ease: EASE_OUT }}
+        >
           <div className="flex flex-col gap-2">
             {navItems.map((item) => (
               <Link
@@ -146,70 +180,270 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               Request Invite
             </button>
           </div>
-        </div>
+        </motion.div>
       ) : null}
-    </header>
+    </motion.header>
   );
 }
 
-/* ─── 2. Hero ────────────────────────────────────────────────────── */
+/* ─── 2. Hero ────────────────────────────────────────────────── */
+
+/* Floating card configuration — position grid for 6 accelerator markers */
+const floatingCards: {
+  id: string;
+  label: string;
+  shortMark: string;
+  bg: string;
+  textColor: string;
+  x: string;
+  y: string;
+  rotate: number;
+  delay: number;
+  side: "left" | "right";
+}[] = [
+  /* ── Left column ── */
+  { id: "yc", label: "Y Combinator", shortMark: "YC", bg: "#ff6600", textColor: "#fff", x: "4%", y: "14%", rotate: -6, delay: 0, side: "left" },
+  { id: "antler", label: "Antler", shortMark: "A", bg: "#ff6c59", textColor: "#fff", x: "2%", y: "44%", rotate: 4, delay: 0.18, side: "left" },
+  { id: "gfs", label: "Google for Startups", shortMark: "GfS", bg: "#4285f4", textColor: "#fff", x: "6%", y: "74%", rotate: -3, delay: 0.32, side: "left" },
+  /* ── Right column ── */
+  { id: "techstars", label: "Techstars", shortMark: "TS", bg: "#00a4e4", textColor: "#fff", x: "4%", y: "16%", rotate: 5, delay: 0.1, side: "right" },
+  { id: "aws", label: "AWS Activate", shortMark: "aws", bg: "#232f3e", textColor: "#fff", x: "2%", y: "46%", rotate: -4, delay: 0.24, side: "right" },
+  { id: "500", label: "500 Global", shortMark: "500", bg: "#e8483f", textColor: "#fff", x: "5%", y: "76%", rotate: 3, delay: 0.36, side: "right" },
+];
+
+const trustLogos = [
+  { name: "Y Combinator", short: "YC" },
+  { name: "Antler", short: "Antler" },
+  { name: "Google for Startups", short: "GfS" },
+  { name: "Techstars", short: "Techstars" },
+  { name: "500 Global", short: "500" },
+];
+
+function FloatingCard({
+  card,
+  shouldReduceMotion,
+}: {
+  card: (typeof floatingCards)[number];
+  shouldReduceMotion: boolean | null;
+}) {
+  const posStyle: React.CSSProperties =
+    card.side === "left"
+      ? { left: card.x, top: card.y }
+      : { right: card.x, top: card.y };
+
+  return (
+    <motion.div
+      className="group absolute z-10 hidden xl:flex"
+      style={posStyle}
+      initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.88, y: 18 }}
+      animate={
+        shouldReduceMotion
+          ? { opacity: 1 }
+          : {
+              opacity: 1,
+              scale: 1,
+              y: [0, -6, 0],
+              rotate: [card.rotate, card.rotate + 1.2, card.rotate - 0.8, card.rotate],
+            }
+      }
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : {
+              opacity: { duration: 0.8, delay: 0.5 + card.delay, ease: EASE_OUT },
+              scale: { duration: 0.8, delay: 0.5 + card.delay, ease: EASE_OUT },
+              y: { duration: 5 + card.delay * 2, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut", delay: 0.5 + card.delay },
+              rotate: { duration: 7 + card.delay * 3, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut", delay: 0.5 + card.delay },
+            }
+      }
+      whileHover={shouldReduceMotion ? undefined : { y: -10, scale: 1.05, transition: { duration: 0.25, ease: EASE_OUT } }}
+    >
+      <div
+        className="flex items-center gap-3 rounded-[18px] border border-black/[0.06] bg-white/[0.92] px-4 py-3 shadow-[0_8px_30px_rgba(18,15,11,0.07)] backdrop-blur-sm transition-shadow duration-300 group-hover:shadow-[0_14px_40px_rgba(18,15,11,0.1)]"
+        style={{ transform: `rotate(${card.rotate}deg)` }}
+      >
+        {/* Mark */}
+        <div
+          className="flex size-9 shrink-0 items-center justify-center rounded-[12px] border border-black/[0.06]"
+          style={{ background: card.bg, color: card.textColor }}
+        >
+          <span className="text-[12px] font-bold leading-none tracking-[-0.04em]" style={card.shortMark === "aws" ? { textTransform: "uppercase" as const, fontSize: 10 } : undefined}>
+            {card.shortMark}
+          </span>
+        </div>
+        {/* Label */}
+        <div className="min-w-0 pr-1">
+          <div className="text-[13px] font-semibold leading-tight tracking-[-0.02em] text-[#171513]">{card.label}</div>
+          <div className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8b8276]">Program</div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+/* The breakpoint where floating cards appear — also used for subtle mid-screen cards */
+function FloatingCardMid({
+  card,
+  shouldReduceMotion,
+}: {
+  card: (typeof floatingCards)[number];
+  shouldReduceMotion: boolean | null;
+}) {
+  const posStyle: React.CSSProperties =
+    card.side === "left"
+      ? { left: card.x, top: card.y }
+      : { right: card.x, top: card.y };
+
+  return (
+    <motion.div
+      className="group absolute z-10 hidden lg:flex xl:hidden"
+      style={posStyle}
+      initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.88 }}
+      animate={
+        shouldReduceMotion
+          ? { opacity: 0.7 }
+          : {
+              opacity: 0.7,
+              scale: 1,
+              y: [0, -4, 0],
+            }
+      }
+      transition={
+        shouldReduceMotion
+          ? { duration: 0 }
+          : {
+              opacity: { duration: 0.8, delay: 0.6 + card.delay },
+              scale: { duration: 0.8, delay: 0.6 + card.delay },
+              y: { duration: 6, repeat: Infinity, repeatType: "mirror" as const, ease: "easeInOut", delay: 0.6 + card.delay },
+            }
+      }
+    >
+      <div
+        className="flex size-10 items-center justify-center rounded-[12px] border border-black/[0.06] bg-white/[0.88] shadow-[0_6px_20px_rgba(18,15,11,0.06)] backdrop-blur-sm"
+      >
+        <div
+          className="flex size-8 items-center justify-center rounded-[8px]"
+          style={{ background: card.bg, color: card.textColor }}
+        >
+          <span className="text-[10px] font-bold leading-none" style={card.shortMark === "aws" ? { textTransform: "uppercase" as const, fontSize: 8 } : undefined}>
+            {card.shortMark}
+          </span>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative overflow-hidden pt-28 sm:pt-32">
-      <div className="absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(circle_at_top,rgba(255,107,61,0.14),transparent_68%)]" />
-      <div className="absolute left-1/2 top-[120px] h-[460px] w-[880px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.9),rgba(255,255,255,0))] blur-3xl" />
-      <div className="absolute inset-x-0 top-0 h-full bg-[linear-gradient(180deg,rgba(255,255,255,0.55),transparent_22%,transparent_100%)]" />
+    <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
+      {/* Background layers */}
+      <div className="absolute inset-x-0 top-0 h-[640px] bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(255,107,61,0.11),transparent_68%)]" />
+      <div className="absolute left-1/2 top-[100px] h-[520px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.85),rgba(255,255,255,0))] blur-3xl" />
+      <div className="absolute inset-x-0 top-0 h-full bg-[linear-gradient(180deg,rgba(255,255,255,0.45),transparent_18%,transparent_100%)]" />
 
-      <div className="relative mx-auto max-w-[1240px] px-4 pb-16 sm:px-6 xl:px-8">
+      <div className="relative mx-auto max-w-[1340px] px-4 pb-20 sm:px-6 xl:px-10">
+        {/* ── Floating accelerator cards — desktop ── */}
+        {floatingCards.map((card) => (
+          <FloatingCard key={card.id} card={card} shouldReduceMotion={shouldReduceMotion} />
+        ))}
+        {/* ── Floating marks — tablet (icons only) ── */}
+        {floatingCards.map((card) => (
+          <FloatingCardMid key={`mid-${card.id}`} card={card} shouldReduceMotion={shouldReduceMotion} />
+        ))}
+
+        {/* ── Central content stack ── */}
         <motion.div
           animate="visible"
-          className="relative flex min-h-[560px] items-center justify-center sm:min-h-[620px]"
+          className="relative z-20 flex min-h-[600px] flex-col items-center justify-center sm:min-h-[660px] lg:min-h-[680px]"
           initial={shouldReduceMotion ? false : "hidden"}
-          variants={stagger}
+          variants={heroStagger}
         >
-          <div className="relative z-20 flex max-w-[940px] flex-col items-center text-center">
+          <div className="flex max-w-[780px] flex-col items-center text-center">
+            {/* Badge */}
             <motion.div
-              className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.18em] text-[#8b8276] shadow-[0_10px_26px_rgba(18,15,11,0.05)] backdrop-blur"
-              variants={fadeUp}
+              className="inline-flex items-center gap-2.5 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-2 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#8b8276] shadow-[0_8px_24px_rgba(18,15,11,0.04)] backdrop-blur"
+              variants={fadeRise}
             >
-              <span className="inline-block size-2 rounded-full bg-[#ff6b3d]" />
-              Matched against real startup programs
+              <motion.span
+                animate={shouldReduceMotion ? undefined : { scale: [1, 1.35, 1] }}
+                className="inline-block size-[7px] rounded-full bg-[#ff6b3d]"
+                transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 3.5 }}
+              />
+              Backed by real startup programs
             </motion.div>
 
+            {/* Headline — premium editorial mixed serif */}
             <motion.h1
-              className="mt-8 max-w-[980px] text-[clamp(3.15rem,5.4vw,4rem)] font-semibold leading-[0.94] tracking-[-0.06em] text-[#171513] [text-wrap:balance]"
-              variants={fadeUp}
+              className="mt-10 sm:mt-12"
+              variants={fadeRise}
             >
-              <span className="block">Stop pitching blind.</span>
-              <span className="mt-2 block lg:whitespace-nowrap">Start applying where you actually fit.</span>
+              <span
+                className="block text-[clamp(2.6rem,5.8vw,4.4rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#171513]"
+                style={{ fontFamily: "var(--font-sans)" }}
+              >
+                Stop pitching blind.
+              </span>
+              <motion.span
+                className="mt-2 block text-[clamp(2.5rem,5.6vw,4.2rem)] leading-[0.96] tracking-[-0.03em] text-[#171513] sm:mt-3"
+                style={{ fontFamily: "var(--font-instrument)", fontStyle: "italic", fontWeight: 400 }}
+                variants={fadeRiseWithDelay(0.08)}
+              >
+                Start applying where you fit.
+              </motion.span>
             </motion.h1>
 
+            {/* Supporting copy */}
             <motion.p
-              className="mx-auto mt-6 max-w-[560px] text-[17px] leading-[1.85] text-[#645d54] sm:text-[18px]"
-              variants={fadeUp}
+              className="mx-auto mt-7 max-w-[500px] text-[16px] leading-[1.9] text-[#6f685f] sm:mt-8 sm:text-[17px]"
+              variants={fadeRise}
             >
-              Fundme turns your deck, notes, and traction into an application base, shows the programs that actually
-              fit, drafts the right angle for each one, and keeps every deadline in one place.
+              Upload your deck and traction once. See the programs that actually
+              fit. Draft the right angle for each one. Track every deadline in one place.
             </motion.p>
 
-            <motion.div className="mt-10 flex flex-col items-center gap-3 sm:flex-row" variants={fadeUp}>
-              <button
-                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_18px_40px_rgba(18,15,11,0.14)] transition-colors hover:bg-[#2a2622]"
+            {/* CTA row — lighter, refined */}
+            <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4" variants={fadeRise}>
+              <motion.button
+                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
                 onClick={onOpenAuth}
                 type="button"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
               >
-                Get Started
-                <ArrowRight className="size-4" />
-              </button>
-              <a
-                className="inline-flex items-center gap-2 rounded-full border border-black/8 bg-white/90 px-6 py-3.5 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
+                Get started free
+                <ArrowRight className="size-3.5" />
+              </motion.button>
+              <motion.a
+                className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[14px] font-medium text-[#645d54] transition-colors hover:text-[#171513]"
                 href="#how-it-works"
+                whileHover={shouldReduceMotion ? undefined : { x: 2 }}
               >
                 See how it works
-              </a>
+                <ArrowRight className="size-3.5" />
+              </motion.a>
+            </motion.div>
+
+            {/* Trust row */}
+            <motion.div
+              className="mt-12 flex flex-col items-center gap-3 sm:mt-14"
+              variants={fadeRiseWithDelay(0.35)}
+            >
+              <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
+                Programs already in the room
+              </span>
+              <div className="flex items-center gap-5 sm:gap-6">
+                {trustLogos.map((logo) => (
+                  <span
+                    key={logo.short}
+                    className="text-[12px] font-semibold tracking-[-0.01em] text-[#b5ad9f] transition-colors duration-200 hover:text-[#8b8276] sm:text-[13px]"
+                  >
+                    {logo.name}
+                  </span>
+                ))}
+              </div>
             </motion.div>
           </div>
         </motion.div>
@@ -218,7 +452,7 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── 3. Marquee logo rail ──────────────────────────────────────── */
+/* ─── 3. Marquee logo rail ──────────────────────────────────── */
 
 function LogoRailCard({
   name,
@@ -243,58 +477,95 @@ function LogoRailCard({
 }
 
 function LogoRailSection() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-6">
-      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
+      <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
         <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Programs already in the room</div>
-      </div>
+      </SectionReveal>
 
-      <div className="logo-rail-viewport relative mt-5">
+      <motion.div
+        className="logo-rail-viewport relative mt-5"
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
+        transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
+        viewport={{ once: true }}
+        whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
+      >
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
 
-        <div className="logo-rail-strip px-4 sm:px-6 xl:px-8">
+        <div className={cn("logo-rail-strip px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}>
           {ecosystemPrograms.map((program) => (
             <LogoRailCard key={program.id} {...program} />
           ))}
         </div>
 
-        <div aria-hidden="true" className="logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8">
+        <div
+          aria-hidden="true"
+          className={cn("logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}
+        >
           {ecosystemPrograms.map((program) => (
             <LogoRailCard key={`${program.id}-duplicate`} {...program} />
           ))}
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
 
-/* ─── 4. Stats strip ──────────────────────────────────────────── */
+/* ─── 4. Stats strip ────────────────────────────────────────── */
+
+/** Extracts leading number and remaining suffix from a stat value like "100+ hrs" */
+function parseStatValue(raw: string): { num: number; suffix: string } {
+  const match = raw.match(/^(\d+)/);
+  if (!match) return { num: 0, suffix: raw };
+  const num = parseInt(match[1], 10);
+  const suffix = raw.slice(match[0].length);
+  return { num, suffix };
+}
 
 function StatsStrip() {
+  const shouldReduceMotion = useReducedMotion();
+  const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
+
   return (
     <section className="border-b border-[#d9cebf] bg-[#f1e8dc] px-4 py-14 sm:px-6 xl:px-8">
-      <SectionReveal className="mx-auto max-w-[1180px]">
+      <motion.div
+        className="mx-auto max-w-[1180px]"
+        initial={shouldReduceMotion ? false : "hidden"}
+        ref={ref}
+        variants={cardStagger}
+        viewport={{ once: true, amount: 0.3 }}
+        whileInView={shouldReduceMotion ? undefined : "visible"}
+      >
         <div className="grid gap-8 sm:grid-cols-2 xl:grid-cols-4 xl:gap-0">
-          {homepageStats.map((stat, index) => (
-            <div
-              className={cn(
-                "px-0 py-2 xl:px-8",
-                index < homepageStats.length - 1 && "xl:border-r xl:border-black/8",
-              )}
-              key={stat.value}
-            >
-              <div className="text-[34px] font-semibold leading-[0.92] tracking-[-0.05em] text-[#171513]">{stat.value}</div>
-              <div className="mt-3 max-w-[250px] text-[14px] leading-6 text-[#6f6559]">{stat.label}</div>
-            </div>
-          ))}
+          {homepageStats.map((stat, index) => {
+            const { num, suffix } = parseStatValue(stat.value);
+
+            return (
+              <motion.div
+                className={cn(
+                  "px-0 py-2 xl:px-8",
+                  index < homepageStats.length - 1 && "xl:border-r xl:border-black/8",
+                )}
+                key={stat.value}
+                variants={fadeRise}
+              >
+                <div className="text-[34px] font-semibold leading-[0.92] tracking-[-0.05em] text-[#171513]">
+                  <CountUpValue isVisible={isInView} suffix={suffix} value={num} />
+                </div>
+                <div className="mt-3 max-w-[250px] text-[14px] leading-6 text-[#6f6559]">{stat.label}</div>
+              </motion.div>
+            );
+          })}
         </div>
-      </SectionReveal>
+      </motion.div>
     </section>
   );
 }
 
-/* ─── 5. How it works ─────────────────────────────────────────── */
+/* ─── 5. How it works ────────────────────────────────────────── */
 
 function HowItWorksSection() {
   const shouldReduceMotion = useReducedMotion();
@@ -303,7 +574,15 @@ function HowItWorksSection() {
     <section className="scroll-mt-28 border-b border-[#e7ddd0] bg-[#f8f3ec] px-4 py-20 sm:px-6 xl:px-8" id="how-it-works">
       <SectionReveal className="mx-auto max-w-[1180px]">
         <div className="mx-auto max-w-[700px] text-center">
-          <div className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]">How it works</div>
+          <motion.div
+            className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]"
+            initial={shouldReduceMotion ? false : { opacity: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
+          >
+            How it works
+          </motion.div>
           <h2 className="mt-4 text-[40px] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513] sm:text-[48px]">
             From scattered pitch decks to matched applications.
           </h2>
@@ -312,7 +591,13 @@ function HowItWorksSection() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-10 lg:grid-cols-3 lg:gap-0">
+        <motion.div
+          className="mt-16 grid gap-10 lg:grid-cols-3 lg:gap-0"
+          initial={shouldReduceMotion ? false : "hidden"}
+          variants={staggerContainer(0.15, 0.2)}
+          viewport={{ once: true, amount: 0.2 }}
+          whileInView={shouldReduceMotion ? undefined : "visible"}
+        >
           {storySteps.map((step, index) => {
             const Icon = stepIcons[step.id as keyof typeof stepIcons];
 
@@ -323,11 +608,23 @@ function HowItWorksSection() {
                   index < storySteps.length - 1 && "lg:border-r lg:border-black/8",
                 )}
                 key={step.id}
-                transition={{ duration: 0.18 }}
-                whileHover={shouldReduceMotion ? undefined : { y: -4 }}
+                variants={fadeRise}
+                whileHover={shouldReduceMotion ? undefined : hoverLiftSmall}
               >
-                <div className="absolute left-0 top-0 h-px w-16 bg-[#d9cbbd]" />
-                <div className="text-[12px] font-medium tracking-[0.18em] text-[#b15d37]">{step.eyebrow}</div>
+                {/* Decorative top line — reveals via scaleX */}
+                <motion.div
+                  className="absolute left-0 top-0 h-px w-16 origin-left bg-[#d9cbbd]"
+                  initial={shouldReduceMotion ? false : { scaleX: 0, opacity: 0 }}
+                  transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.3 + index * 0.12 }}
+                  viewport={{ once: true }}
+                  whileInView={shouldReduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
+                />
+                <motion.div
+                  className="text-[12px] font-medium tracking-[0.18em] text-[#b15d37]"
+                  variants={fadeRiseSmall}
+                >
+                  {step.eyebrow}
+                </motion.div>
                 <div className="mt-7 flex size-11 items-center justify-center rounded-2xl border border-black/8 bg-white/84 shadow-[0_10px_24px_rgba(18,15,11,0.04)]">
                   <Icon className="size-5 text-[#171513]" />
                 </div>
@@ -338,15 +635,17 @@ function HowItWorksSection() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </SectionReveal>
     </section>
   );
 }
 
-/* ─── 6. Product proof — one dominant visual ────────────────────── */
+/* ─── 6. Product proof — one dominant visual ─────────────────── */
 
 function ProductProofSection() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section className="scroll-mt-28 border-b border-[#d4c4b3] bg-[#eae0d2] px-4 py-20 sm:px-6 xl:px-8" id="product-proof">
       <SectionReveal className="mx-auto max-w-[1180px]">
@@ -364,17 +663,37 @@ function ProductProofSection() {
         </div>
 
         {/* Startup context pills */}
-        <div className="mb-8 flex flex-wrap items-center justify-center gap-2">
-          <span className="rounded-full border border-[#d4c4b3] bg-white/60 px-3.5 py-1.5 text-[12px] font-medium uppercase tracking-[0.12em] text-[#8b8276]">Startup Context</span>
-          <span className="rounded-full border border-black/6 bg-white/80 px-3 py-1.5 text-[13px] text-[#645d54]">AI contract intelligence</span>
-          <span className="rounded-full border border-black/6 bg-white/80 px-3 py-1.5 text-[13px] text-[#645d54]">Pre-seed</span>
-          <span className="rounded-full border border-black/6 bg-white/80 px-3 py-1.5 text-[13px] text-[#645d54]">Agency workflow pain</span>
-          <span className="rounded-full border border-black/6 bg-white/80 px-3 py-1.5 text-[13px] text-[#645d54]">87 signups</span>
-          <span className="rounded-full border border-black/6 bg-white/80 px-3 py-1.5 text-[13px] text-[#645d54]">3 pilots</span>
-        </div>
+        <motion.div
+          className="mb-8 flex flex-wrap items-center justify-center gap-2"
+          initial={shouldReduceMotion ? false : "hidden"}
+          variants={staggerContainer(0.06, 0)}
+          viewport={{ once: true }}
+          whileInView={shouldReduceMotion ? undefined : "visible"}
+        >
+          {["Startup Context", "AI contract intelligence", "Pre-seed", "Agency workflow pain", "87 signups", "3 pilots"].map((tag, i) => (
+            <motion.span
+              className={cn(
+                "rounded-full px-3 py-1.5 text-[13px]",
+                i === 0
+                  ? "border border-[#d4c4b3] bg-white/60 text-[12px] font-medium uppercase tracking-[0.12em] text-[#8b8276] px-3.5"
+                  : "border border-black/6 bg-white/80 text-[#645d54]",
+              )}
+              key={tag}
+              variants={scaleIn}
+            >
+              {tag}
+            </motion.span>
+          ))}
+        </motion.div>
 
-        {/* Main proof surface */}
-        <div className="overflow-hidden rounded-[28px] border border-black/10 bg-white shadow-[0_30px_80px_rgba(18,15,11,0.09)]">
+        {/* Main proof surface — single strong entrance */}
+        <motion.div
+          className="overflow-hidden rounded-[28px] border border-black/10 bg-white shadow-[0_30px_80px_rgba(18,15,11,0.09)]"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 32, scale: 0.97 }}
+          transition={{ duration: 0.8, ease: EASE_OUT }}
+          viewport={{ once: true, amount: 0.15 }}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0, scale: 1 }}
+        >
           {/* Top bar */}
           <div className="flex flex-col gap-3 border-b border-black/8 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
@@ -405,9 +724,15 @@ function ProductProofSection() {
               {/* What is ready to move */}
               <div className="mt-6">
                 <div className="text-[13px] font-medium text-[#171513]">What is ready to move</div>
-                <div className="mt-4 space-y-4">
+                <motion.div
+                  className="mt-4 space-y-4"
+                  initial={shouldReduceMotion ? false : "hidden"}
+                  variants={staggerContainer(0.08, 0.3)}
+                  viewport={{ once: true }}
+                  whileInView={shouldReduceMotion ? undefined : "visible"}
+                >
                   {proofHighlights.map((item) => (
-                    <div className="flex items-start gap-3" key={item.title}>
+                    <motion.div className="flex items-start gap-3" key={item.title} variants={fadeRiseSmall}>
                       <div className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#fff5eb] text-[#b15d37]">
                         <CheckCircle2 className="size-4" />
                       </div>
@@ -418,36 +743,52 @@ function ProductProofSection() {
                         </div>
                         <div className="mt-1 text-[14px] leading-6 text-[#645d54]">{item.description}</div>
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </div>
             </div>
 
             {/* Right: Why + CTA */}
             <div className="border-t border-black/8 bg-[#faf5ee] px-6 py-6 sm:px-8 xl:border-l xl:border-t-0">
               <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Why this is worth your time</div>
-              <div className="mt-5 space-y-4">
+              <motion.div
+                className="mt-5 space-y-4"
+                initial={shouldReduceMotion ? false : "hidden"}
+                variants={staggerContainer(0.08, 0.4)}
+                viewport={{ once: true }}
+                whileInView={shouldReduceMotion ? undefined : "visible"}
+              >
                 {proofWhyItems.map((item) => (
-                  <div className="rounded-[16px] border border-black/6 bg-white/70 px-4 py-3.5 text-[14px] leading-6 text-[#4a4540]" key={item}>
+                  <motion.div
+                    className="rounded-[16px] border border-black/6 bg-white/70 px-4 py-3.5 text-[14px] leading-6 text-[#4a4540]"
+                    key={item}
+                    variants={fadeRiseSmall}
+                  >
                     {item}
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
-              <div className="mt-6 rounded-[16px] border border-[#ff6b3d]/20 bg-[#ff6b3d]/8 px-5 py-4">
+              <motion.div
+                className="mt-6 rounded-[16px] border border-[#ff6b3d]/20 bg-[#ff6b3d]/8 px-5 py-4"
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
+                transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.6 }}
+                viewport={{ once: true }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+              >
                 <div className="text-[14px] font-semibold text-[#171513]">Find My Matches</div>
                 <div className="mt-1.5 text-[13px] leading-5 text-[#645d54]">Bring your startup materials. See which programs actually fit.</div>
-              </div>
+              </motion.div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </SectionReveal>
     </section>
   );
 }
 
-/* ─── 7. Matched programs — featured lead + ranked shortlist ──── */
+/* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
 function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
@@ -469,8 +810,11 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
         {/* Featured lead */}
         <motion.article
           className="mb-6 rounded-[28px] border border-[#efcdb9] bg-[#fff8f1] px-7 py-7 shadow-[0_20px_50px_rgba(18,15,11,0.06)]"
-          transition={{ duration: 0.2 }}
-          whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.7, ease: EASE_OUT }}
+          viewport={{ once: true, amount: 0.3 }}
+          whileHover={shouldReduceMotion ? undefined : hoverLiftSmall}
+          whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
         >
           <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex min-w-0 items-start gap-4">
@@ -491,13 +835,15 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
               </div>
             </div>
 
-            <button
+            <motion.button
               className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
               onClick={onOpenAuth}
               type="button"
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+              whileTap={shouldReduceMotion ? undefined : tapCompress}
             >
               Review & Apply →
-            </button>
+            </motion.button>
           </div>
 
           <div className="mt-5">
@@ -507,13 +853,19 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
         </motion.article>
 
         {/* Ranked shortlist */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {shortlist.map((program, index) => (
+        <motion.div
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          initial={shouldReduceMotion ? false : "hidden"}
+          variants={staggerContainer(0.1, 0.15)}
+          viewport={{ once: true, amount: 0.2 }}
+          whileInView={shouldReduceMotion ? undefined : "visible"}
+        >
+          {shortlist.map((program) => (
             <motion.article
               className="rounded-[22px] border border-black/8 bg-white px-5 py-5 shadow-[0_12px_36px_rgba(18,15,11,0.03)] transition-colors"
               key={program.id}
-              transition={{ duration: 0.2 }}
-              whileHover={shouldReduceMotion ? undefined : { y: -3 }}
+              variants={fadeRise}
+              whileHover={shouldReduceMotion ? undefined : hoverLiftSmall}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3">
@@ -537,24 +889,27 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
 
               <p className="mt-4 text-[14px] leading-6 text-[#645d54]">{program.why}</p>
 
-              <button
+              <motion.button
                 className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
                 onClick={onOpenAuth}
                 type="button"
+                whileHover={shouldReduceMotion ? undefined : { x: 3 }}
               >
                 Review & Apply <ArrowRight className="size-3.5" />
-              </button>
+              </motion.button>
             </motion.article>
           ))}
-        </div>
+        </motion.div>
       </SectionReveal>
     </section>
   );
 }
 
-/* ─── 8. Final CTA ──────────────────────────────────────────────── */
+/* ─── 8. Final CTA ──────────────────────────────────────────── */
 
 function FinalCtaSection({ onOpenAuth }: { onOpenAuth: () => void }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <section className="border-b border-[#292420] bg-[#171513] px-4 py-20 text-white sm:px-6 xl:px-8">
       <SectionReveal className="mx-auto max-w-[720px] text-center">
@@ -565,13 +920,15 @@ function FinalCtaSection({ onOpenAuth }: { onOpenAuth: () => void }) {
           Upload once. Match faster. Draft smarter.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <button
+          <motion.button
             className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_14px_36px_rgba(255,107,61,0.28)] transition-colors hover:bg-[#f45d2e]"
             onClick={onOpenAuth}
             type="button"
+            whileHover={shouldReduceMotion ? undefined : { scale: 1.04, y: -2 }}
+            whileTap={shouldReduceMotion ? undefined : tapCompress}
           >
             Request Invite →
-          </button>
+          </motion.button>
         </div>
         <p className="mt-4 text-[13px] text-white/40">No credit card required · Free to start</p>
       </SectionReveal>
@@ -579,49 +936,51 @@ function FinalCtaSection({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── 9. Footer ──────────────────────────────────────────────────── */
+/* ─── 9. Footer ──────────────────────────────────────────────── */
 
 function HomepageFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   return (
     <footer className="bg-[#eee3d6] px-4 py-14 sm:px-6 xl:px-8">
-      <div className="mx-auto grid max-w-[1180px] gap-10 md:grid-cols-[1.35fr_0.9fr_0.9fr_0.9fr]">
-        <div>
-          <BrandLockup />
-          <p className="mt-5 max-w-[300px] text-[14px] leading-7 text-[#645d54]">
-            Built for founders who are serious but too busy to perform serial bureaucracy.
-          </p>
-        </div>
+      <SectionReveal className="mx-auto max-w-[1180px]">
+        <div className="grid gap-10 md:grid-cols-[1.35fr_0.9fr_0.9fr_0.9fr]">
+          <div>
+            <BrandLockup />
+            <p className="mt-5 max-w-[300px] text-[14px] leading-7 text-[#645d54]">
+              Built for founders who are serious but too busy to perform serial bureaucracy.
+            </p>
+          </div>
 
-        <div>
-          <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Product</div>
-          <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-            <Link href="#how-it-works">How It Works</Link>
-            <Link href="/explore">Programs</Link>
-            <Link href="#product-proof">Pricing</Link>
+          <div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Product</div>
+            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
+              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="#how-it-works">How It Works</Link>
+              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="/explore">Programs</Link>
+              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">Pricing</Link>
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Programs</div>
+            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
+              {matchedPrograms.slice(0, 4).map((program) => (
+                <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#matched-programs" key={program.id}>
+                  {program.name}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Company</div>
+            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
+              <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">About</a>
+              <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">Blog</a>
+              <button className="w-fit text-left transition-colors duration-200 hover:text-[#b15d37]" onClick={onOpenAuth} type="button">Contact</button>
+              <button className="w-fit text-left transition-colors duration-200 hover:text-[#b15d37]" onClick={onOpenAuth} type="button">Privacy</button>
+            </div>
           </div>
         </div>
-
-        <div>
-          <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Programs</div>
-          <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-            {matchedPrograms.slice(0, 4).map((program) => (
-              <a href="#matched-programs" key={program.id}>
-                {program.name}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Company</div>
-          <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-            <a href="#product-proof">About</a>
-            <a href="#product-proof">Blog</a>
-            <button className="w-fit text-left" onClick={onOpenAuth} type="button">Contact</button>
-            <button className="w-fit text-left" onClick={onOpenAuth} type="button">Privacy</button>
-          </div>
-        </div>
-      </div>
+      </SectionReveal>
 
       <div className="mx-auto mt-12 flex max-w-[1180px] flex-col gap-2 border-t border-black/8 pt-6 text-[12px] text-[#8b8276] md:flex-row md:items-center md:justify-between">
         <div>© 2026 Fundme.ai. Built for founders, not for application.</div>
@@ -631,7 +990,7 @@ function HomepageFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── Assembled Homepage ────────────────────────────────────────── */
+/* ─── Assembled Homepage ────────────────────────────────────── */
 
 export function PublicHomepage() {
   const router = useRouter();
