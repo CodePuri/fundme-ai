@@ -6,7 +6,8 @@
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {
     "clsx": "^2.1.1",
