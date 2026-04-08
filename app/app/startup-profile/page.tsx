@@ -119,10 +119,10 @@ export default function StartupProfilePage() {
     <PageShell>
       <div>
         <div className="eyebrow">Your Startup</div>
-        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
+        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
           Your Startup
         </h1>
-        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-zinc-500">
+        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-[var(--text-muted)]">
           Built from your uploaded material. Edit anything. This powers your matches and drafts.
         </p>
       </div>
@@ -186,20 +186,22 @@ export default function StartupProfilePage() {
           ))}
         </div>
 
-        <div className="sticky top-28 h-fit rounded-xl bg-zinc-900 p-6">
+        <div className="sticky top-28 h-fit rounded-xl border border-[var(--border)] bg-[var(--surface)] p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="text-[18px] font-semibold tracking-[-0.03em] text-white">
+              <div className="text-[18px] font-semibold tracking-[-0.03em] text-[var(--text-primary)]">
                 Tell us more
               </div>
-              <div className="mt-2 text-[14px] leading-7 text-zinc-500">
+              <div className="mt-2 text-[14px] leading-7 text-[var(--text-muted)]">
                 Just talk. We&apos;ll fill in the details.
               </div>
             </div>
             <button
               aria-label="Use voice mock"
               className={`relative flex size-10 items-center justify-center rounded-full border ${
-                listening ? "border-white bg-white text-black" : "border-zinc-700 text-zinc-300"
+                listening
+                  ? "border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] text-[var(--button-primary-text)]"
+                  : "border-[var(--border)] text-[var(--text-muted)]"
               }`}
               onClick={handleVoiceMock}
               type="button"
@@ -208,7 +210,7 @@ export default function StartupProfilePage() {
                 <div className="absolute inset-[-10px] flex items-center justify-center gap-1">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <span
-                      className="w-1 animate-pulse rounded-full bg-white/40"
+                      className="w-1 animate-pulse rounded-full bg-[var(--button-primary-text)]/50"
                       key={index}
                       style={{ height: `${8 + (index % 3) * 6}px`, animationDelay: `${index * 70}ms` }}
                     />
@@ -220,7 +222,7 @@ export default function StartupProfilePage() {
           </div>
 
           <Textarea
-            className="mt-5 min-h-[180px] border-zinc-800 bg-transparent text-zinc-300"
+            className="mt-5 min-h-[180px] bg-transparent text-[var(--text-primary)]"
             onChange={(event) => setRamble(event.target.value)}
             placeholder="Talk through the problem, traction, product, and why now."
             value={ramble}
@@ -230,12 +232,12 @@ export default function StartupProfilePage() {
             {filling ? "Filling from voice note..." : "Fill from voice note"}
           </Button>
 
-          <div className="mt-5 rounded-[12px] border border-zinc-800 bg-black/20 p-4">
-            <div className="flex items-center gap-2 text-[13px] text-white">
+          <div className="mt-5 rounded-[12px] border border-[var(--border)] bg-[var(--bg)]/20 p-4">
+            <div className="flex items-center gap-2 text-[13px] text-[var(--text-primary)]">
               <Sparkles className="size-4" />
               Structured extraction
             </div>
-            <p className="mt-3 text-[14px] leading-7 text-zinc-500">
+            <p className="mt-3 text-[14px] leading-7 text-[var(--text-muted)]">
               The strongest narrative remains consistent: agencies lose money to scope creep, and
               Flowstate catches the moment nobody else owns.
             </p>

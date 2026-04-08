@@ -8,9 +8,9 @@ export function Progress({
   className?: string;
 }) {
   return (
-    <div className={cn("h-1.5 overflow-hidden rounded-full bg-white/6", className)}>
+    <div className={cn("h-1.5 overflow-hidden rounded-full bg-[var(--surface-elevated)]", className)}>
       <div
-        className="h-full rounded-full bg-white transition-[width] duration-500 ease-out"
+        className="h-full rounded-full bg-[var(--button-primary-bg)] transition-[width] duration-500 ease-out"
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
       />
     </div>

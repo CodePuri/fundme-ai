@@ -11,11 +11,12 @@ import {
 import { toast } from "sonner";
 
 import {
+  createApplicationQuestions,
   defaultFounderProfile,
   defaultOpportunities,
   defaultStartupProfile,
   gmailEmails,
-  ycQuestions,
+  type ApplicationSession,
   type ApplicationQuestion,
   type FounderProfile,
   type Opportunity,
@@ -31,7 +32,7 @@ type DemoState = {
   startupProfile: StartupProfile;
   founderProfile: FounderProfile;
   opportunities: Opportunity[];
-  ycQuestions: ApplicationQuestion[];
+  applicationSessions: Record<string, ApplicationSession>;
   emailUpdatesApplied: boolean;
   selectedFiles: string[];
   lastSyncAt: string;
@@ -62,9 +63,10 @@ type DemoContextValue = {
   startNewIdea: () => void;
   updateStartupField: (field: keyof StartupProfile, value: string) => void;
   updateFounderField: (field: keyof FounderProfile, value: string | string[]) => void;
-  cycleAnswerVariant: (questionId: string) => void;
-  saveAnswer: (questionId: string, answer: string) => void;
-  markReady: (questionId: string) => void;
+  ensureApplicationSession: (programSlug: string) => void;
+  cycleAnswerVariant: (programSlug: string, questionId: string) => void;
+  saveAnswer: (programSlug: string, questionId: string, answer: string) => void;
+  markReady: (programSlug: string, questionId: string) => void;
   updateOpportunityStatus: (slug: string, status: ProgramStatus) => void;
   connectGmail: () => void;
   applyEmailUpdates: () => void;
@@ -74,6 +76,46 @@ type DemoContextValue = {
 const STORAGE_KEY = "fundme-ai-demo-v2";
 export const ONBOARDING_STEP_KEY = "onboardingStep";
 export const ONBOARDING_DRAFT_KEY = "onboardingDraft";
+const DEFAULT_APPLICATION_SLUG = "yc-w26";
+
+function cloneQuestions(questions: ApplicationQuestion[]) {
+  return questions.map((question) => ({
+    ...question,
+    variants: [...question.variants],
+    sourceSnippets: [...question.sourceSnippets],
+  }));
+}
+
+function createApplicationSession(programSlug: string): ApplicationSession {
+  return {
+    programSlug,
+    questions: createApplicationQuestions(),
+    lastOpenedAt: new Date().toISOString(),
+  };
+}
+
+function updateSessionProgress(program: Opportunity, questions: ApplicationQuestion[]): Opportunity {
+  const readyCount = questions.filter((question) => question.ready).length;
+  const lockedStatuses: ProgramStatus[] = [
+    "Submitted",
+    "Interview Scheduled",
+    "Accepted",
+    "Rejected",
+  ];
+  return {
+    ...program,
+    tracked: true,
+    questionCount: questions.length,
+    questionsCompleted: readyCount,
+    status:
+      readyCount === questions.length
+        ? "Ready"
+        : lockedStatuses.includes(program.status)
+          ? program.status
+          : "Drafting",
+    lastEdited: new Date().toISOString(),
+  };
+}
 
 const defaultState: DemoState = {
   isAuthenticated: false,
@@ -84,7 +126,9 @@ const defaultState: DemoState = {
   startupProfile: defaultStartupProfile,
   founderProfile: defaultFounderProfile,
   opportunities: defaultOpportunities,
-  ycQuestions,
+  applicationSessions: {
+    [DEFAULT_APPLICATION_SLUG]: createApplicationSession(DEFAULT_APPLICATION_SLUG),
+  },
   emailUpdatesApplied: false,
   selectedFiles: defaultStartupProfile.uploadedAssets,
   lastSyncAt: "2026-04-05T13:08:00.000Z",
@@ -98,16 +142,34 @@ const defaultState: DemoState = {
 
 const DemoContext = createContext<DemoContextValue | null>(null);
 
-function hydrateState(saved: Partial<DemoState>): DemoState {
+function hydrateState(saved: Partial<DemoState> & { ycQuestions?: ApplicationQuestion[] }): DemoState {
   const mergedOpportunities = defaultState.opportunities.map((opportunity) => {
     const savedMatch = saved.opportunities?.find((item) => item.slug === opportunity.slug);
     return savedMatch ? { ...opportunity, ...savedMatch } : opportunity;
   });
 
-  const mergedQuestions = defaultState.ycQuestions.map((question) => {
-    const savedMatch = saved.ycQuestions?.find((item) => item.id === question.id);
-    return savedMatch ? { ...question, ...savedMatch } : question;
-  });
+  const savedSessions = saved.applicationSessions ?? {};
+  const mergedSessions = Object.fromEntries(
+    Object.entries(savedSessions).map(([programSlug, session]) => [
+      programSlug,
+      {
+        ...session,
+        lastOpenedAt: session.lastOpenedAt ?? new Date().toISOString(),
+        questions: cloneQuestions(session.questions),
+      },
+    ]),
+  ) as Record<string, ApplicationSession>;
+  delete mergedSessions[DEFAULT_APPLICATION_SLUG];
+
+  const savedDefaultQuestions = savedSessions[DEFAULT_APPLICATION_SLUG]?.questions ?? saved.ycQuestions;
+  const defaultQuestions = cloneQuestions(
+    savedDefaultQuestions && savedDefaultQuestions.length
+      ? defaultState.applicationSessions[DEFAULT_APPLICATION_SLUG].questions.map((question) => {
+          const savedMatch = savedDefaultQuestions.find((item) => item.id === question.id);
+          return savedMatch ? { ...question, ...savedMatch } : question;
+        })
+      : defaultState.applicationSessions[DEFAULT_APPLICATION_SLUG].questions,
+  );
 
   return {
     ...defaultState,
@@ -121,7 +183,15 @@ function hydrateState(saved: Partial<DemoState>): DemoState {
       ...saved.founderProfile,
     },
     opportunities: mergedOpportunities,
-    ycQuestions: mergedQuestions,
+    applicationSessions: {
+      [DEFAULT_APPLICATION_SLUG]: {
+        programSlug: DEFAULT_APPLICATION_SLUG,
+        questions: defaultQuestions,
+        lastOpenedAt:
+          savedSessions[DEFAULT_APPLICATION_SLUG]?.lastOpenedAt ?? defaultState.lastSyncAt,
+      },
+      ...mergedSessions,
+    },
     selectedFiles: saved.selectedFiles?.length ? saved.selectedFiles : defaultState.selectedFiles,
     manualTrackerPrograms: saved.manualTrackerPrograms ?? [],
   };
@@ -133,6 +203,51 @@ function updateBySlug(
   updater: (item: Opportunity) => Opportunity,
 ) {
   return opportunities.map((item) => (item.slug === slug ? updater(item) : item));
+}
+
+function ensureSessionExists(
+  sessions: Record<string, ApplicationSession>,
+  programSlug: string,
+) {
+  if (sessions[programSlug]) {
+    return sessions;
+  }
+
+  return {
+    ...sessions,
+    [programSlug]: createApplicationSession(programSlug),
+  };
+}
+
+function updateApplicationSession(
+  state: DemoState,
+  programSlug: string,
+  updater: (questions: ApplicationQuestion[]) => ApplicationQuestion[],
+) {
+  const timestamp = new Date().toISOString();
+  const nextSessions = ensureSessionExists(state.applicationSessions, programSlug);
+  const currentSession = nextSessions[programSlug];
+  const nextQuestions = updater(currentSession.questions);
+  const nextSession: ApplicationSession = {
+    programSlug,
+    questions: nextQuestions,
+    lastOpenedAt: timestamp,
+  };
+
+  return {
+    ...state,
+    applicationSessions: {
+      ...nextSessions,
+      [programSlug]: nextSession,
+    },
+    opportunities: state.opportunities.map((program) =>
+      program.slug === programSlug ? updateSessionProgress(program, nextQuestions) : program,
+    ),
+    manualTrackerPrograms: state.manualTrackerPrograms.map((program) =>
+      program.slug === programSlug ? updateSessionProgress(program, nextQuestions) : program,
+    ),
+    lastSyncAt: timestamp,
+  };
 }
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
@@ -176,10 +291,14 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     () => ({
       state,
       signIn: () => {
+        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
         startTransition(() => {
           setState((current) => ({
             ...current,
             isAuthenticated: true,
+            onboardingCompleted: true,
+            resumeBannerDismissed: true,
             lastSyncAt: new Date().toISOString(),
           }));
         });
@@ -261,57 +380,76 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
           },
         }));
       },
-      cycleAnswerVariant: (questionId) => {
-        setState((current) => ({
-          ...current,
-          ycQuestions: current.ycQuestions.map((item) => {
-            if (item.id !== questionId) {
-              return item;
-            }
-            const nextVariant = item.variants[0];
-            return {
-              ...item,
-              answer: nextVariant,
-              variants: [...item.variants.slice(1), item.answer],
-              lastSaved: new Date().toISOString(),
-            };
-          }),
-        }));
-        toast.success("Fundme rewrote this answer with a sharper YC angle.");
+      ensureApplicationSession: (programSlug) => {
+        setState((current) => {
+          if (current.applicationSessions[programSlug]) {
+            return current;
+          }
+
+          return {
+            ...current,
+            applicationSessions: ensureSessionExists(current.applicationSessions, programSlug),
+          };
+        });
       },
-      saveAnswer: (questionId, answer) => {
-        setState((current) => ({
-          ...current,
-          ycQuestions: current.ycQuestions.map((item) =>
-            item.id === questionId
-              ? {
-                  ...item,
-                  answer,
-                  lastSaved: new Date().toISOString(),
-                }
-              : item,
+      cycleAnswerVariant: (programSlug, questionId) => {
+        setState((current) =>
+          updateApplicationSession(current, programSlug, (questions) =>
+            questions.map((item) => {
+              if (item.id !== questionId) {
+                return item;
+              }
+              const nextVariant = item.variants[0];
+              return {
+                ...item,
+                answer: nextVariant,
+                variants: [...item.variants.slice(1), item.answer],
+                lastSaved: new Date().toISOString(),
+              };
+            }),
           ),
-        }));
+        );
+        toast.success("Fundme rewrote this answer with a sharper program fit.");
       },
-      markReady: (questionId) => {
-        setState((current) => ({
-          ...current,
-          ycQuestions: current.ycQuestions.map((item) =>
-            item.id === questionId
-              ? {
-                  ...item,
-                  ready: true,
-                  lastSaved: new Date().toISOString(),
-                }
-              : item,
+      saveAnswer: (programSlug, questionId, answer) => {
+        setState((current) =>
+          updateApplicationSession(current, programSlug, (questions) =>
+            questions.map((item) =>
+              item.id === questionId
+                ? {
+                    ...item,
+                    answer,
+                    lastSaved: new Date().toISOString(),
+                  }
+                : item,
+            ),
           ),
-        }));
+        );
+      },
+      markReady: (programSlug, questionId) => {
+        setState((current) =>
+          updateApplicationSession(current, programSlug, (questions) =>
+            questions.map((item) =>
+              item.id === questionId
+                ? {
+                    ...item,
+                    ready: true,
+                    lastSaved: new Date().toISOString(),
+                  }
+                : item,
+            ),
+          ),
+        );
         toast.success("This answer is marked ready for founder review.");
       },
       updateOpportunityStatus: (slug, status) => {
         setState((current) => ({
           ...current,
           opportunities: updateBySlug(current.opportunities, slug, (item) => ({
+            ...item,
+            status,
+          })),
+          manualTrackerPrograms: updateBySlug(current.manualTrackerPrograms, slug, (item) => ({
             ...item,
             status,
           })),
@@ -343,14 +481,34 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         toast.success("Tracker updated from the latest inbox signals.");
       },
       addTrackerProgram: (program) => {
+        let addedToTracker = false;
+
         setState((current) => {
-          if (
-            current.manualTrackerPrograms.some((item) => item.slug === program.slug) ||
-            current.opportunities.some((item) => item.slug === program.slug && item.tracked)
-          ) {
+          if (current.manualTrackerPrograms.some((item) => item.slug === program.slug)) {
             return current;
           }
 
+          const existingOpportunity = current.opportunities.find((item) => item.slug === program.slug);
+
+          if (existingOpportunity) {
+            if (existingOpportunity.tracked) {
+              return current;
+            }
+
+            addedToTracker = true;
+            return {
+              ...current,
+              opportunities: updateBySlug(current.opportunities, program.slug, (item) => ({
+                ...item,
+                tracked: true,
+                status: item.status ?? "Drafting",
+                lastEdited: new Date().toISOString(),
+              })),
+              lastSyncAt: new Date().toISOString(),
+            };
+          }
+
+          addedToTracker = true;
           return {
             ...current,
             manualTrackerPrograms: [
@@ -361,9 +519,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
                 tracked: true,
               },
             ],
+            lastSyncAt: new Date().toISOString(),
           };
         });
-        toast.success("Program added to your tracker.");
+        if (addedToTracker) {
+          toast.success("Program added to your tracker.");
+        }
       },
     }),
     [state],

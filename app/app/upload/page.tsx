@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function LegacyUploadPage() {
-  redirect("/onboarding");
+  redirect("/app/startup-profile");
 }

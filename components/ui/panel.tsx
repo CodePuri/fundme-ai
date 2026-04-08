@@ -16,7 +16,7 @@ export function Panel({
       className={cn(
         "rounded-[14px] border p-5",
         tone === "default" && "border-[var(--border)] bg-[var(--surface)]",
-        tone === "muted" && "border-[var(--border)] bg-black",
+        tone === "muted" && "border-[var(--border)] bg-[var(--surface-elevated)]",
         tone === "elevated" && "border-[var(--border)] bg-[var(--surface-elevated)]",
         tone === "amber" && "border-amber-400/18 bg-amber-400/10",
         className,

@@ -2,20 +2,83 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #050505;
-  --surface: #0c0c0d;
-  --surface-elevated: #121214;
-  --border: rgba(255, 255, 255, 0.07);
-  --text-primary: #f5f5f5;
-  --text-muted: #8f8f97;
-  --text-faint: #50505a;
+  --bg: #f6f1ea;
+  --surface: #ffffff;
+  --surface-elevated: #faf6f0;
+  --border: rgba(17, 17, 17, 0.08);
+  --border-strong: rgba(17, 17, 17, 0.16);
+  --text-primary: #111111;
+  --text-muted: #6d665e;
+  --text-faint: #8d8578;
+  --input-bg: rgba(255, 255, 255, 0.88);
+  --input-bg-focus: #ffffff;
+  --input-border-focus: rgba(255, 107, 61, 0.32);
+  --focus-ring: rgba(255, 107, 61, 0.28);
+  --focus-ring-offset: #f6f1ea;
+  --button-primary-bg: #ff6b3d;
+  --button-primary-bg-hover: #f45d2e;
+  --button-primary-border: #ff6b3d;
+  --button-primary-border-hover: #f45d2e;
+  --button-primary-text: #ffffff;
   --accent-green: #22c55e;
   --accent-amber: #f59e0b;
   --accent-blue: #60a5fa;
+  --editorial-bg: #f6f1ea;
+  --editorial-surface: #faf6f0;
+  --editorial-panel: rgba(255, 255, 255, 0.94);
+  --editorial-border: rgba(17, 17, 17, 0.08);
+  --editorial-text: #111111;
+  --editorial-muted: #6d665e;
+  --editorial-faint: #8d8578;
+  --editorial-accent: #ff6b3d;
   --font-sans: "Geist Sans", "Inter", sans-serif;
   --font-display: "Cormorant Garamond", Georgia, serif;
   --font-editorial: "Playfair Display", Georgia, serif;
   --font-instrument: "Instrument Serif", Georgia, serif;
+}
+
+[data-theme="app"] {
+  --bg: #f6f1ea;
+  --surface: #ffffff;
+  --surface-elevated: #faf6f0;
+  --border: rgba(17, 17, 17, 0.08);
+  --border-strong: rgba(17, 17, 17, 0.16);
+  --text-primary: #111111;
+  --text-muted: #6d665e;
+  --text-faint: #8d8578;
+  --input-bg: rgba(255, 255, 255, 0.88);
+  --input-bg-focus: #ffffff;
+  --input-border-focus: rgba(255, 107, 61, 0.32);
+  --focus-ring: rgba(255, 107, 61, 0.28);
+  --focus-ring-offset: #f6f1ea;
+  --button-primary-bg: #ff6b3d;
+  --button-primary-bg-hover: #f45d2e;
+  --button-primary-border: #ff6b3d;
+  --button-primary-border-hover: #f45d2e;
+  --button-primary-text: #ffffff;
+  color-scheme: light;
+}
+
+[data-theme="public"] {
+  --bg: #f6f1ea;
+  --surface: #ffffff;
+  --surface-elevated: #faf6f0;
+  --border: rgba(17, 17, 17, 0.08);
+  --border-strong: rgba(17, 17, 17, 0.16);
+  --text-primary: #111111;
+  --text-muted: #6d665e;
+  --text-faint: #8d8578;
+  --input-bg: rgba(255, 255, 255, 0.88);
+  --input-bg-focus: #ffffff;
+  --input-border-focus: rgba(255, 107, 61, 0.32);
+  --focus-ring: rgba(255, 107, 61, 0.28);
+  --focus-ring-offset: #f6f1ea;
+  --button-primary-bg: #ff6b3d;
+  --button-primary-bg-hover: #f45d2e;
+  --button-primary-border: #ff6b3d;
+  --button-primary-border-hover: #f45d2e;
+  --button-primary-text: #ffffff;
+  color-scheme: light;
 }
 
 * {
@@ -26,13 +89,14 @@ html {
   background: var(--bg);
   color: var(--text-primary);
   scroll-behavior: smooth;
+  color-scheme: light;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
   background:
-    radial-gradient(circle at top center, rgba(255, 255, 255, 0.04), transparent 28%),
+    radial-gradient(circle at top center, rgba(255, 107, 61, 0.08), transparent 28%),
     var(--bg);
   color: var(--text-primary);
   font-family: var(--font-sans);
@@ -51,23 +115,23 @@ textarea {
 }
 
 ::selection {
-  background: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 107, 61, 0.18);
   color: var(--text-primary);
 }
 
 :focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.34);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
 .liquid-glass {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(17, 17, 17, 0.08);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 24px 80px rgba(0, 0, 0, 0.35);
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 24px 80px rgba(17, 17, 17, 0.08);
 }
 
 .page-frame {
@@ -98,7 +162,7 @@ textarea {
 .app-input {
   width: 100%;
   border: 1px solid var(--border);
-  background: #080809;
+  background: var(--input-bg);
   color: var(--text-primary);
   transition:
     border-color 180ms ease,
@@ -111,10 +175,67 @@ textarea {
 }
 
 .app-input:focus {
-  border-color: rgba(255, 255, 255, 0.16);
-  background: #101011;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04);
+  border-color: var(--input-border-focus);
+  background: var(--input-bg-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus-ring) 24%, transparent);
   outline: none;
+}
+
+.editorial-input {
+  border: 1px solid var(--editorial-border);
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--editorial-text);
+}
+
+.editorial-input::placeholder {
+  color: var(--editorial-faint);
+}
+
+.editorial-input:focus {
+  border-color: rgba(255, 107, 61, 0.32);
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(255, 107, 61, 0.08);
+}
+
+.editorial-panel {
+  border: 1px solid var(--editorial-border);
+  background: var(--editorial-panel);
+  box-shadow: 0 20px 60px rgba(17, 17, 17, 0.08);
+}
+
+.editorial-subtle-panel {
+  border: 1px solid var(--editorial-border);
+  background: var(--editorial-surface);
+}
+
+@keyframes logo-rail-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.logo-rail-viewport {
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-rail-strip {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  gap: 1rem;
+  animation: logo-rail-scroll 26s linear infinite;
+  will-change: transform;
+}
+
+.logo-rail-strip--duplicate {
+  position: absolute;
+  top: 0;
+  left: 100%;
 }
 
 @keyframes fade-rise {
@@ -136,6 +257,25 @@ textarea {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+
+  .logo-rail-viewport {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .logo-rail-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .logo-rail-strip {
+    position: relative;
+    animation: none;
+    transform: translateX(0);
+  }
+
+  .logo-rail-strip--duplicate {
+    display: none;
   }
 
   *,

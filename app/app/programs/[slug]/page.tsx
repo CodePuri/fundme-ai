@@ -1,32 +1,75 @@
 "use client";
 
-import { use } from "react";
+import { use, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PageShell } from "@/components/app/page-shell";
 import { useDemo } from "@/components/app/demo-provider";
+import { StartupProgramLogo } from "@/components/startup-programs/startup-program-logo";
 import { Badge } from "@/components/ui/badge";
 import { Breadcrumbs } from "@/components/ui/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { Panel, PanelBody, PanelDescription, PanelHeader, PanelTitle } from "@/components/ui/panel";
 import { ProgramLogo } from "@/components/ui/program-logo";
 import { StatusBadge, fitTone, statusTone } from "@/components/ui/status-badge";
+import { createApplicationQuestions } from "@/lib/demo-data";
+import { buildOpportunityFromStartupProgram, buildStartupProgramWorkspaceContext } from "@/lib/startup-program-workflow";
+import { getStartupProgramByWorkflowSlug } from "@/lib/startup-programs";
 
 function scoreColor(score: number) {
   if (score >= 80) {
-    return "text-green-300";
+    return "text-green-700";
   }
   if (score >= 65) {
-    return "text-amber-300";
+    return "text-amber-700";
   }
-  return "text-zinc-400";
+  return "text-[var(--text-faint)]";
 }
 
 export default function ProgramDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { state } = useDemo();
+  const { addTrackerProgram, state } = useDemo();
   const { slug } = use(params);
-  const program = state.opportunities.find((item) => item.slug === slug);
+  const trackedProgram =
+    state.opportunities.find((item) => item.slug === slug) ??
+    state.manualTrackerPrograms.find((item) => item.slug === slug) ??
+    null;
+  const startupProgram = getStartupProgramByWorkflowSlug(slug);
+  const program = trackedProgram ?? (startupProgram ? buildOpportunityFromStartupProgram(startupProgram) : null);
+
+  useEffect(() => {
+    if (!startupProgram) {
+      return;
+    }
+
+    addTrackerProgram(buildOpportunityFromStartupProgram(startupProgram));
+  }, [addTrackerProgram, startupProgram]);
+
+  const startupProgramContext = useMemo(() => {
+    if (!startupProgram) {
+      return null;
+    }
+
+    return buildStartupProgramWorkspaceContext(
+      startupProgram,
+      state.startupProfile,
+      state.founderProfile,
+    );
+  }, [startupProgram, state.founderProfile, state.startupProfile]);
+  const questions = useMemo(() => {
+    if (!program) {
+      return [];
+    }
+
+    return (
+      state.applicationSessions[program.slug]?.questions ?? createApplicationQuestions()
+    );
+  }, [program, state.applicationSessions]);
+  const previewQuestionCount = questions.length || program?.questionCount || 0;
+  const previewQuestionsCompleted =
+    questions.length > 0
+      ? questions.filter((question) => question.ready).length
+      : program?.questionsCompleted ?? 0;
 
   if (!program) {
     notFound();
@@ -49,7 +92,11 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
-            <ProgramLogo domain={program.domain} size={48} slug={program.slug} />
+            {startupProgram ? (
+              <StartupProgramLogo name={startupProgram.name} size={48} slug={startupProgram.slug} />
+            ) : (
+              <ProgramLogo domain={program.domain} size={48} slug={program.slug} />
+            )}
             <div>
               <h1 className="text-[38px] font-semibold tracking-[-0.05em]">{program.name}</h1>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -79,9 +126,9 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
             <PanelHeader className="block">
               <PanelTitle>Why you match</PanelTitle>
             </PanelHeader>
-            <PanelBody className="flex flex-col gap-3">
+              <PanelBody className="flex flex-col gap-3">
               {program.signals.map((signal) => (
-                <div className="rounded-[10px] border border-[var(--border)] bg-black px-4 py-4 text-[14px] text-[var(--text-muted)]" key={signal}>
+                <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-4 text-[14px] text-[var(--text-muted)]" key={signal}>
                   {signal}
                 </div>
               ))}
@@ -102,14 +149,14 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
           <Panel>
             <PanelHeader className="block">
               <PanelTitle>
-                Application Preview ({program.questionsCompleted}/{program.questionCount} questions)
+                Application Preview ({previewQuestionsCompleted}/{previewQuestionCount} questions)
               </PanelTitle>
             </PanelHeader>
             <PanelBody className="flex flex-col gap-3">
-              {state.ycQuestions.map((question) => (
-                <div className="rounded-[10px] border border-[var(--border)] bg-black p-4" key={question.id}>
+              {questions.map((question) => (
+                <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] p-4" key={question.id}>
                   <div className="text-[13px] text-[var(--text-primary)]">{question.question}</div>
-                  <div className="mt-3 h-10 rounded-[6px] bg-[var(--surface)]" />
+                  <div className="mt-3 h-10 rounded-[6px] bg-[var(--surface)]/80" />
                 </div>
               ))}
             </PanelBody>
@@ -129,19 +176,32 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
               <PanelTitle>Requirements</PanelTitle>
             </PanelHeader>
             <PanelBody className="flex flex-col gap-3">
-              {program.requirements.map((item) => (
-                <div className="rounded-[10px] border border-[var(--border)] bg-black px-4 py-4 text-[14px] text-[var(--text-muted)]" key={item}>
+              {(startupProgramContext?.requirements ?? program.requirements).map((item) => (
+                <div className="rounded-[10px] border border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-4 text-[14px] text-[var(--text-muted)]" key={item}>
                   {item}
                 </div>
               ))}
             </PanelBody>
           </Panel>
 
-          <Link href={`/app/workspace/${program.slug}`}>
-            <Button className="w-full" size="lg">
-              Continue to workspace
-            </Button>
-          </Link>
+          <div className="flex flex-col gap-3">
+            {startupProgram ? (
+              <a
+                className="inline-flex h-11 w-full items-center justify-center rounded-[4px] border border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] px-5 text-sm font-medium text-[var(--button-primary-text)] transition-colors hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)]"
+                href={startupProgram.apply_url || startupProgram.website_url}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Apply
+              </a>
+            ) : null}
+
+            <Link href={`/app/workspace/${program.slug}`}>
+              <Button className="w-full" size="lg">
+                Continue to workspace
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </PageShell>

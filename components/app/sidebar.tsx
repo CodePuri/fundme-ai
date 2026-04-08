@@ -1,7 +1,6 @@
 "use client";
 
 import type { ComponentType } from "react";
-import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Building2,
@@ -30,7 +29,7 @@ const sections: Array<{ label: string; items: SidebarItem[] }> = [
   {
     label: "Workspace",
     items: [
-      { href: "/onboarding", label: "Add New Idea", icon: PlusCircle, reset: true },
+      { href: "/app/startup-profile", label: "Add New Idea", icon: PlusCircle, reset: true },
       { href: "/app/startup-profile", label: "Startup Profile", icon: Building2 },
       { href: "/app/founder-profile", label: "Founder Profile", icon: UserRound },
     ],
@@ -58,15 +57,15 @@ export function Sidebar() {
   const { state, startNewIdea } = useDemo();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-zinc-900 bg-black px-4 py-5 lg:flex">
-      <Link className="flex items-center gap-3 rounded-[10px] px-2 py-2" href="/">
+    <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-5 lg:flex">
+      <button className="flex items-center gap-3 rounded-[10px] px-2 py-2 text-left" onClick={() => router.push("/app/matches")} type="button">
         <BrandLockup surface="plate" />
-      </Link>
+      </button>
 
       <div className="mt-8 flex flex-col gap-6">
         {sections.map((section) => (
           <div key={section.label}>
-            <div className="px-3 text-[11px] uppercase tracking-[0.14em] text-zinc-600">
+            <div className="px-3 text-[11px] uppercase tracking-[0.14em] text-[var(--text-faint)]">
               {section.label}
             </div>
             <nav className="mt-2 flex flex-col gap-1">
@@ -76,9 +75,9 @@ export function Sidebar() {
                 return (
                   <button
                     className={cn(
-                      "flex w-full items-center justify-between rounded-r-xl border-l-2 border-transparent px-3 py-2.5 text-[13px] text-zinc-500 transition-colors",
-                      "hover:bg-zinc-950 hover:text-white",
-                      active && "border-l-white bg-zinc-950 text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.04)]",
+                      "flex w-full items-center justify-between rounded-[14px] border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
+                      "border-transparent text-[var(--text-muted)] hover:border-[var(--border)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]",
+                      active && "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-[0_8px_24px_rgba(17,17,17,0.06)]",
                     )}
                     key={href}
                     onClick={() => {
@@ -104,10 +103,10 @@ export function Sidebar() {
         ))}
       </div>
 
-      <div className="mt-auto border-t border-zinc-900 pt-4">
-        <div className="rounded-[12px] bg-zinc-950 px-3 py-3">
-          <div className="text-[13px] font-medium text-white">Arjun Mehta</div>
-          <div className="mt-1 text-[12px] text-zinc-500">Flowstate AI</div>
+      <div className="mt-auto border-t border-[var(--border)] pt-4">
+        <div className="rounded-[12px] bg-[var(--surface)] px-3 py-3">
+          <div className="text-[13px] font-medium text-[var(--text-primary)]">Arjun Mehta</div>
+          <div className="mt-1 text-[12px] text-[var(--text-muted)]">Flowstate AI</div>
         </div>
       </div>
     </aside>

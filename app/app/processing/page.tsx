@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function LegacyProcessingPage() {
-  redirect("/processing");
+  redirect("/app/matches");
 }

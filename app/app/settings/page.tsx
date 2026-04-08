@@ -30,7 +30,7 @@ function SocialCard({
   const [connected, setConnected] = useState(false);
 
   return (
-    <div className="rounded-[12px] border border-zinc-800 bg-black p-4">
+    <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-4">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <LogoImage
@@ -40,15 +40,15 @@ function SocialCard({
             size={32}
           />
           <div>
-            <div className="text-[15px] font-medium text-white">{title}</div>
+            <div className="text-[15px] font-medium text-[var(--text-primary)]">{title}</div>
             {connected ? (
-              <div className="mt-2 flex items-center gap-2 text-[13px] text-zinc-400">
+              <div className="mt-2 flex items-center gap-2 text-[13px] text-[var(--text-muted)]">
                 <span className="size-2 rounded-full bg-green-400" />
                 <span>Connected</span>
                 <span>{handle}</span>
               </div>
             ) : (
-              <div className="mt-2 text-[13px] text-zinc-500">Not connected</div>
+              <div className="mt-2 text-[13px] text-[var(--text-faint)]">Not connected</div>
             )}
           </div>
         </div>
@@ -75,7 +75,7 @@ export default function SettingsPage() {
     <PageShell>
       <div>
         <div className="eyebrow">Settings</div>
-        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
+        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
           Settings
         </h1>
       </div>
@@ -94,11 +94,11 @@ export default function SettingsPage() {
 
               <Field>
                 <FieldLabel>Notification Preferences</FieldLabel>
-                <label className="flex items-center gap-3 text-[14px] text-white">
+                <label className="flex items-center gap-3 text-[14px] text-[var(--text-primary)]">
                   <input defaultChecked type="checkbox" />
                   Email me about new matches
                 </label>
-                <label className="mt-3 flex items-center gap-3 text-[14px] text-white">
+                <label className="mt-3 flex items-center gap-3 text-[14px] text-[var(--text-primary)]">
                   <input defaultChecked type="checkbox" />
                   Application deadline reminders
                 </label>
@@ -113,7 +113,7 @@ export default function SettingsPage() {
             </PanelHeader>
 
             <PanelBody className="grid gap-4">
-              <div className="rounded-[12px] border border-zinc-800 bg-black p-4">
+              <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-4">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <LogoImage
@@ -123,9 +123,9 @@ export default function SettingsPage() {
                       size={32}
                     />
                     <div>
-                      <div className="text-[15px] font-medium text-white">Gmail</div>
-                      <div className="mt-2 flex items-center gap-2 text-[13px] text-zinc-400">
-                        <span className={`size-2 rounded-full ${state.gmailConnected ? "bg-green-400" : "bg-zinc-600"}`} />
+                      <div className="text-[15px] font-medium text-[var(--text-primary)]">Gmail</div>
+                      <div className="mt-2 flex items-center gap-2 text-[13px] text-[var(--text-muted)]">
+                        <span className={`size-2 rounded-full ${state.gmailConnected ? "bg-green-400" : "bg-[var(--text-faint)]"}`} />
                         {state.gmailConnected ? "Connected" : "Not connected"}
                       </div>
                     </div>
@@ -172,13 +172,13 @@ export default function SettingsPage() {
           </PanelHeader>
           <PanelBody className="flex flex-col gap-4">
             {gmailEmails.map((email) => (
-              <div className="rounded-[12px] border border-zinc-800 bg-black p-4" key={email.id}>
+              <div className="rounded-[12px] border border-[var(--border)] bg-[var(--surface)] p-4" key={email.id}>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="text-[15px] font-medium text-white">{email.subject}</div>
-                  <div className="text-[12px] text-zinc-500">{formatTimestamp(email.receivedAt)}</div>
+                  <div className="text-[15px] font-medium text-[var(--text-primary)]">{email.subject}</div>
+                  <div className="text-[12px] text-[var(--text-faint)]">{formatTimestamp(email.receivedAt)}</div>
                 </div>
-                <div className="mt-2 text-[13px] text-zinc-500">{email.from}</div>
-                <div className="mt-4 text-[14px] leading-7 text-zinc-400">{email.preview}</div>
+                <div className="mt-2 text-[13px] text-[var(--text-faint)]">{email.from}</div>
+                <div className="mt-4 text-[14px] leading-7 text-[var(--text-muted)]">{email.preview}</div>
                 <div className="mt-4 flex items-center justify-between gap-4">
                   <StatusBadge className="text-[11px]" tone={statusTone(email.suggestedStatus)}>
                     {email.suggestedStatus}

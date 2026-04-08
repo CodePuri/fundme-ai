@@ -41,24 +41,24 @@ export default function FounderProfilePage() {
     <PageShell>
       <div>
         <div className="eyebrow">Your Profile</div>
-        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
+        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
           Your Profile
         </h1>
-        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-zinc-500">
+        <p className="mt-4 max-w-[760px] text-[14px] leading-7 text-[var(--text-muted)]">
           Programs do not just read the startup. They read the founder too. Keep this sharp.
         </p>
       </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="flex size-16 items-center justify-center rounded-full bg-zinc-800 text-[24px] font-semibold tracking-[-0.04em]">
+          <div className="flex size-16 items-center justify-center rounded-full bg-[var(--surface)] text-[24px] font-semibold tracking-[-0.04em] text-[var(--text-primary)]">
             {initials}
           </div>
           <div>
-            <div className="font-[family-name:var(--font-display)] text-[34px] leading-none tracking-[-0.04em] text-white">
+            <div className="font-[family-name:var(--font-display)] text-[34px] leading-none tracking-[-0.04em] text-[var(--text-primary)]">
               {state.founderProfile.name}
             </div>
-            <div className="mt-1 text-[16px] text-zinc-500">{state.founderProfile.role}</div>
+            <div className="mt-1 text-[16px] text-[var(--text-muted)]">{state.founderProfile.role}</div>
           </div>
         </div>
 
@@ -100,9 +100,9 @@ export default function FounderProfilePage() {
                     value={String(state.founderProfile[field.key])}
                   />
                 ) : (
-                  <div className="group flex min-h-11 items-center justify-between rounded-[8px] border border-zinc-800 bg-black px-3.5 text-[14px] text-white">
+                  <div className="group flex min-h-11 items-center justify-between rounded-[8px] border border-[var(--border)] bg-[var(--surface)] px-3.5 text-[14px] text-[var(--text-primary)]">
                     <span>{String(state.founderProfile[field.key])}</span>
-                    <Pencil className="size-3.5 text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                    <Pencil className="size-3.5 text-[var(--text-faint)] opacity-0 transition-opacity group-hover:opacity-100" />
                   </div>
                 )}
               </Field>
@@ -113,7 +113,7 @@ export default function FounderProfilePage() {
               <div className="flex flex-wrap gap-2">
                 {state.founderProfile.skills.map((skill) => (
                   <span
-                    className="rounded-full bg-zinc-800 px-2 py-0.5 text-xs text-zinc-300"
+                    className="rounded-full border border-[var(--border)] bg-[var(--surface)] px-2 py-0.5 text-xs text-[var(--text-muted)]"
                     key={skill}
                   >
                     {skill}
@@ -136,10 +136,10 @@ export default function FounderProfilePage() {
                     value={String(state.founderProfile[field.key])}
                   />
                 ) : (
-                  <blockquote className="group mt-3 rounded-[10px] bg-zinc-900 px-4 py-4 text-[14px] leading-7 text-white">
+                  <blockquote className="group mt-3 rounded-[10px] bg-[var(--surface)] px-4 py-4 text-[14px] leading-7 text-[var(--text-primary)]">
                     <div className="flex items-start justify-between gap-3">
                       <span>{String(state.founderProfile[field.key])}</span>
-                      <Pencil className="mt-1 size-3.5 text-zinc-600 opacity-0 transition-opacity group-hover:opacity-100" />
+                      <Pencil className="mt-1 size-3.5 text-[var(--text-faint)] opacity-0 transition-opacity group-hover:opacity-100" />
                     </div>
                   </blockquote>
                 )}

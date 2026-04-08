@@ -74,6 +74,12 @@ export type ApplicationQuestion = {
   sourceSnippets: string[];
 };
 
+export type ApplicationSession = {
+  programSlug: string;
+  questions: ApplicationQuestion[];
+  lastOpenedAt: string;
+};
+
 export type GmailEmail = {
   id: string;
   subject: string;
@@ -477,7 +483,7 @@ export const defaultOpportunities: Opportunity[] = [
   },
 ];
 
-export const ycQuestions: ApplicationQuestion[] = [
+const ycQuestionTemplate: ApplicationQuestion[] = [
   {
     id: "q1",
     question: "What does your company do in one sentence?",
@@ -558,6 +564,16 @@ export const ycQuestions: ApplicationQuestion[] = [
     ],
   },
 ];
+
+export function createApplicationQuestions(): ApplicationQuestion[] {
+  return ycQuestionTemplate.map((question) => ({
+    ...question,
+    variants: [...question.variants],
+    sourceSnippets: [...question.sourceSnippets],
+  }));
+}
+
+export const ycQuestions: ApplicationQuestion[] = createApplicationQuestions();
 
 export const gmailEmails: GmailEmail[] = [
   {

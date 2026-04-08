@@ -13,20 +13,23 @@ const applicationSlugs = ["yc-w26", "antler-india", "aws-activate"];
 
 export default function ApplicationsPage() {
   const { state } = useDemo();
-  const applications = state.opportunities.filter((item) => applicationSlugs.includes(item.slug));
+  const applications = [
+    ...state.opportunities.filter((item) => item.tracked || applicationSlugs.includes(item.slug)),
+    ...state.manualTrackerPrograms,
+  ];
 
   return (
     <PageShell>
       <div>
         <div className="eyebrow">In Progress</div>
-        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-white">
+        <h1 className="mt-3 text-[38px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
           In Progress
         </h1>
-        <p className="mt-4 text-[14px] text-zinc-500">Your drafts live here. Edit them, finish them, and move them forward.</p>
+        <p className="mt-4 text-[14px] text-[var(--text-muted)]">Your drafts live here. Edit them, finish them, and move them forward.</p>
       </div>
 
-      <div className="overflow-hidden rounded-[16px] border border-zinc-800 bg-black">
-        <div className="grid grid-cols-[1.2fr_0.8fr_1fr_1.2fr_120px] border-b border-zinc-800 px-4 py-3 text-[11px] uppercase tracking-[0.14em] text-zinc-600">
+      <div className="overflow-hidden rounded-[16px] border border-[var(--border)] bg-[var(--surface)]">
+        <div className="grid grid-cols-[1.2fr_0.8fr_1fr_1.2fr_120px] border-b border-[var(--border)] px-4 py-3 text-[11px] uppercase tracking-[0.14em] text-[var(--text-faint)]">
           <div>Program</div>
           <div>Last edited</div>
           <div>Progress</div>
@@ -45,13 +48,13 @@ export default function ApplicationsPage() {
 
           return (
             <div
-              className="grid grid-cols-[1.2fr_0.8fr_1fr_1.2fr_120px] items-center border-b border-zinc-800 px-4 py-4 text-[14px] text-zinc-400 last:border-b-0"
+              className="grid grid-cols-[1.2fr_0.8fr_1fr_1.2fr_120px] items-center border-b border-[var(--border)] px-4 py-4 text-[14px] text-[var(--text-muted)] last:border-b-0"
               key={program.slug}
             >
               <div className="flex items-center gap-3">
                 <ProgramLogo domain={program.domain} size={36} slug={program.slug} />
                 <div>
-                <div className="text-white">{program.name}</div>
+                <div className="text-[var(--text-primary)]">{program.name}</div>
                 <div className="mt-2">
                   <Badge size="sm">{program.type}</Badge>
                 </div>
@@ -67,7 +70,7 @@ export default function ApplicationsPage() {
                 <Progress value={program.slug === "antler-india" ? 0 : progress} />
                 <div className="mt-2 flex items-center gap-2 text-[12px]">
                   {program.slug === "antler-india" ? (
-                    <span className="text-zinc-500">Not started</span>
+                    <span className="text-[var(--text-faint)]">Not started</span>
                   ) : null}
                   {program.slug === "aws-activate" ? (
                     <Badge size="sm" tone="green">

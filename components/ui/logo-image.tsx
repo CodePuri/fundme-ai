@@ -41,7 +41,7 @@ export function LogoImage({
     <img
       alt={`${fallbackText} logo`}
       className={cn(
-        "rounded-lg bg-zinc-900 p-1 object-contain",
+        "rounded-lg border border-[var(--border)] bg-[var(--surface-elevated)] p-1 object-contain",
         grayscale && "grayscale opacity-75",
         className,
       )}
