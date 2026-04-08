@@ -106,6 +106,16 @@ export function MatchesContent() {
                 ? "Clear founder-market fit, a sharp wedge, and enough early signal to make the story land fast."
                 : hero.why}
             </PanelDescription>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <Link href={`/app/programs/${hero.slug}`}>
+                <Button size="lg">Draft Application</Button>
+              </Link>
+              {hero.slug === "yc-w26" && (
+                <Link href={`/app/programs/${hero.slug}`}>
+                   <Button variant="secondary" size="lg">Watch AI fill this for you</Button>
+                </Link>
+              )}
+            </div>
           </div>
           <ScoreBlock score={hero.fitScore} signals={hero.signals} />
         </PanelHeader>

@@ -198,9 +198,20 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
 
             <Link href={`/app/workspace/${program.slug}`}>
               <Button className="w-full" size="lg">
-                Continue to workspace
+                Draft Application
               </Button>
             </Link>
+            
+            {program.slug === "yc-w26" && (
+              <Link href={`/app/workspace/${program.slug}`}>
+                <Button className="w-full text-[var(--accent-amber)] hover:text-amber-500" variant="secondary" size="lg">
+                   <div className="flex items-center justify-center gap-2">
+                     <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                     Watch AI fill this for you
+                   </div>
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </div>

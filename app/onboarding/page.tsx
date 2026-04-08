@@ -3,14 +3,14 @@
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Mic, CheckCircle2 } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight, Mic, CheckCircle2, LoaderCircle, PenIcon, Plus } from "lucide-react";
 
 import {
   ONBOARDING_DRAFT_KEY,
   ONBOARDING_STEP_KEY,
   useDemo,
 } from "@/components/app/demo-provider";
+import { TopNavbar } from "@/components/app/top-navbar";
 import { Button } from "@/components/ui/button";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,7 @@ type OnboardingDraft = {
   linkedIn?: string;
   notes?: string;
   files?: string[];
+  imported?: boolean;
 };
 
 export default function OnboardingPage() {
@@ -49,6 +50,10 @@ export default function OnboardingPage() {
   const [typedOpen, setTypedOpen] = useState(false);
   const [doneFlash, setDoneFlash] = useState(false);
 
+  const [hasImported, setHasImported] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+
   useEffect(() => {
     const savedStep = window.localStorage.getItem(ONBOARDING_STEP_KEY);
     const savedDraft = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
@@ -61,6 +66,7 @@ export default function OnboardingPage() {
     let nextFiles: string[] = [];
     let nextStep = 1;
     let nextTypedOpen = false;
+    let nextImported = false;
 
     if (savedStep && parseInt(savedStep) > 1 && parseInt(savedStep) <= 4) {
       nextStep = Number(savedStep);
@@ -78,13 +84,16 @@ export default function OnboardingPage() {
           nextTypedOpen = true;
         }
         if (parsed.files) nextFiles = parsed.files;
+        if (parsed.imported) nextImported = parsed.imported;
       } catch {
         window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
       }
     }
 
     startTransition(() => {
-      setStep(nextStep);
+      if (nextStep < 4) setStep(nextStep); // Don't hydrate back into processing step automatically
+      else setStep(3);
+      
       setName(nextName);
       setRole(nextRole);
       setCompanyName(nextCompanyName);
@@ -92,6 +101,7 @@ export default function OnboardingPage() {
       setNotes(nextNotes);
       setFiles(nextFiles);
       setTypedOpen(nextTypedOpen);
+      setHasImported(nextImported);
       setHasHydrated(true);
     });
   }, []);
@@ -118,22 +128,53 @@ export default function OnboardingPage() {
         linkedIn,
         notes,
         files,
-      }),
+        imported: hasImported
+      })
     );
-  }, [hasHydrated, name, role, companyName, linkedIn, notes, files]);
+  }, [hasHydrated, name, role, companyName, linkedIn, notes, files, hasImported]);
+
+  // Step 4 Inline processing timer
+  useEffect(() => {
+    if (step !== 4) {
+      setElapsed(0);
+      return;
+    }
+    const timer = window.setInterval(() => {
+      setElapsed((current) => {
+        const next = current + 100;
+        if (next >= 5000) {
+          window.clearInterval(timer);
+          return 5000;
+        }
+        return next;
+      });
+    }, 100);
+
+    return () => window.clearInterval(timer);
+  }, [step]);
+
+  useEffect(() => {
+    if (step !== 4) return;
+    if (elapsed >= 5000) {
+      const t = setTimeout(() => {
+        router.push("/app/matches");
+      }, 500);
+      return () => clearTimeout(t);
+    }
+  }, [step, elapsed, router]);
 
   async function handleListen() {
     if (listening) return;
 
     setListening(true);
     setTypedOpen(false);
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await new Promise((resolve) => setTimeout(resolve, 6000));
     setTypedOpen(true);
     let typed = "";
     for (const character of rambleText) {
       typed += character;
       setNotes(typed);
-      await new Promise((resolve) => setTimeout(resolve, 15));
+      await new Promise((resolve) => setTimeout(resolve, 20));
     }
     setListening(false);
     setDoneFlash(true);
@@ -149,7 +190,7 @@ export default function OnboardingPage() {
       notes: rambleText,
       files: ["totem_interactive_deck.pdf", "velocity_memo.docx"],
     });
-    router.push("/processing");
+    setStep(4);
   }
 
   function finishOnboarding() {
@@ -162,87 +203,19 @@ export default function OnboardingPage() {
       files,
     });
     setStep(4);
-    setTimeout(() => {
-      router.push("/processing");
-    }, 1500);
   }
 
   if (!hasHydrated) {
-    return <main className="min-h-screen bg-[var(--surface)]" />;
+    return <main className="min-h-screen bg-[var(--bg)]" data-theme="app" />;
   }
 
-  const steps = [
-    { num: 1, title: "Your details" },
-    { num: 2, title: "Company details" },
-    { num: 3, title: "Upload materials" },
-  ];
-
   return (
-    <main className="flex min-h-screen w-full bg-[var(--surface)] text-[var(--text-primary)]" data-theme="app">
-      
-      {/* LEFT PANE - Branding and Progress */}
-      <div className="hidden w-1/3 flex-col bg-[var(--bg)] border-r border-[var(--border)] p-10 lg:flex relative">
-        <Link className="flex items-center gap-2 mb-16" href="/">
-          <div className="flex size-7 items-center justify-center rounded-[8px] bg-[var(--text-primary)] text-[var(--bg)]">
-            <svg className="size-4" viewBox="0 0 24 24">
-              <path
-                d="M12 2L2 22h20L12 2zm0 6l5 10h-10l5-10z"
-                fill="currentColor"
-              />
-            </svg>
-          </div>
-          <span className="text-[15px] font-bold tracking-tight text-[var(--text-primary)]">
-            Fundme.ai
-          </span>
-        </Link>
+    <main className="flex flex-col min-h-screen w-full bg-[var(--bg)] text-[var(--text-primary)]" data-theme="app">
+      <TopNavbar hideSidebarToggle />
 
-        <div className="flex-1">
-          <div className="text-[28px] font-semibold tracking-[-0.03em] mb-8">
-            Tell us about your startup.
-          </div>
-          <div className="flex flex-col gap-6">
-            {steps.map((s) => {
-              const isActive = step === s.num;
-              const isPast = step > s.num;
-              return (
-                <div key={s.num} className="flex items-center gap-4">
-                  <div className={`flex size-8 items-center justify-center rounded-full border text-[14px] font-medium transition-colors ${isActive ? 'border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg)]' : isPast ? 'border-[var(--text-primary)] bg-transparent text-[var(--text-primary)]' : 'border-[var(--border-strong)] bg-transparent text-[var(--text-muted)]'}`}>
-                    {isPast ? <CheckCircle2 className="size-5" /> : s.num}
-                  </div>
-                  <div className={`text-[15px] transition-colors ${isActive || isPast ? 'text-[var(--text-primary)] font-medium' : 'text-[var(--text-muted)]'}`}>
-                    {s.title}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="mt-auto pt-8 border-t border-[var(--border)]">
-           <button 
-             onClick={handleSkipToDemo}
-             className="text-[14px] text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2"
-           >
-             Skip / Use Demo Data <ArrowRight className="size-3" />
-           </button>
-        </div>
-      </div>
-
-      {/* RIGHT PANE - Interaction */}
-      <div className="flex flex-1 flex-col items-center justify-center p-6 sm:p-12 pb-24 relative overflow-y-auto">
-        <div className="w-full max-w-[560px] mx-auto relative pt-12 md:pt-0">
+      <div className="flex flex-1 flex-col items-center justify-start p-6 sm:p-12 pb-24 relative overflow-y-auto">
+        <div className="w-full max-w-[640px] mx-auto relative pt-8 md:pt-16">
           
-          {/* Mobile Header / Progress Context */}
-          <div className="lg:hidden flex items-center justify-between mb-12">
-            <Link className="flex items-center gap-2" href="/">
-              <div className="flex size-6 items-center justify-center rounded-[6px] bg-[var(--text-primary)] text-[var(--bg)]">
-                <svg className="size-3" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 6l5 10h-10l5-10z" fill="currentColor" /></svg>
-              </div>
-              <span className="text-[14px] font-bold">Fundme.ai</span>
-            </Link>
-            <div className="text-[13px] text-[var(--text-muted)] font-medium">Step {step} of 3</div>
-          </div>
-
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div
@@ -257,13 +230,13 @@ export default function OnboardingPage() {
                     Tell us about yourself
                   </h1>
                   <p className="text-[16px] text-[var(--text-muted)]">
-                    Let's start with your identity and role.
+                    Let's start with your identity and background.
                   </p>
                 </div>
                 
-                <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Field>
-                    <FieldLabel>Full Name</FieldLabel>
+                    <FieldLabel>Full Name <span className="text-red-500">*</span></FieldLabel>
                     <Input 
                       placeholder="e.g. Aakash Puri" 
                       onChange={(e) => setName(e.target.value)} 
@@ -278,15 +251,7 @@ export default function OnboardingPage() {
                       value={role} 
                     />
                   </Field>
-                  <Field>
-                    <FieldLabel>Company Name</FieldLabel>
-                    <Input 
-                      placeholder="e.g. Totem Interactive"
-                      onChange={(e) => setCompanyName(e.target.value)} 
-                      value={companyName} 
-                    />
-                  </Field>
-                  <Field>
+                  <Field className="md:col-span-2">
                     <FieldLabel>LinkedIn URL</FieldLabel>
                     <Input 
                       placeholder="https://linkedin.com/in/..."
@@ -294,9 +259,134 @@ export default function OnboardingPage() {
                       value={linkedIn} 
                     />
                   </Field>
+                  <Field className="md:col-span-2">
+                    <FieldLabel>Company Name <span className="text-red-500">*</span></FieldLabel>
+                    <Input 
+                      placeholder="e.g. Totem Interactive"
+                      onChange={(e) => setCompanyName(e.target.value)} 
+                      value={companyName} 
+                    />
+                  </Field>
                 </div>
+
+                <div className="rounded-[16px] border border-[var(--border)] bg-[var(--surface-elevated)] p-6 relative overflow-hidden">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                     <div>
+                       <div className="text-[15px] font-semibold tracking-tight text-[var(--text-primary)]">Autofill your background with LinkedIn</div>
+                       <div className="text-[13px] text-[var(--text-muted)] mt-1.5 leading-relaxed md:max-w-[340px]">The import may take a few seconds to populate and could have missing data. Please review the results and make any necessary edits.</div>
+                     </div>
+                     <Button 
+                       variant="secondary" 
+                       disabled={isImporting || hasImported} 
+                       className="whitespace-nowrap"
+                       onClick={async () => {
+                         setIsImporting(true);
+                         await new Promise(r => setTimeout(r, 2000));
+                         setIsImporting(false);
+                         setHasImported(true);
+                         setName("Aakash Puri");
+                         setRole("CEO & Founder");
+                         setCompanyName("Totem Interactive");
+                         setLinkedIn("https://www.linkedin.com/in/aakash-puri-a44aa594/");
+                       }}
+                     >
+                        {isImporting ? <><LoaderCircle className="animate-spin size-4 mr-2" /> Importing...</> : hasImported ? "Imported ✓" : "Import from LinkedIn"}
+                     </Button>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                {hasImported && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="flex flex-col gap-10">
+                     {/* Education Block */}
+                     <div>
+                       <div className="flex items-center justify-between mb-5 border-b border-[var(--border)] pb-3">
+                         <div className="text-[14px] font-semibold tracking-tight text-[var(--text-primary)] uppercase">Education <span className="text-red-500">*</span></div>
+                         <Button variant="ghost" size="sm" className="h-7 text-[12px]"><Plus className="size-3 mr-1"/> Add</Button>
+                       </div>
+                       
+                       <div className="flex flex-col gap-5">
+                         <div className="flex justify-between items-start group">
+                           <div>
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">Thakur College of Science & Commerce</div>
+                             <div className="text-[13px] text-[var(--text-muted)] mt-0.5">Bachelor's degree, Mass Communication</div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Jan 2019 - Jan 2022</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+
+                         <div className="flex justify-between items-start group">
+                           <div>
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">RD & SH National College</div>
+                             <div className="text-[13px] text-[var(--text-muted)] mt-0.5">Arts & Media Management</div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Jan 2017 - Jan 2019</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+
+                         <div className="flex justify-between items-start group">
+                           <div>
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">Pinnacle High International School</div>
+                             <div className="text-[13px] text-[var(--text-muted)] mt-0.5">IGCSE</div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Jan 2012 - Jan 2018</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+
+                     {/* Work History Block */}
+                     <div>
+                       <div className="flex items-center justify-between mb-5 border-b border-[var(--border)] pb-3">
+                         <div className="text-[14px] font-semibold tracking-tight text-[var(--text-primary)] uppercase">Work History <span className="text-red-500">*</span></div>
+                         <Button variant="ghost" size="sm" className="h-7 text-[12px]"><Plus className="size-3 mr-1"/> Add</Button>
+                       </div>
+
+                       <div className="flex flex-col gap-6">
+                         <div className="flex flex-col md:flex-row md:justify-between md:items-start group gap-2">
+                           <div className="max-w-[440px]">
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">Totem Interactive - Chief Executive Officer</div>
+                             <div className="text-[13px] text-[var(--text-muted)] leading-relaxed mt-2">Currently, here at Totem Interactive, we're on to solving real world problems and are our way to empower businesses and creators with innovative app development and web solutions using our rich experience...</div>
+                           </div>
+                           <div className="flex items-center gap-3 md:pt-0 pt-2">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Apr 2022 - Present</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+
+                         <div className="flex flex-col md:flex-row md:justify-between md:items-start group gap-2">
+                           <div className="max-w-[440px]">
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">CrazyLabs - 2022 Batch of Crazy Hubs</div>
+                             <div className="text-[13px] text-[var(--text-muted)] leading-relaxed mt-2">The hubs gave my spontaneous burst of creativity the structure and understanding of what makes games truly fun. Tested and deployed multiple Hyper-casual prototypes with them...</div>
+                           </div>
+                           <div className="flex items-center gap-3 md:pt-0 pt-2">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Jan 2023 - Nov 2023</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+
+                         <div className="flex flex-col md:flex-row md:justify-between md:items-start group gap-2">
+                           <div className="max-w-[440px]">
+                             <div className="text-[14px] font-medium text-[var(--text-primary)]">Self-employed - Independent Filmmaker</div>
+                           </div>
+                           <div className="flex items-center gap-3">
+                             <span className="text-[13px] text-[var(--text-muted)] whitespace-nowrap">Aug 2019 - Aug 2021</span>
+                             <PenIcon className="size-3.5 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors" />
+                           </div>
+                         </div>
+                       </div>
+                     </div>
+                  </motion.div>
+                )}
+               </AnimatePresence>
                 
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-end pt-8 border-t border-[var(--border)] mt-4">
                   <Button onClick={() => setStep(2)} size="lg" disabled={!name || !companyName}>
                     Continue <ArrowRight className="size-4 ml-1" />
                   </Button>
@@ -310,48 +400,52 @@ export default function OnboardingPage() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col items-center text-center w-full"
+                className="flex flex-col items-center justify-center text-center w-full min-h-[500px]"
               >
-                <div className="eyebrow mb-6">What are you building?</div>
+                <div className="eyebrow mb-8">What are you building?</div>
                 <button
-                  className={`relative flex size-24 items-center justify-center rounded-full border ${
+                  className={`relative flex size-28 items-center justify-center rounded-full border ${
                     listening
                       ? "border-[var(--text-primary)] bg-[var(--text-primary)] text-[var(--bg)] shadow-[0_0_0_12px_color-mix(in_srgb,var(--text-primary)_5%,transparent)]"
-                      : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-sm hover:border-[var(--border-strong)]"
-                  } transition-all duration-300`}
+                      : "border-[var(--border)] bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-md hover:border-[var(--border-strong)] hover:shadow-lg transition-all"
+                  } duration-500`}
                   onClick={handleListen}
                   type="button"
                 >
                   {listening && (
-                    <div className="absolute inset-[-14px] flex items-center justify-center gap-1.5">
-                      {Array.from({ length: 8 }).map((_, index) => (
-                        <span
-                          className="w-1.5 animate-pulse rounded-full bg-white/60"
-                          key={index}
-                          style={{ height: `${12 + (index % 4) * 8}px`, animationDelay: `${index * 80}ms` }}
-                        />
-                      ))}
+                    <div className="absolute inset-[-20px] flex items-center justify-center gap-[4px] opacity-80">
+                      {Array.from({ length: 12 }).map((_, index) => {
+                         const h = 10 + Math.random() * 24;
+                         return (
+                          <motion.span
+                            key={index}
+                            className="w-[3px] rounded-full bg-[var(--bg)]"
+                            animate={{ height: [`${h}px`, `${h * 1.8}px`, `${h}px`] }}
+                            transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.05, ease: "easeInOut" }}
+                          />
+                         )
+                      })}
                     </div>
                   )}
-                  <Mic className="relative z-10 size-10" />
+                  <Mic className="relative z-10 size-12" />
                 </button>
-                <div className="mt-8 text-[32px] sm:text-[36px] font-semibold tracking-[-0.03em] leading-tight">
-                  Tap to speak and describe it naturally
+                <div className="mt-10 text-[32px] sm:text-[40px] font-semibold tracking-[-0.04em] leading-tight">
+                  Tap to speak and <br/>describe it naturally
                 </div>
                 <button 
-                  className="mt-4 text-[15px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]" 
+                  className="mt-6 text-[15px] text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)] font-medium" 
                   onClick={() => setTypedOpen(true)} 
                   type="button"
                 >
                   prefer to type →
                 </button>
                 
-                {doneFlash && <div className="mt-6 text-[15px] font-medium text-[var(--accent-green)]">Got it ✓</div>}
+                {doneFlash && <div className="mt-8 text-[15px] font-semibold tracking-wide uppercase text-[var(--accent-green)] flex items-center gap-2"><CheckCircle2 className="size-4" /> Captured</div>}
 
                 {typedOpen && (
-                  <motion.div animate={{ opacity: 1, y: 0 }} className="mt-10 w-full text-left" initial={{ opacity: 0, y: 24 }}>
+                  <motion.div animate={{ opacity: 1, y: 0 }} className="mt-12 w-full text-left" initial={{ opacity: 0, y: 24 }}>
                     <Textarea
-                      className="min-h-[200px] text-[16px]"
+                      className="min-h-[160px] text-[16px] resize-none"
                       placeholder="Start typing your startup pitch..."
                       onChange={(event) => setNotes(event.target.value)}
                       value={notes}
@@ -359,9 +453,9 @@ export default function OnboardingPage() {
                   </motion.div>
                 )}
                 
-                <div className="flex justify-between items-center w-full mt-10 pt-6 border-t border-[var(--border)]">
+                <div className="flex justify-between items-center w-full mt-16 pt-6 border-t border-[var(--border)]">
                    <button
-                     className="text-[14px] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                     className="text-[14px] font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                      onClick={() => setStep(1)}
                      type="button"
                    >
@@ -387,15 +481,17 @@ export default function OnboardingPage() {
                     Upload your materials
                   </h1>
                   <p className="text-[16px] text-[var(--text-muted)]">
-                    Add your deck, memo, or previous application answers to help us understand you better. (Optional)
+                    Add your deck, memo, or previous application answers from your files.
                   </p>
                 </div>
 
-                <FileUploadArea files={files} onChange={setFiles} />
+                <div className="mt-4">
+                   <FileUploadArea files={files} onChange={setFiles} />
+                </div>
 
-                <div className="flex justify-between items-center mt-4 pt-6 border-t border-[var(--border)]">
+                <div className="flex justify-between items-center mt-10 pt-6 border-t border-[var(--border)]">
                    <button
-                     className="text-[14px] text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                     className="text-[14px] font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)]"
                      onClick={() => setStep(2)}
                      type="button"
                    >
@@ -411,32 +507,75 @@ export default function OnboardingPage() {
             {step === 4 && (
               <motion.div
                 key="step4"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="flex flex-col items-center justify-center text-center space-y-6 pt-12"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center fixed inset-0 z-50 bg-[var(--bg)]"
               >
-                <div className="relative size-16">
-                  <div className="absolute inset-0 rounded-full border-4 border-[var(--border)]" />
-                  <div className="absolute inset-0 rounded-full border-4 border-[var(--text-primary)] border-t-transparent animate-spin" />
+                <div className="absolute inset-x-0 top-[73px] z-20 h-0.5 bg-[var(--border)]">
+                   <motion.div animate={{ width: `${(elapsed / 5000) * 100}%` }} className="h-full bg-[var(--accent-amber)]" initial={{ width: 0 }} />
                 </div>
-                <div>
-                  <div className="text-[24px] font-semibold tracking-tight">Processing your profile...</div>
-                  <div className="text-[var(--text-muted)] mt-2">Uploading materials and preparing context</div>
+
+                <div className="text-center mb-12 w-full">
+                    <motion.h1 
+                      initial={{ opacity: 0, y: 15 }} 
+                      animate={{ opacity: 1, y: 0 }} 
+                      className="text-[40px] sm:text-[52px] font-semibold tracking-tight leading-none"
+                    >
+                      Finding where you belong...
+                    </motion.h1>
                 </div>
+
+                <div className="w-full max-w-[500px] flex flex-col gap-3 px-6">
+                   {[
+                     "Analyzing your startup", 
+                     "Understanding your materials", 
+                     "Preparing your founder profile", 
+                     "Finding the right startup programs"
+                   ].map((text, i) => {
+                      const activeIndex = Math.min(3, Math.floor(elapsed / 1250));
+                      const done = i < activeIndex || elapsed >= 5000;
+                      const active = i === activeIndex && elapsed < 5000;
+                      return (
+                         <motion.div 
+                           initial={{ opacity: 0, scale: 0.96 }}
+                           animate={{ opacity: 1, scale: 1 }}
+                           transition={{ delay: i * 0.1 }}
+                           key={text} 
+                           className="flex items-center gap-4 rounded-[12px] border border-[var(--border)] bg-[var(--surface-elevated)] p-4 shadow-sm"
+                         >
+                           {done ? (
+                             <div className="flex size-[26px] items-center justify-center rounded-full bg-[var(--text-primary)] text-[var(--bg)] shadow-sm">
+                               <CheckCircle2 className="size-3.5" />
+                             </div>
+                           ) : active ? (
+                             <div className="flex size-[26px] items-center justify-center rounded-full border border-[var(--border-strong)]">
+                               <LoaderCircle className="size-3.5 animate-spin text-[var(--text-primary)]" />
+                             </div>
+                           ) : (
+                             <div className="flex size-[26px] items-center justify-center rounded-full border border-[var(--border)]">
+                               <span className="size-1.5 rounded-full bg-[var(--text-muted)]" />
+                             </div>
+                           )}
+                           <span className={done || active ? "text-[14px] text-[var(--text-primary)] font-medium tracking-tight" : "text-[14px] text-[var(--text-muted)] tracking-tight"}>{text}</span>
+                         </motion.div>
+                      )
+                   })}
+                 </div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
         
-        {/* Mobile Skip Demo Data */}
-        <div className="lg:hidden absolute bottom-6 w-full flex justify-center">
-            <button 
-              onClick={handleSkipToDemo}
-              className="text-[13px] font-medium text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Skip / Use Demo Data
-            </button>
-        </div>
+        {step < 4 && (
+          <div className="fixed bottom-6 right-8 opacity-40 hover:opacity-100 transition-opacity z-50">
+             <button 
+               onClick={handleSkipToDemo}
+               className="text-[12px] font-medium tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--surface)] px-3 py-1.5 rounded-full border border-[var(--border)]"
+             >
+               Skip Demo
+             </button>
+          </div>
+        )}
       </div>
     </main>
   );
