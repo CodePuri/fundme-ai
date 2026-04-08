@@ -1,10 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { Suspense, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Bell, X } from "lucide-react";
 
-import { useDemo } from "@/components/app/demo-provider";
+import { ONBOARDING_STEP_KEY, useDemo } from "@/components/app/demo-provider";
 import { Sidebar } from "@/components/app/sidebar";
 import { NavSearch } from "@/components/startup-programs/nav-search";
 import { buildAuthEntryHref } from "@/lib/auth-intent";
@@ -28,10 +29,10 @@ function buildProtectedDestination(pathname: string, search: string) {
 export function DashboardFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { state, markTrackerVisited } = useDemo();
+  const { state, hasHydrated, dismissResumeBanner, markTrackerVisited } = useDemo();
 
   useEffect(() => {
-    if (state.isAuthenticated || pathname === "/search") {
+    if (!hasHydrated || state.isAuthenticated || pathname === "/search") {
       return;
     }
 
@@ -52,7 +53,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
       },
     });
     router.replace(href);
-  }, [pathname, router, state.isAuthenticated]);
+  }, [hasHydrated, pathname, router, state.isAuthenticated]);
 
   useEffect(() => {
     if (pathname === "/app/tracker") {
@@ -65,7 +66,12 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
     [pathname],
   );
 
-  if (!state.isAuthenticated) {
+  const resumeStep =
+    hasHydrated && typeof window !== "undefined" ? window.localStorage.getItem(ONBOARDING_STEP_KEY) : null;
+  const showResumeBanner =
+    hasHydrated && !state.resumeBannerDismissed && (resumeStep === "2" || resumeStep === "3");
+
+  if (!hasHydrated || !state.isAuthenticated) {
     return <div className="min-h-screen bg-[var(--bg)]" data-theme="app" />;
   }
 
@@ -107,6 +113,27 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </header>
+
+        {showResumeBanner ? (
+          <div className="border-b border-[var(--border)] bg-[var(--surface-elevated)]">
+            <div className="page-frame flex items-center justify-between gap-4 px-4 py-3 sm:px-6 xl:px-8">
+              <div className="text-[14px] text-[var(--text-muted)]">Welcome back, Arjun</div>
+              <div className="flex items-center gap-3">
+                <Link className="text-[13px] text-[var(--text-muted)] hover:text-[var(--text-primary)]" href="/onboarding">
+                  Continue →
+                </Link>
+                <button
+                  aria-label="Dismiss welcome banner"
+                  className="text-[var(--text-faint)] transition-colors hover:text-[var(--text-primary)]"
+                  onClick={dismissResumeBanner}
+                  type="button"
+                >
+                  <X className="size-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         <main className="page-frame min-h-[calc(100vh-73px)] px-4 py-6 sm:px-6 xl:px-8">
           {children}

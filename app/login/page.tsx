@@ -8,7 +8,7 @@ export default async function LoginPage({
   searchParams: Promise<{ redirect?: string }>;
 }) {
   const params = await searchParams;
-  const destination = params.redirect || "/app/matches";
+  const destination = params.redirect || "/onboarding";
   const entryPath = destination.startsWith("/explore") ? "/search" : "/";
 
   redirect(

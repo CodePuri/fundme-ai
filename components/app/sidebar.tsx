@@ -29,7 +29,7 @@ const sections: Array<{ label: string; items: SidebarItem[] }> = [
   {
     label: "Workspace",
     items: [
-      { href: "/app/startup-profile", label: "Add New Idea", icon: PlusCircle, reset: true },
+      { href: "/onboarding", label: "Add New Idea", icon: PlusCircle, reset: true },
       { href: "/app/startup-profile", label: "Startup Profile", icon: Building2 },
       { href: "/app/founder-profile", label: "Founder Profile", icon: UserRound },
     ],
@@ -59,7 +59,7 @@ export function Sidebar() {
   return (
     <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-5 lg:flex">
       <button className="flex items-center gap-3 rounded-[10px] px-2 py-2 text-left" onClick={() => router.push("/app/matches")} type="button">
-        <BrandLockup surface="plate" />
+        <BrandLockup />
       </button>
 
       <div className="mt-8 flex flex-col gap-6">

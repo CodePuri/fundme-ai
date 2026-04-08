@@ -37,7 +37,7 @@ export default function SearchPage() {
         <PublicAuthController
           fallbackIntent={{
             action: "browse",
-            destination: "/app/matches",
+            destination: "/onboarding",
           }}
         />
       </Suspense>

@@ -254,6 +254,61 @@ textarea {
   animation: fade-rise 0.6s ease-out both;
 }
 
+/* ─── Homepage section rhythm ───────────────────────────── */
+
+[data-theme="public"] section {
+  position: relative;
+}
+
+[data-theme="public"] section + section {
+  margin-top: 0;
+}
+
+/* Proof surface internal cards on hover */
+[data-theme="public"] .proof-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+[data-theme="public"] .proof-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(18, 15, 11, 0.08);
+}
+
+/* Program card shimmer on hover */
+[data-theme="public"] article {
+  transition: box-shadow 0.22s ease;
+}
+
+[data-theme="public"] article:hover {
+  box-shadow: 0 20px 60px rgba(18, 15, 11, 0.07);
+}
+
+/* Smooth scroll offsets for anchor links */
+[data-theme="public"] [id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Print styles for export mode */
+@media print {
+  header,
+  footer,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  * {
+    box-shadow: none !important;
+    border-color: #ccc !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

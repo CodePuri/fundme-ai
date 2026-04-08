@@ -46,6 +46,7 @@ type DemoState = {
 
 type DemoContextValue = {
   state: DemoState;
+  hasHydrated: boolean;
   signIn: () => void;
   setUploadInputs: (payload: {
     sourceUrl: string;
@@ -251,27 +252,32 @@ function updateApplicationSession(
 }
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<DemoState>(() => {
-    if (typeof window === "undefined") {
-      return defaultState;
-    }
+  const [state, setState] = useState<DemoState>(defaultState);
+  const [hasHydrated, setHasHydrated] = useState(false);
 
+  useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
+
     if (!saved) {
-      return defaultState;
+      setHasHydrated(true);
+      return;
     }
 
     try {
-      return hydrateState(JSON.parse(saved) as Partial<DemoState>);
+      setState(hydrateState(JSON.parse(saved) as Partial<DemoState>));
     } catch {
       window.localStorage.removeItem(STORAGE_KEY);
-      return defaultState;
+    } finally {
+      setHasHydrated(true);
     }
-  });
+  }, []);
 
   useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
+  }, [hasHydrated, state]);
 
   useEffect(() => {
     function handleDemoReset(event: KeyboardEvent) {
@@ -290,15 +296,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo<DemoContextValue>(
     () => ({
       state,
+      hasHydrated,
       signIn: () => {
-        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
-        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
         startTransition(() => {
           setState((current) => ({
             ...current,
             isAuthenticated: true,
-            onboardingCompleted: true,
-            resumeBannerDismissed: true,
+            resumeBannerDismissed: false,
             lastSyncAt: new Date().toISOString(),
           }));
         });
@@ -527,7 +531,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         }
       },
     }),
-    [state],
+    [hasHydrated, state],
   );
 
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;
