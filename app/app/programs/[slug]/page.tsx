@@ -103,8 +103,7 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </div>
-        </div>
-
+        
         <div className="text-right">
           <div className={`text-[64px] font-semibold tracking-[-0.06em] ${scoreColor(program.fitScore)}`}>
             {program.fitScore}

@@ -9,6 +9,13 @@ export type StartupProgramBrand = {
 };
 
 const curatedBrands: Record<string, StartupProgramBrand> = {
+  "yc-w26": {
+    assetPath: "/startup-program-brands/y-combinator.svg",
+    fallbackText: "YC",
+    fallbackColor: "#FF7A00",
+    background: "#FFF7ED",
+    padding: "10px",
+  },
   "y-combinator": {
     assetPath: "/startup-program-brands/y-combinator.svg",
     fallbackText: "YC",

@@ -333,23 +333,29 @@ export function ApplicationWorkspaceView({
               transition={{ delay: 0.5, duration: 0.4 }}
               className="fixed bottom-6 left-6 right-6 flex flex-wrap items-center justify-between gap-4 rounded-[16px] border border-[var(--border)] bg-[var(--surface-elevated)] px-6 py-4 shadow-[0_24px_80px_rgba(17,17,17,0.12)] xl:left-1/2 xl:right-auto xl:w-[800px] xl:-translate-x-1/2"
             >
-              <Button
-                onClick={() =>
-                  downloadAnswers(
-                    sanitizeDownloadFileName(programName),
-                    questions.map((item) => ({
-                      question: item.question,
-                      answer: item.answer,
-                    })),
-                  )
-                }
-                variant="secondary"
-              >
-                Download answers →
-              </Button>
               <Button onClick={() => setDemoOpen(false)} variant="ghost" className="whitespace-nowrap">
                 Close
               </Button>
+              <div className="flex flex-wrap items-center justify-end gap-3">
+                <Button variant="outline" className="whitespace-nowrap bg-[var(--surface)] hover:bg-[var(--surface-active)]" onClick={() => setDemoOpen(false)}>
+                  Save Draft
+                </Button>
+                <Button
+                  onClick={() =>
+                    downloadAnswers(
+                      sanitizeDownloadFileName(programName),
+                      questions.map((item) => ({
+                        question: item.question,
+                        answer: item.answer,
+                      })),
+                    )
+                  }
+                  size="lg"
+                  className="whitespace-nowrap border-none bg-amber-500 text-white shadow-[0_4px_16px_rgba(245,158,11,0.25)] hover:bg-amber-600 dark:bg-[var(--accent-amber)] dark:text-black dark:hover:bg-amber-400"
+                >
+                  Download answers →
+                </Button>
+              </div>
             </motion.div>
           ) : null}
         </div>
