@@ -905,86 +905,106 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── 8. Final CTA ──────────────────────────────────────────── */
+/* ─── 8. Cinematic Footer ──────────────────────────────────────────── */
 
-function FinalCtaSection({ onOpenAuth }: { onOpenAuth: () => void }) {
+const footerLinks = [
+  { label: "How It Works", href: "#how-it-works" },
+  { label: "Programs", href: "/explore" },
+  { label: "Pricing", href: "#product-proof" },
+  { label: "Privacy", href: "#" },
+  { label: "Terms", href: "#" },
+  { label: "Contact", href: "#" },
+];
+
+function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="border-b border-[#292420] bg-[#171513] px-4 py-20 text-white sm:px-6 xl:px-8">
-      <SectionReveal className="mx-auto max-w-[720px] text-center">
-        <h2 className="text-[clamp(2.4rem,5.4vw,3.6rem)] font-semibold leading-[0.95] tracking-[-0.05em]">
-          One startup. Many applications.
-        </h2>
-        <p className="mx-auto mt-5 max-w-[480px] text-[17px] leading-8 text-white/70">
-          Upload once. Match faster. Draft smarter.
-        </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <motion.button
-            className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-6 py-3.5 text-[15px] font-medium text-white shadow-[0_14px_36px_rgba(255,107,61,0.28)] transition-colors hover:bg-[#f45d2e]"
-            onClick={onOpenAuth}
-            type="button"
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.04, y: -2 }}
-            whileTap={shouldReduceMotion ? undefined : tapCompress}
-          >
-            Request Invite →
-          </motion.button>
+    <footer
+      className="relative h-[650px] sm:h-[600px] lg:h-[700px]"
+      style={{ clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%)" }}
+    >
+      <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#171513] text-[#f6f1ea] flex flex-col justify-between overflow-hidden pt-8">
+        
+        {/* Subtle Background Word */}
+        <div className="pointer-events-none absolute left-1/2 top-[55%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-[#24211e] select-none">
+          FUNDME
         </div>
-        <p className="mt-4 text-[13px] text-white/40">No credit card required · Free to start</p>
-      </SectionReveal>
-    </section>
-  );
-}
 
-/* ─── 9. Footer ──────────────────────────────────────────────── */
+        {/* Top Marquee Band */}
+        <div className="relative z-10 overflow-hidden py-3">
+          <div className="logo-rail-strip gap-10">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center gap-10">
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Founder application workflow</span>
+                <span className="text-[#453e36]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Matched to real programs</span>
+                <span className="text-[#453e36]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Tailored drafts</span>
+                <span className="text-[#453e36]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8e8477]">Deadlines tracked</span>
+                <span className="text-[#453e36]">•</span>
+              </div>
+            ))}
+          </div>
+        </div>
 
-function HomepageFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
-  return (
-    <footer className="bg-[#eee3d6] px-4 py-14 sm:px-6 xl:px-8">
-      <SectionReveal className="mx-auto max-w-[1180px]">
-        <div className="grid gap-10 md:grid-cols-[1.35fr_0.9fr_0.9fr_0.9fr]">
-          <div>
-            <BrandLockup />
-            <p className="mt-5 max-w-[300px] text-[14px] leading-7 text-[#645d54]">
-              Built for founders who are serious but too busy to perform serial bureaucracy.
+        {/* Main Content */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 sm:px-6 xl:px-8">
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-white">
+              One startup.
+              <br />
+              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#dfd6cb]">Many applications.</span>
+            </h2>
+            <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#a59d93]">
+              Upload once. Match faster. Draft smarter.
             </p>
-          </div>
 
-          <div>
-            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Product</div>
-            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="#how-it-works">How It Works</Link>
-              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="/explore">Programs</Link>
-              <Link className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">Pricing</Link>
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Programs</div>
-            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-              {matchedPrograms.slice(0, 4).map((program) => (
-                <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#matched-programs" key={program.id}>
-                  {program.name}
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Company</div>
-            <div className="mt-5 flex flex-col gap-3 text-[14px] text-[#171513]">
-              <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">About</a>
-              <a className="transition-colors duration-200 hover:text-[#b15d37]" href="#product-proof">Blog</a>
-              <button className="w-fit text-left transition-colors duration-200 hover:text-[#b15d37]" onClick={onOpenAuth} type="button">Contact</button>
-              <button className="w-fit text-left transition-colors duration-200 hover:text-[#b15d37]" onClick={onOpenAuth} type="button">Privacy</button>
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <motion.button
+                className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
+                onClick={onOpenAuth}
+                type="button"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                Get Started
+                <ArrowRight className="size-4" />
+              </motion.button>
+              <motion.a
+                className="inline-flex items-center gap-2 rounded-full border border-[#3b352e] bg-[#211f1c] px-6 py-4 text-[15px] font-medium text-[#dfd6cb] transition-colors hover:bg-[#2c2825]"
+                href="#how-it-works"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                See how it works
+              </motion.a>
             </div>
           </div>
         </div>
-      </SectionReveal>
 
-      <div className="mx-auto mt-12 flex max-w-[1180px] flex-col gap-2 border-t border-black/8 pt-6 text-[12px] text-[#8b8276] md:flex-row md:items-center md:justify-between">
-        <div>© 2026 Fundme.ai. Built for founders, not for application.</div>
-        <div>Upload once. Match faster. Draft smarter.</div>
+        {/* Bottom Strip */}
+        <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#292420]">
+          <div className="flex items-center gap-2">
+             <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
+                <Target className="size-5" />
+             </div>
+             <span className="text-[20px] font-bold tracking-[-0.04em] text-white">Fundme.ai</span>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#a59d93]">
+            {footerLinks.map((link) => (
+              <a key={link.label} href={link.href} className="transition-colors hover:text-white">
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="text-[12px] text-[#5e564d] sm:text-right">
+            © {new Date().getFullYear()} Fundme.ai. <br className="sm:hidden" /> Built for founders.
+          </div>
+        </div>
       </div>
     </footer>
   );
@@ -1012,16 +1032,18 @@ export function PublicHomepage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f1ea] text-[#171513]" data-theme="public">
-      <Header onOpenAuth={() => openAuth()} />
-      <HomepageHero onOpenAuth={() => openAuth()} />
-      <LogoRailSection />
-      <StatsStrip />
-      <HowItWorksSection />
-      <ProductProofSection />
-      <MatchedProgramsSection onOpenAuth={() => openAuth()} />
-      <FinalCtaSection onOpenAuth={() => openAuth()} />
-      <HomepageFooter onOpenAuth={() => openAuth()} />
+    <main className="min-h-screen bg-[#171513] text-[#171513]" data-theme="public">
+      <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.4)] pb-8">
+        <Header onOpenAuth={() => openAuth()} />
+        <HomepageHero onOpenAuth={() => openAuth()} />
+        <LogoRailSection />
+        <StatsStrip />
+        <HowItWorksSection />
+        <ProductProofSection />
+        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+      </div>
+
+      <CinematicFooter onOpenAuth={() => openAuth()} />
 
       <Suspense fallback={null}>
         <PublicAuthController
