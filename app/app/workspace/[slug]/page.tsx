@@ -64,13 +64,15 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
     notFound();
   }
 
+  const displayProgramName = program.name === "YC W26" ? "Y Combinator" : program.name;
+
   return (
     <ApplicationWorkspaceView
       backHref="/app/applications"
       backLabel="← Back"
       breadcrumbs={[
         { label: "Applications", href: "/app/applications" },
-        { label: program.name, href: `/app/programs/${program.slug}` },
+        { label: displayProgramName, href: `/app/programs/${program.slug}` },
         { label: "Workspace" },
       ]}
       contextCards={
@@ -89,12 +91,12 @@ export default function WorkspacePage({ params }: { params: Promise<{ slug: stri
       fitSummary={startupProgramContext?.fitSummary ?? program.why}
       gaps={startupProgramContext?.gaps ?? program.gaps}
       logo={
-        <StartupProgramLogo name={startupProgram?.name ?? program.name} size={52} slug={startupProgram?.slug ?? program.slug} />
+        <StartupProgramLogo name={startupProgram?.name ?? displayProgramName} size={44} slug={startupProgram?.slug ?? program.slug} />
       }
       onCycleAnswer={(questionId) => cycleAnswerVariant(program.slug, questionId)}
       onMarkReady={(questionId) => markReady(program.slug, questionId)}
       onSaveAnswer={(questionId, answer) => saveAnswer(program.slug, questionId, answer)}
-      programName={program.name}
+      programName={displayProgramName}
       programSubtitle={
         startupProgramContext
           ? `${startupProgramContext.subtitle} · Draft application`

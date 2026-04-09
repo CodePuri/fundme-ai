@@ -136,7 +136,7 @@ export function ApplicationWorkspaceView({
         <div className="flex items-start gap-4">
           {logo}
           <div>
-            <h1 className="font-[family-name:var(--font-display)] text-[38px] leading-none tracking-[-0.04em] text-[var(--text-primary)]">
+            <h1 className="text-[32px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
               {programName}
             </h1>
             <div className="mt-2 text-[14px] text-[var(--text-muted)]">{programSubtitle}</div>

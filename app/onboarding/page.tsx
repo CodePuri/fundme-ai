@@ -572,7 +572,7 @@ export default function OnboardingPage() {
                onClick={handleSkipToDemo}
                className="text-[12px] font-medium tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--text-primary)] bg-[var(--surface)] px-3 py-1.5 rounded-full border border-[var(--border)]"
              >
-               Skip Demo
+               Skip
              </button>
           </div>
         )}

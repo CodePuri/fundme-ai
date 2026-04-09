@@ -55,7 +55,7 @@ export default function FounderProfilePage() {
             {initials}
           </div>
           <div>
-            <div className="font-[family-name:var(--font-display)] text-[34px] leading-none tracking-[-0.04em] text-[var(--text-primary)]">
+            <div className="text-[34px] font-semibold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
               {state.founderProfile.name}
             </div>
             <div className="mt-1 text-[16px] text-[var(--text-muted)]">{state.founderProfile.role}</div>
