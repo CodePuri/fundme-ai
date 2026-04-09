@@ -3,16 +3,20 @@ export type ProgramStatus =
   | "Drafting"
   | "Ready"
   | "Submitted"
-  | "Interview"
+  | "Interview Scheduled"
   | "Accepted"
   | "Rejected";
 
 export type Opportunity = {
   slug: string;
   name: string;
+  shortName: string;
+  domain: string;
   type: string;
   category: string;
+  location: string;
   deadline: string;
+  description: string;
   fitScore: number;
   fitLabel: MatchLabel;
   why: string;
@@ -21,6 +25,12 @@ export type Opportunity = {
   gaps: string[];
   signals: string[];
   status: ProgramStatus;
+  intelligence: string | null;
+  lastUpdated: string;
+  lastEdited: string;
+  questionCount: number;
+  questionsCompleted: number;
+  tracked: boolean;
 };
 
 export type StartupProfile = {
@@ -64,6 +74,12 @@ export type ApplicationQuestion = {
   sourceSnippets: string[];
 };
 
+export type ApplicationSession = {
+  programSlug: string;
+  questions: ApplicationQuestion[];
+  lastOpenedAt: string;
+};
+
 export type GmailEmail = {
   id: string;
   subject: string;
@@ -75,247 +91,480 @@ export type GmailEmail = {
 };
 
 export const defaultStartupProfile: StartupProfile = {
-  companyName: "Flowstate AI",
-  tagline: "Contract intelligence that catches scope creep before agencies lose margin.",
-  stage: "Pre-seed",
-  sector: "Vertical SaaS / Legal Ops for Agencies",
+  companyName: "Totem Interactive",
+  tagline: "Software development company building products across AI, apps, platforms.",
+  stage: "Seed",
+  sector: "AI & Digital Solutions",
   location: "Mumbai, India",
-  teamSize: "4",
-  traction: "87 qualified signups, 3 pilot conversations live, 2 agency operators advising product roadmap.",
+  teamSize: "12",
+  traction: "Building products across AI, SaaS, and digital ecosystem. Makers of Velocity.",
   problem:
-    "Digital agencies consistently lose revenue because project teams agree to off-scope work in calls, Slack threads, and email without documenting the commercial impact.",
+    "Product development and AI integration are highly fragmented, leading to slow execution for founders and enterprises.",
   solution:
-    "Flowstate AI monitors client communication, flags probable scope drift in real time, and auto-generates change-order language that account managers can send before margin disappears.",
-  businessModel: "Annual SaaS subscriptions priced by retained revenue under management.",
+    "Totem Interactive builds rapid digital solutions and AI workflows to accelerate product scaling and business execution.",
+  businessModel: "B2B SaaS / Services.",
   competitiveEdge:
-    "The product is trained on agency workflow language, blends detection with immediately usable documentation, and fits into agency delivery rhythms without requiring legal teams.",
-  fundraisingAsk: "$750k pre-seed round to finish productization, deepen integrations, and convert pilots into paid design partners.",
-  useOfFunds:
-    "55% engineering, 25% product and implementation, 20% founder-led GTM with agency-specific distribution partnerships.",
-  uploadedAssets: [
-    "Flowstate_Seed_Deck_v5.pdf",
-    "customer-problem-notes.txt",
-    "agency-pilot-memo.docx",
-    "yc-application-2025.md",
-  ],
-  missingInfo: [
-    "Website URL",
-    "Incorporation details",
-    "Prior funding history",
-    "Cofounder or technical lead details",
-  ],
+    "We have deep execution experience blending AI with traditional software pipelines.",
+  fundraisingAsk: "$1M seed",
+  useOfFunds: "Product Expansion (60%), Go-To-Market (40%)",
+  uploadedAssets: ["totem_interactive_deck.pdf", "velocity_memo.docx"],
+  missingInfo: ["Prior funding history", "Cofounder details"],
 };
 
 export const defaultFounderProfile: FounderProfile = {
-  name: "Arjun Mehta",
-  role: "Founder and CEO",
+  name: "Aakash Puri",
+  role: "CEO & Founder",
   location: "Mumbai, India",
-  linkedIn: "linkedin.com/in/arjunmehta",
+  linkedIn: "https://www.linkedin.com/in/aakash-puri-a44aa594/",
   background:
-    "Arjun spent five years running a digital agency where he repeatedly watched profitable projects turn into flat-fee delivery chaos because scope creep was discovered too late.",
+    "I have extensive experience running technical teams and building software products across multiple domains including AI and platforms.",
   domainExpertise:
-    "Agency operations, client delivery systems, proposal design, change-order workflows, and AI-assisted documentation.",
+    "Software Development, AI Workflows, Product Strategy, and Operations.",
   previousStartupInfo:
-    "Built and operated a services business to multi-lakh annual revenue; this is Arjun's first venture-backed startup.",
+    "Makers of Velocity, an AI prompt-improvement product.",
   skills: [
-    "Founder-led sales",
-    "Agency workflow design",
-    "Operational analytics",
-    "Customer discovery",
-    "Prompt and knowledge-system design",
+    "Product Management",
+    "Digital Strategy",
+    "Enterprise Solutions",
+    "AI Integration",
+    "Team Leadership",
   ],
   credibility:
-    "The founder has lived the pain firsthand, already has warm access to early design partners, and can clearly articulate the cost of untracked scope creep in agency economics.",
-  missingInfo: ["Technical lead profile", "Prior exits or angel track record"],
+    "Founded Totem Interactive in 2022 and shipped multiple complex digital products.",
+  missingInfo: ["Co-founder details"],
 };
 
 export const defaultOpportunities: Opportunity[] = [
   {
     slug: "yc-w26",
-    name: "Y Combinator W26",
+    shortName: "YC",
+    name: "YC W26",
+    domain: "ycombinator.com",
     type: "Accelerator",
-    category: "Global",
-    deadline: "May 12",
-    fitScore: 96,
+    category: "Batch",
+    location: "San Francisco / Remote",
+    deadline: "May 12, 2026",
+    description: "The most competitive startup accelerator for founders with sharp conviction and early momentum.",
+    fitScore: 91,
     fitLabel: "Strong Match",
-    why: "Clear wedge, strong founder-market fit, and early pull from a painful workflow problem.",
+    why: "The wedge is sharp, the founder-market fit is obvious, and the traction is strong enough to feel believable fast.",
     overview:
-      "YC is best for companies with sharp problem definition, speed of iteration, and founders who can sell insight before the product is fully built.",
+      "YC rewards clarity, urgency, and founders who can compress a hard problem into an inevitable first product wedge.",
     requirements: [
-      "Compelling founder story",
+      "Clear problem urgency",
+      "Strong founder insight",
       "Large market with expansion path",
-      "Velocity and user insight",
-      "Clear reason this team wins",
+      "Convincing speed of execution",
     ],
     gaps: [
-      "Tighten technical execution story",
-      "Clarify product defensibility beyond workflow automation",
-      "Add formal website and incorporation details",
+      "Clarify defensibility beyond AI automation",
+      "Tighten the solo-founder execution story",
+      "Add website and incorporation details",
     ],
     signals: [
-      "Founder has firsthand pain and language",
-      "Problem is urgent and quantifiable",
-      "Application can lean on pilot conversations and distribution insight",
+      "Strong founder-market fit from lived agency pain",
+      "Recurring SaaS model with fast ROI story",
+      "Traction is early but concrete",
     ],
-    status: "Drafting",
+    status: "Submitted",
+    intelligence: "Application received",
+    lastUpdated: "2026-04-05T13:08:00.000Z",
+    lastEdited: "2026-04-05T11:20:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 3,
+    tracked: true,
   },
   {
     slug: "antler-india",
+    shortName: "A",
     name: "Antler India",
+    domain: "antler.co",
     type: "Accelerator",
-    category: "India",
+    category: "Pre-seed",
+    location: "Bengaluru",
     deadline: "Rolling",
-    fitScore: 91,
+    description: "Early-stage conviction program backing founders before the company is fully formed.",
+    fitScore: 85,
     fitLabel: "Strong Match",
-    why: "Strong pre-seed thesis with a founder who knows the buyer and can iterate fast in-market.",
-    overview: "Antler backs founders early and values velocity, ambition, and a sharp understanding of the problem space.",
-    requirements: ["Founder quality", "Market insight", "Ability to recruit", "Early product narrative"],
-    gaps: ["Show technical build path", "Add hiring plan for first engineering lead"],
-    signals: ["India footprint", "B2B workflow pain point", "Pre-seed timing fits program"],
-    status: "Drafting",
+    why: "The founder profile, pre-seed timing, and local market context all fit Antler's early-conviction pattern.",
+    overview:
+      "Antler works best when founder quality is obvious and the startup has a tight wedge into a large market.",
+    requirements: [
+      "Ambitious founder profile",
+      "Large market insight",
+      "Sharp early wedge",
+      "Credible ability to recruit and execute",
+    ],
+    gaps: ["Explain the first technical hiring plan", "Show how pilots convert into repeatable SaaS revenue"],
+    signals: [
+      "Local founder with direct customer access",
+      "Painful workflow problem with measurable ROI",
+      "Pre-seed stage fits the program well",
+    ],
+    status: "Interview Scheduled",
+    intelligence: "Interview invite received",
+    lastUpdated: "2026-04-05T12:34:00.000Z",
+    lastEdited: "2026-04-04T18:10:00.000Z",
+    questionCount: 12,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
-    slug: "google-startups-india",
-    name: "Google for Startups India",
+    slug: "google-for-startups",
+    shortName: "G",
+    name: "Google for Startups",
+    domain: "startup.google.com",
     type: "Program",
-    category: "Cloud + Mentorship",
-    deadline: "Jun 3",
-    fitScore: 87,
-    fitLabel: "Strong Match",
-    why: "AI-enabled B2B workflow product with a credible use case and immediate product-development upside.",
-    overview: "Google for Startups supports technical founders with cloud credits, mentoring, and ecosystem access.",
-    requirements: ["Product innovation", "Scale potential", "Team readiness"],
-    gaps: ["More product screenshots", "More explicit AI stack explanation"],
-    signals: ["AI-native product", "India focus", "Early GTM clarity"],
+    category: "Credits + Mentorship",
+    location: "India",
+    deadline: "June 3, 2026",
+    description: "Operator support, product guidance, and cloud advantages for promising early startups.",
+    fitScore: 78,
+    fitLabel: "Good Match",
+    why: "A credible AI workflow product with infrastructure needs and a strong case for operator-focused product mentorship.",
+    overview:
+      "Google for Startups is strongest for technical products with real build requirements and a believable growth path.",
+    requirements: ["Technical ambition", "Clear product direction", "A compelling early growth story"],
+    gaps: ["Make the AI workflow and product architecture more explicit"],
+    signals: ["AI-native product", "Operational SaaS model", "Early user demand"],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-04T15:20:00.000Z",
+    lastEdited: "2026-04-03T12:10:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
     slug: "techstars-mumbai",
+    shortName: "T",
     name: "Techstars Mumbai",
+    domain: "techstars.com",
     type: "Accelerator",
-    category: "India",
-    deadline: "Jul 18",
-    fitScore: 83,
+    category: "Mentor-led",
+    location: "Mumbai",
+    deadline: "July 18, 2026",
+    description: "Mentor-heavy accelerator for startups that benefit from sharp feedback and founder storytelling.",
+    fitScore: 72,
     fitLabel: "Good Match",
-    why: "B2B SaaS with founder hustle and early market clarity aligns with mentor-led acceleration.",
-    overview: "Techstars focuses on mentor density and founder readiness to compress learning cycles.",
-    requirements: ["Strong founding team", "Coachability", "Market potential"],
-    gaps: ["Need clearer GTM math", "Add roadmap for enterprise integration"],
-    signals: ["Founder-led sales", "Urgent workflow problem"],
+    why: "Good local fit and useful mentor density while the narrative and distribution model sharpen.",
+    overview:
+      "Techstars Mumbai is strongest when the team benefits from mentor leverage and founder storytelling discipline.",
+    requirements: ["Coachability", "Founder momentum", "A path to repeatable distribution"],
+    gaps: ["Clarify first repeatable acquisition channel"],
+    signals: ["Mumbai base", "Founder-led GTM is plausible"],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-04T14:10:00.000Z",
+    lastEdited: "2026-04-03T16:00:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
-    slug: "nasscom-10000",
-    name: "NASSCOM 10,000 Startups",
-    type: "Incubator",
-    category: "India",
+    slug: "nasscom-10k",
+    shortName: "N",
+    name: "NASSCOM 10K",
+    domain: "nasscom.in",
+    type: "Program",
+    category: "Ecosystem",
+    location: "India",
     deadline: "Rolling",
-    fitScore: 79,
+    description: "Indian startup ecosystem support with founder programming, visibility, and network access.",
+    fitScore: 68,
     fitLabel: "Good Match",
-    why: "India-based SaaS startup with early traction and ecosystem fit.",
-    overview: "NASSCOM helps Indian startups with market access, founder support, and ecosystem credibility.",
-    requirements: ["Indian startup profile", "Innovation angle", "Team commitment"],
-    gaps: ["Formal company registration data"],
-    signals: ["India HQ", "Enterprise workflow use case"],
+    why: "A solid ecosystem program for an India-based SaaS company building a painful workflow tool for agencies.",
+    overview:
+      "NASSCOM 10K helps with ecosystem credibility, access, and support for Indian software startups.",
+    requirements: ["Indian startup profile", "Product clarity", "Commitment to scale"],
+    gaps: ["Formalize company registration details"],
+    signals: ["India HQ", "Software product", "Enterprise workflow category"],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-03T11:30:00.000Z",
+    lastEdited: "2026-04-02T14:00:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
     slug: "500-global",
+    shortName: "5",
     name: "500 Global",
+    domain: "500.co",
     type: "Accelerator",
     category: "Global",
-    deadline: "Aug 1",
-    fitScore: 76,
+    location: "Remote",
+    deadline: "August 1, 2026",
+    description: "Global accelerator platform for startups with repeatable growth potential and investor readiness.",
+    fitScore: 65,
     fitLabel: "Good Match",
-    why: "Operational SaaS with cross-border scale path and clear revenue story.",
-    overview: "500 Global looks for scalable businesses with credible growth paths and founder ambition.",
-    requirements: ["Scalability", "Strong market narrative", "Fundraising readiness"],
-    gaps: ["Broaden market sizing", "Add longer-term product expansion vision"],
-    signals: ["Recurring revenue model", "Large service economy problem"],
+    why: "The story works if it expands from agencies into a larger revenue-protection workflow category.",
+    overview:
+      "500 Global becomes stronger once the market narrative broadens and fundraising readiness improves.",
+    requirements: ["Scalable market narrative", "Early proof points", "Fundraising readiness"],
+    gaps: ["Broaden market sizing beyond agency operations"],
+    signals: ["Recurring SaaS model", "Cross-border software potential"],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-03T09:48:00.000Z",
+    lastEdited: "2026-04-02T11:40:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
-    slug: "on-deck-founders",
-    name: "On Deck Founders Fellowship",
-    type: "Fellowship",
-    category: "Network",
-    deadline: "Rolling",
-    fitScore: 71,
+    slug: "surge",
+    shortName: "S",
+    name: "Surge by Sequoia",
+    domain: "surgeahead.com",
+    type: "Accelerator",
+    category: "India + SEA",
+    location: "Bengaluru / Remote",
+    deadline: "September 10, 2026",
+    description: "Sequoia-backed founder support for breakout startups across India and Southeast Asia.",
+    fitScore: 60,
     fitLabel: "Possible Match",
-    why: "Useful for network density, founder support, and feedback loops while refining the story.",
-    overview: "A founder community and support environment for early operators building ambitious startups.",
-    requirements: ["Founder ambition", "Clarity of idea", "Community participation"],
-    gaps: ["Less urgent than direct accelerator paths"],
-    signals: ["Strong founder narrative", "Pre-seed exploration phase"],
+    why: "Interesting upside, but the current story is still sharper for YC and Antler than for a broader venture-scale pitch.",
+    overview:
+      "Surge is compelling when the category ambition and venture-scale story are both already very crisp.",
+    requirements: ["High-growth potential", "Venture-scale framing", "Founder ambition"],
+    gaps: ["Needs a broader category story and sharper venture framing"],
+    signals: ["India founder", "Clear pain point", "Good operator credibility"],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-02T17:40:00.000Z",
+    lastEdited: "2026-04-01T17:20:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 0,
+    tracked: true,
   },
   {
     slug: "aws-activate",
+    shortName: "A",
     name: "AWS Activate",
+    domain: "aws.amazon.com",
     type: "Credits",
     category: "Infrastructure",
+    location: "Global",
     deadline: "Rolling",
-    fitScore: 64,
+    description: "Non-dilutive cloud credits and startup tooling support for technical teams building fast.",
+    fitScore: 55,
     fitLabel: "Possible Match",
-    why: "Helpful non-dilutive support for an AI-heavy workflow product, though not core to the narrative.",
-    overview: "AWS Activate provides infrastructure credits and founder support for eligible startups.",
-    requirements: ["Basic company details", "Build plan", "Cloud use case"],
-    gaps: ["Formal incorporation details"],
-    signals: ["AI product likely to consume infrastructure"],
+    why: "Useful support for cloud spend and a clean non-dilutive win, even if it is not the hero part of the story.",
+    overview:
+      "AWS Activate is a practical support program for startups with a credible cloud-heavy product roadmap.",
+    requirements: ["Company details", "Product use case", "Cloud need"],
+    gaps: ["Add incorporation details to complete the application"],
+    signals: ["AI workload", "Infra credits are useful immediately"],
+    status: "Ready",
+    intelligence: "Draft complete",
+    lastUpdated: "2026-04-04T08:54:00.000Z",
+    lastEdited: "2026-04-05T07:50:00.000Z",
+    questionCount: 18,
+    questionsCompleted: 18,
+    tracked: true,
+  },
+  {
+    slug: "anthropic-startup-credits",
+    shortName: "An",
+    name: "Anthropic Startup Credits",
+    domain: "anthropic.com",
+    type: "Credits",
+    category: "AI Infrastructure",
+    location: "Global",
+    deadline: "Rolling",
+    description: "Free Claude API credits up to $10K for early-stage AI startups shipping real product.",
+    fitScore: 52,
+    fitLabel: "Possible Match",
+    why: "Useful API support for an AI workflow company, though it is more of a practical win than a flagship signal.",
+    overview: "Anthropic credits help early AI startups lower model costs while they validate usage and product shape.",
+    requirements: ["Working AI product", "Clear use of model credits", "Early-stage company profile"],
+    gaps: ["Show how Flowstate uses LLMs in the product loop without sounding generic"],
+    signals: [
+      "Flowstate is AI-native and benefits from usage credits",
+      "Credits reduce infrastructure pressure during pilots",
+      "The product narrative is stronger than the infra narrative",
+    ],
     status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-02T10:30:00.000Z",
+    lastEdited: "2026-04-01T12:10:00.000Z",
+    questionCount: 0,
+    questionsCompleted: 0,
+    tracked: false,
+  },
+  {
+    slug: "microsoft-for-startups",
+    shortName: "M",
+    name: "Microsoft for Startups",
+    domain: "microsoft.com",
+    type: "Credits",
+    category: "Platform",
+    location: "Global",
+    deadline: "Rolling",
+    description: "Azure credits up to $150K plus GitHub and LinkedIn access for startup teams.",
+    fitScore: 50,
+    fitLabel: "Possible Match",
+    why: "Helpful non-dilutive support if Flowstate broadens its technical stack and wants platform perks beyond cloud spend.",
+    overview: "Microsoft for Startups is strongest for technical teams who can benefit from Azure, GitHub, and partner access.",
+    requirements: ["Startup profile", "Technical product", "Credible use of platform benefits"],
+    gaps: ["Make the infrastructure plan more specific"],
+    signals: [
+      "The company can use cloud and tooling credits immediately",
+      "Platform support is valuable at pre-seed stage",
+      "Program fit is practical rather than narrative-defining",
+    ],
+    status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-04-01T15:00:00.000Z",
+    lastEdited: "2026-03-31T10:40:00.000Z",
+    questionCount: 0,
+    questionsCompleted: 0,
+    tracked: false,
+  },
+  {
+    slug: "sequoia-arc",
+    shortName: "SA",
+    name: "Sequoia Arc",
+    domain: "sequoiacap.com",
+    type: "Fellowship",
+    category: "Founder Support",
+    location: "Global",
+    deadline: "Rolling",
+    description: "Sequoia's early-stage scout and support program for pre-seed founders.",
+    fitScore: 48,
+    fitLabel: "Possible Match",
+    why: "Interesting if the story sharpens into a broader category-defining wedge, but it is not yet the strongest room today.",
+    overview: "Arc favors ambitious pre-seed founders with sharp category thinking and room to compound quickly.",
+    requirements: ["Ambitious category thesis", "Founder conviction", "Pre-seed readiness"],
+    gaps: ["Make the long-term category ambition more expansive"],
+    signals: [
+      "Founder insight is real and hard-won",
+      "The current wedge is strong but still niche",
+      "Needs a bigger market framing to stand out here",
+    ],
+    status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-03-31T16:45:00.000Z",
+    lastEdited: "2026-03-30T14:20:00.000Z",
+    questionCount: 0,
+    questionsCompleted: 0,
+    tracked: false,
+  },
+  {
+    slug: "entrepreneur-first-india",
+    shortName: "EF",
+    name: "Entrepreneur First India",
+    domain: "joinef.com",
+    type: "Accelerator",
+    category: "Pre-team",
+    location: "Bengaluru",
+    deadline: "Rolling",
+    description: "Pre-team pre-idea program that funds founders while they find a cofounder.",
+    fitScore: 45,
+    fitLabel: "Possible Match",
+    why: "Less aligned because Flowstate already has a concrete company and product wedge, but still relevant around solo-founder support.",
+    overview: "Entrepreneur First is best for exceptional individuals before the startup is fully formed.",
+    requirements: ["Exceptional founder profile", "Early-stage openness", "Cofounder search context"],
+    gaps: ["The company is already more formed than the ideal EF stage"],
+    signals: [
+      "Solo-founder story is relevant here",
+      "Program stage is earlier than Flowstate's current position",
+      "Useful only if the cofounder gap becomes a priority",
+    ],
+    status: "Drafting",
+    intelligence: null,
+    lastUpdated: "2026-03-30T10:20:00.000Z",
+    lastEdited: "2026-03-29T11:10:00.000Z",
+    questionCount: 0,
+    questionsCompleted: 0,
+    tracked: false,
   },
 ];
 
-export const ycQuestions: ApplicationQuestion[] = [
+const ycQuestionTemplate: ApplicationQuestion[] = [
   {
-    id: "what-are-you-building",
-    question: "What are you building, and what problem are you solving?",
-    answer:
-      "We are building Flowstate AI, a contract intelligence layer for digital agencies. Agencies regularly lose margin because account managers agree to off-scope work in meetings, email, and Slack without realizing the revenue impact until the project is already underwater. Flowstate detects probable scope creep in real time and automatically drafts the change-order documentation required to recover that revenue before it disappears.",
+    id: "q1",
+    question: "What does your company do in one sentence?",
+    answer: "Totem Interactive builds AI products, platforms, and digital solutions for enterprises.",
     variants: [
-      "Flowstate AI helps digital agencies catch scope creep before it kills project margin. We monitor client communication, flag off-scope requests as they happen, and generate the change-order language teams need to convert hidden delivery work into approved revenue.",
-      "We are building an AI-powered scope control system for agencies. Instead of discovering margin leakage at the end of a project, teams get live alerts, commercial context, and draft change orders the moment client requests start drifting beyond the original agreement.",
+      "We accelerate business execution by building intelligent software and AI workflows.",
+      "Thinkalocity.ai acts as an AI workflow layer for smarter founder and business execution.",
     ],
     ready: false,
-    lastSaved: "2026-04-04T16:10:00.000Z",
+    lastSaved: "2026-04-05T12:12:00.000Z",
     sourceSnippets: [
-      "Pitch deck: 'scope creep is the silent margin killer for agencies'",
-      "Founder notes: 'documentation delay is what makes recovery impossible'",
+      "totem_deck.pdf, slide 3: 'Building products across AI, platforms, and digital.'",
     ],
   },
   {
-    id: "why-now",
-    question: "Why is this the right time for your company to exist?",
+    id: "q2",
+    question: "What is your company going to make?",
     answer:
-      "Agencies now run more of their delivery process through fragmented digital channels, which means scope drift is more frequent and less visible than it was in email-only workflows. At the same time, LLMs have become good enough to understand ambiguous client requests, map them to contractual commitments, and draft commercially precise documentation. That combination makes real-time scope intelligence possible for the first time.",
+      "We build products across AI, apps, platforms, games, AR/VR, and digital solutions. Our core focus is launching products like Velocity, an AI prompt-improvement tool, and Thinkalocity, an AI workflow layer.",
     variants: [
-      "The timing works because agency delivery has become messy enough to create the problem and language models have become reliable enough to solve it. Teams finally have enough communication exhaust to detect scope drift and enough AI capability to turn that signal into action.",
-      "Scope creep has always existed, but the modern agency stack makes it easier to miss and more expensive to ignore. We can now ingest messy communication across channels, reason over contractual expectations, and create a draft response instantly instead of after the work is already done.",
+      "We are building an AI workflow ecosystem that helps founders and businesses execute smarter through tools like Thinkalocity and Velocity.",
     ],
     ready: true,
-    lastSaved: "2026-04-04T16:12:00.000Z",
+    lastSaved: "2026-04-05T12:16:00.000Z",
     sourceSnippets: [
-      "Startup memo: communication moved from PM tools to Slack and calls",
-      "Deck: 'AI can now reason over nuance, not just keywords'",
+      "startup_memo.docx: 'Makers of Velocity, an AI prompt-improvement product.'",
     ],
   },
   {
-    id: "founder-fit",
-    question: "Why are you the right person to build this?",
+    id: "q3",
+    question: "Who are your competitors and what do you understand that they do not?",
     answer:
-      "I spent five years running a digital agency and repeatedly watched profitable projects become painful because teams were too slow to recognize and document scope drift. I know how agencies sell, deliver, and argue about margin because I lived those workflows directly. That gives me unusually fast access to real buyer language, design partners, and a product instinct shaped by firsthand pain rather than abstract market research.",
+      "Most development agencies lack deep, proprietary product layers (like Thinkalocity). We don't just build software; we build AI-native execution workflows.",
     variants: [
-      "I built this because I ran into the problem as an operator, not an observer. After years of trying to protect agency margin with process alone, I know exactly where workflows break and what kind of output teams will actually use in a client conversation.",
-      "My founder advantage is painful intimacy with the workflow. I’ve been the person negotiating project expansion without the documentation needed to charge for it, so the product is grounded in operational reality rather than generic AI tooling.",
+      "Traditional agencies are purely service-oriented. We exist at the intersection of product incubation and service execution.",
     ],
     ready: false,
-    lastSaved: "2026-04-04T16:14:00.000Z",
+    lastSaved: "2026-04-05T12:21:00.000Z",
     sourceSnippets: [
-      "Founder notes: 'scope creep killed our best projects more than sales ever did'",
-      "LinkedIn summary: ran digital agency for five years",
+      "Founder notes: 'We ship actual AI products instead of just selling hours.'",
+    ],
+  },
+  {
+    id: "q4",
+    question: "Why are you the right person to build this?",
+    answer:
+      "I have been successfully operating Totem Interactive since 2022, securing strong talent in Mumbai, and shipping distinct AI products.",
+    variants: [
+      "With a strong background in software development and launching products like Velocity, I have the execution speed to build and scale Thinkalocity.",
+    ],
+    ready: false,
+    lastSaved: "2026-04-05T12:24:00.000Z",
+    sourceSnippets: [
+      "Founder Profile: 'Successfully shipped AI workflow products.'",
+    ],
+  },
+  {
+    id: "q5",
+    question: "How do you make money?",
+    answer:
+      "We generate revenue through high-end digital solutions, combined with potential SaaS subscriptions for our proprietary AI products.",
+    variants: [
+      "A blended model of recurring SaaS revenue from tools like Thinkalocity, backed by robust enterprise execution contracts.",
+    ],
+    ready: false,
+    lastSaved: "2026-04-05T12:27:00.000Z",
+    sourceSnippets: [
+      "startup_memo.docx: 'Blended B2B service and SaaS.'",
     ],
   },
 ];
+
+export function createApplicationQuestions(): ApplicationQuestion[] {
+  return ycQuestionTemplate.map((question) => ({
+    ...question,
+    variants: [...question.variants],
+    sourceSnippets: [...question.sourceSnippets],
+  }));
+}
+
+export const ycQuestions: ApplicationQuestion[] = createApplicationQuestions();
 
 export const gmailEmails: GmailEmail[] = [
   {
@@ -325,7 +574,7 @@ export const gmailEmails: GmailEmail[] = [
     preview: "We've received your W26 application and will review it shortly.",
     programSlug: "yc-w26",
     suggestedStatus: "Submitted",
-    receivedAt: "2026-04-04T16:25:00.000Z",
+    receivedAt: "2026-04-05T13:08:00.000Z",
   },
   {
     id: "antler-invite",
@@ -333,7 +582,7 @@ export const gmailEmails: GmailEmail[] = [
     from: "india@antler.co",
     preview: "We'd love to schedule a partner interview next week.",
     programSlug: "antler-india",
-    suggestedStatus: "Interview",
-    receivedAt: "2026-04-04T16:40:00.000Z",
+    suggestedStatus: "Interview Scheduled",
+    receivedAt: "2026-04-05T12:34:00.000Z",
   },
 ];

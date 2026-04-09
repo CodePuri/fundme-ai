@@ -3,28 +3,43 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "subtle" | "danger";
+  size?: "sm" | "md" | "lg";
 };
 
-export function Button({
-  className,
-  variant = "primary",
-  type = "button",
-  ...props
-}: ButtonProps) {
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    className,
+    variant = "primary",
+    size = "md",
+    type = "button",
+    ...props
+  },
+  ref,
+) {
   return (
     <button
       className={cn(
-        "inline-flex h-11 items-center justify-center rounded-2xl px-4 text-sm font-medium transition duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-full border text-sm font-medium transition-colors duration-150 disabled:pointer-events-none disabled:opacity-50",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
+        size === "sm" && "h-8 px-3 text-[12px]",
+        size === "md" && "h-10 px-4",
+        size === "lg" && "h-11 px-5",
         variant === "primary" &&
-          "bg-cyan-300 text-slate-950 shadow-[0_12px_40px_rgba(83,214,255,0.18)] hover:-translate-y-0.5 hover:bg-cyan-200",
+          "border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)]",
         variant === "secondary" &&
-          "border border-white/12 bg-white/6 text-white hover:-translate-y-0.5 hover:bg-white/10",
-        variant === "ghost" && "text-white/70 hover:bg-white/6 hover:text-white",
+          "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)]",
+        variant === "ghost" &&
+          "border-transparent bg-transparent text-[var(--text-primary)] hover:border-[var(--border)] hover:bg-[var(--surface)]",
+        variant === "subtle" &&
+          "border-[var(--border)] bg-transparent text-[var(--text-muted)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]",
+        variant === "danger" &&
+          "border-red-500/20 bg-red-500/10 text-red-100 hover:border-red-500/30 hover:bg-red-500/15",
         className,
       )}
+      ref={ref}
       type={type}
       {...props}
     />
   );
-}
+});

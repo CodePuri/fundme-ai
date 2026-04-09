@@ -1,74 +1,113 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import type { ComponentType } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import {
-  BriefcaseBusiness,
   Building2,
-  Cog,
+  Compass,
   FilePenLine,
-  FolderUp,
   LayoutDashboard,
+  PlusCircle,
+  Settings2,
   Sparkles,
   UserRound,
 } from "lucide-react";
 
+import { useDemo } from "@/components/app/demo-provider";
+import { BrandLockup } from "@/components/ui/brand-lockup";
 import { cn } from "@/lib/utils";
 
-const navItems = [
-  { href: "/app/upload", label: "Upload", icon: FolderUp },
-  { href: "/app/startup-profile", label: "Startup Profile", icon: Building2 },
-  { href: "/app/founder-profile", label: "Founder Profile", icon: UserRound },
-  { href: "/app/matches", label: "Matches", icon: Sparkles },
-  { href: "/app/programs/yc-w26", label: "YC Detail", icon: BriefcaseBusiness },
-  { href: "/app/workspace/yc-w26", label: "Application", icon: FilePenLine },
-  { href: "/app/tracker", label: "Tracker", icon: LayoutDashboard },
-  { href: "/app/settings", label: "Settings", icon: Cog },
+type SidebarItem = {
+  href: string;
+  label: string;
+  icon: ComponentType<{ className?: string }>;
+  tracker?: boolean;
+  reset?: boolean;
+};
+
+const sections: Array<{ label: string; items: SidebarItem[] }> = [
+  {
+    label: "Workspace",
+    items: [
+      { href: "/onboarding", label: "Add New Idea", icon: PlusCircle, reset: true },
+      { href: "/app/startup-profile", label: "Startup Profile", icon: Building2 },
+      { href: "/app/founder-profile", label: "Founder Profile", icon: UserRound },
+    ],
+  },
+  {
+    label: "Opportunities",
+    items: [
+      { href: "/app/matches", label: "Matches", icon: Sparkles },
+      { href: "/explore", label: "Explore", icon: Compass },
+      { href: "/app/applications", label: "Applications", icon: FilePenLine },
+    ],
+  },
+  {
+    label: "Manage",
+    items: [
+      { href: "/app/tracker", label: "Tracker", icon: LayoutDashboard, tracker: true },
+      { href: "/app/settings", label: "Settings", icon: Settings2 },
+    ],
+  },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { state, startNewIdea } = useDemo();
 
   return (
-    <aside className="sticky top-0 hidden h-screen w-72 flex-col border-r border-white/10 bg-[#0a0c12]/90 px-5 py-6 lg:flex">
-      <Link className="group flex items-center gap-3" href="/">
-        <div className="flex size-10 items-center justify-center rounded-2xl border border-cyan-400/30 bg-cyan-400/10 text-cyan-200">
-          F
-        </div>
-        <div>
-          <div className="font-[family-name:var(--font-display)] text-lg font-semibold text-white">
-            Fundme.ai
+    <aside className="sticky top-0 hidden h-screen w-[248px] flex-col border-r border-[var(--border)] bg-[var(--surface-elevated)] px-4 py-5 lg:flex">
+      <button className="flex items-center gap-3 rounded-[10px] px-2 py-2 text-left" onClick={() => router.push("/app/matches")} type="button">
+        <BrandLockup />
+      </button>
+
+      <div className="mt-8 flex flex-col gap-6">
+        {sections.map((section) => (
+          <div key={section.label}>
+            <div className="px-3 text-[11px] uppercase tracking-[0.14em] text-[var(--text-faint)]">
+              {section.label}
+            </div>
+            <nav className="mt-2 flex flex-col gap-1">
+              {section.items.map(({ href, label, icon: Icon, tracker, reset }) => {
+                const active = pathname === href || pathname.startsWith(`${href}/`);
+
+                return (
+                  <button
+                    className={cn(
+                      "flex w-full items-center justify-between rounded-[10px] border px-3 py-2.5 text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]",
+                      "border-transparent text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)]",
+                      active && "border-[var(--border)] bg-[var(--surface)] text-[var(--text-primary)] shadow-sm",
+                    )}
+                    key={href}
+                    onClick={() => {
+                      if (reset) {
+                        startNewIdea();
+                      }
+                      router.push(href);
+                    }}
+                    type="button"
+                  >
+                    <span className="flex items-center gap-3">
+                      <Icon className="size-3.5" />
+                      <span>{label}</span>
+                    </span>
+                    {tracker && state.trackerNotificationVisible ? (
+                      <span className="size-1.5 rounded-full bg-amber-400" />
+                    ) : null}
+                  </button>
+                );
+              })}
+            </nav>
           </div>
-          <div className="text-xs text-white/45">Founder workflow engine</div>
-        </div>
-      </Link>
-
-      <div className="mt-10 space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
-
-          return (
-            <Link
-              className={cn(
-                "flex items-center gap-3 rounded-2xl px-4 py-3 text-sm text-white/60 transition hover:-translate-y-0.5 hover:bg-white/6 hover:text-white",
-                active && "bg-white/8 text-white shadow-[0_0_0_1px_rgba(255,255,255,0.08)]",
-              )}
-              href={href}
-              key={href}
-            >
-              <Icon className="size-4" />
-              {label}
-            </Link>
-          );
-        })}
+        ))}
       </div>
 
-      <div className="mt-auto rounded-[28px] border border-white/10 bg-white/[0.03] p-4">
-        <div className="text-xs uppercase tracking-[0.24em] text-white/35">Demo mode</div>
-        <p className="mt-3 text-sm leading-6 text-white/65">
-          All intelligence, Gmail sync, and profile extraction are intentionally mocked for a clean
-          pitch-worthy workflow.
-        </p>
+      <div className="mt-auto border-t border-[var(--border)] pt-4">
+        <div className="rounded-[12px] bg-[var(--surface)] px-3 py-3">
+          <div className="text-[13px] font-medium text-[var(--text-primary)]">{state.founderProfile?.name || "Aakash Puri"}</div>
+          <div className="mt-1 text-[12px] text-[var(--text-muted)]">{state.startupProfile?.companyName || "Totem Interactive"}</div>
+        </div>
       </div>
     </aside>
   );
