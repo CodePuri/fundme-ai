@@ -1,5 +1,5 @@
 import { DashboardFrame } from "@/components/app/dashboard-frame";
-import { MatchesContent } from "@/app/app/matches/page";
+import { MatchesContent } from "@/components/app/matches-content";
 
 export default function MatchesRedirectPage() {
   return (

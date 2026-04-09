@@ -10,6 +10,8 @@
     "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {
+    "@clerk/nextjs": "^7.0.12",
+    "@supabase/supabase-js": "^2.103.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.10.0",
     "lucide-react": "^0.511.0",
@@ -21,6 +23,8 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.5",
+    "@types/estree": "^1.0.8",
+    "@types/json-schema": "^7.0.15",
     "@types/node": "^24.6.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",

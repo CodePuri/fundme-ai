@@ -2,7 +2,8 @@
 
 import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
@@ -14,9 +15,8 @@ import {
 } from "lucide-react";
 import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 
-import { PublicAuthController } from "@/components/public/public-auth-controller";
+// import { PublicAuthController } from "@/components/public/public-auth-controller";
 import { BrandLockup } from "@/components/ui/brand-lockup";
-import { buildAuthEntryHref } from "@/lib/auth-intent";
 import { cn } from "@/lib/utils";
 import {
   EASE_OUT,
@@ -1010,21 +1010,14 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
 export function PublicHomepage() {
   const router = useRouter();
-  const pathname = usePathname();
+  const { isSignedIn } = useUser();
 
-  function openAuth(destination = "/onboarding") {
-    const liveParams =
-      typeof window === "undefined" ? new URLSearchParams() : new URLSearchParams(window.location.search);
-    const href = buildAuthEntryHref({
-      entryPath: pathname,
-      entryParams: liveParams,
-      intent: {
-        action: "default",
-        destination,
-      },
-    });
-
-    router.push(href, { scroll: false });
+  function openAuth(_destination = "/onboarding") {
+    if (isSignedIn) {
+      router.push("/thank-you");
+    } else {
+      router.push("/sign-up");
+    }
   }
 
   return (
@@ -1041,14 +1034,14 @@ export function PublicHomepage() {
 
       <CinematicFooter onOpenAuth={() => openAuth()} />
 
-      <Suspense fallback={null}>
+      {/* <Suspense fallback={null}>
         <PublicAuthController
           fallbackIntent={{
             action: "default",
             destination: "/onboarding",
           }}
         />
-      </Suspense>
+      </Suspense> */}
     </main>
   );
 }

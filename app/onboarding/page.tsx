@@ -2,6 +2,7 @@
 
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, Mic, CheckCircle2, LoaderCircle, PenIcon, Plus, User, Sparkles, FileText, Layout } from "lucide-react";
 
@@ -35,9 +36,11 @@ type OnboardingDraft = {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const { isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { completeOnboarding } = useDemo();
   const [hasHydrated, setHasHydrated] = useState(false);
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Default seeded
   const [name, setName] = useState("");
@@ -55,6 +58,17 @@ export default function OnboardingPage() {
   const [hasImported, setHasImported] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [elapsed, setElapsed] = useState(0);
+
+  // Redirect already-submitted users straight to /thank-you
+  useEffect(() => {
+    if (!isClerkLoaded || !isSignedIn) return;
+    fetch("/api/onboarding")
+      .then((res) => res.json())
+      .then((data: { submitted?: boolean }) => {
+        if (data.submitted) router.replace("/thank-you");
+      })
+      .catch(() => {/* ignore, let user proceed */});
+  }, [isClerkLoaded, isSignedIn, router]);
 
   useEffect(() => {
     const savedStep = window.localStorage.getItem(ONBOARDING_STEP_KEY);
@@ -159,7 +173,7 @@ export default function OnboardingPage() {
     if (step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
-        router.push("/app/matches");
+        router.push("/thank-you");
       }, 500);
       return () => clearTimeout(t);
     }
@@ -195,16 +209,44 @@ export default function OnboardingPage() {
     setStep(5);
   }
 
-  function finishOnboarding() {
+  async function finishOnboarding() {
+    const resolvedName = name || "Aakash Puri";
+    const resolvedRole = role || "CEO & Founder";
+    const resolvedCompany = companyName || "Totem Interactive";
+    const resolvedLinkedIn = linkedIn || "https://www.linkedin.com/in/aakash-puri-a44aa594/";
+    const resolvedNotes = notes || rambleText;
+
+    // Update demo state for in-session use
     completeOnboarding({
-      founderName: name || "Aakash Puri",
-      founderRole: role || "CEO & Founder",
-      companyName: companyName || "Totem Interactive",
-      linkedIn: linkedIn || "https://www.linkedin.com/in/aakash-puri-a44aa594/",
-      notes: notes || rambleText,
+      founderName: resolvedName,
+      founderRole: resolvedRole,
+      companyName: resolvedCompany,
+      linkedIn: resolvedLinkedIn,
+      notes: resolvedNotes,
       files,
     });
-    setStep(5);
+
+    setIsSubmitting(true);
+
+    try {
+      await fetch("/api/onboarding", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: resolvedName,
+          role: resolvedRole,
+          companyName: resolvedCompany,
+          linkedIn: resolvedLinkedIn,
+          notes: resolvedNotes,
+        }),
+      });
+    } catch {
+      // If the save fails, still proceed to thank-you — don't block the user
+    } finally {
+      setIsSubmitting(false);
+    }
+
+    router.push("/thank-you");
   }
 
   if (!hasHydrated) {
@@ -305,15 +347,17 @@ export default function OnboardingPage() {
                       value={role} 
                     />
                   </Field>
+                  {/* LinkedIn URL field — commented out until LinkedIn import is wired up
                   <Field className="md:col-span-2">
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">LinkedIn URL</FieldLabel>
-                    <Input 
+                    <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
                       placeholder="https://linkedin.com/in/..."
-                      onChange={(e) => setLinkedIn(e.target.value)} 
-                      value={linkedIn} 
+                      onChange={(e) => setLinkedIn(e.target.value)}
+                      value={linkedIn}
                     />
                   </Field>
+                  */}
                   <Field className="md:col-span-2">
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Company Name <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input 
@@ -325,15 +369,16 @@ export default function OnboardingPage() {
                   </Field>
                 </div>
 
+                {/* Autofill from LinkedIn — commented out until LinkedIn import is wired up
                 <div className="rounded-[24px] bg-[#fff5f0] border border-[#ff6b3d]/10 p-8 relative overflow-hidden group hover:border-[#ff6b3d]/20 transition-all">
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
                      <div className="flex-1">
                        <div className="text-[17px] font-semibold text-black">Autofill from LinkedIn</div>
                        <div className="text-[14px] text-black/50 mt-2 leading-relaxed max-w-[380px]">We'll fetch your education and work history to jumpstart your profile. Review and edit any time.</div>
                      </div>
-                     <Button 
-                       variant="primary" 
-                       disabled={isImporting || hasImported} 
+                     <Button
+                       variant="primary"
+                       disabled={isImporting || hasImported}
                        className="h-12 px-8 rounded-full shadow-lg shadow-[#ff6b3d]/10 hover:shadow-[#ff6b3d]/20 transition-all"
                        onClick={async () => {
                          setIsImporting(true);
@@ -349,7 +394,9 @@ export default function OnboardingPage() {
                         {isImporting ? <><LoaderCircle className="animate-spin size-4 mr-2" /> Importing...</> : hasImported ? "Successfully Imported ✓" : "Import Now"}
                      </Button>
                   </div>
-                </div>                <AnimatePresence>
+                </div>
+                */}                {/* LinkedIn imported profile block — commented out until LinkedIn import is wired up
+                <AnimatePresence>
                 {hasImported && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-12 mt-12 bg-black/[0.01] p-8 rounded-[32px] border border-black/5">
                      {/* Education Block */}
@@ -412,7 +459,8 @@ export default function OnboardingPage() {
                   </motion.div>
                 )}
                </AnimatePresence>
-                
+                */}
+
                 <div className="flex justify-end pt-12 border-t border-black/5 mt-8">
                   <Button onClick={() => setStep(2)} size="lg" className="h-12 px-10 rounded-full" disabled={!name || !companyName}>
                     Continue <ArrowRight className="size-4 ml-2" />

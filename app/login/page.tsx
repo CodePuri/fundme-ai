@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 
-import { buildAuthEntryHref } from "@/lib/auth-intent";
-
 export default async function LoginPage({
   searchParams,
 }: {
@@ -9,15 +7,5 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const destination = params.redirect || "/onboarding";
-  const entryPath = destination.startsWith("/explore") ? "/search" : "/";
-
-  redirect(
-    buildAuthEntryHref({
-      entryPath,
-      intent: {
-        action: "default",
-        destination,
-      },
-    }),
-  );
+  redirect(`/sign-in?redirect_url=${encodeURIComponent(destination)}`);
 }

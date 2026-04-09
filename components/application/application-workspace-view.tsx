@@ -337,7 +337,7 @@ export function ApplicationWorkspaceView({
                 Close
               </Button>
               <div className="flex flex-wrap items-center justify-end gap-3">
-                <Button variant="outline" className="whitespace-nowrap bg-[var(--surface)] hover:bg-[var(--surface-active)]" onClick={() => setDemoOpen(false)}>
+                <Button variant="secondary" className="whitespace-nowrap bg-[var(--surface)] hover:bg-[var(--surface-active)]" onClick={() => setDemoOpen(false)}>
                   Save Draft
                 </Button>
                 <Button
