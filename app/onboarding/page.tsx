@@ -4,7 +4,7 @@ import { startTransition, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Mic, CheckCircle2, LoaderCircle, PenIcon, Plus, User, Sparkles, FileText, Layout } from "lucide-react";
+import { ArrowRight, Mic, CheckCircle2, LoaderCircle, PenIcon, User, Sparkles, FileText } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
 
@@ -369,97 +369,7 @@ export default function OnboardingPage() {
                   </Field>
                 </div>
 
-                {/* Autofill from LinkedIn — commented out until LinkedIn import is wired up
-                <div className="rounded-[24px] bg-[#fff5f0] border border-[#ff6b3d]/10 p-8 relative overflow-hidden group hover:border-[#ff6b3d]/20 transition-all">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                     <div className="flex-1">
-                       <div className="text-[17px] font-semibold text-black">Autofill from LinkedIn</div>
-                       <div className="text-[14px] text-black/50 mt-2 leading-relaxed max-w-[380px]">We'll fetch your education and work history to jumpstart your profile. Review and edit any time.</div>
-                     </div>
-                     <Button
-                       variant="primary"
-                       disabled={isImporting || hasImported}
-                       className="h-12 px-8 rounded-full shadow-lg shadow-[#ff6b3d]/10 hover:shadow-[#ff6b3d]/20 transition-all"
-                       onClick={async () => {
-                         setIsImporting(true);
-                         await new Promise(r => setTimeout(r, 2000));
-                         setIsImporting(false);
-                         setHasImported(true);
-                         setName("Aakash Puri");
-                         setRole("CEO & Founder");
-                         setCompanyName("Totem Interactive");
-                         setLinkedIn("https://www.linkedin.com/in/aakash-puri-a44aa594/");
-                       }}
-                     >
-                        {isImporting ? <><LoaderCircle className="animate-spin size-4 mr-2" /> Importing...</> : hasImported ? "Successfully Imported ✓" : "Import Now"}
-                     </Button>
-                  </div>
-                </div>
-                */}                {/* LinkedIn imported profile block — commented out until LinkedIn import is wired up
-                <AnimatePresence>
-                {hasImported && (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col gap-12 mt-12 bg-black/[0.01] p-8 rounded-[32px] border border-black/5">
-                     {/* Education Block */}
-                     <div>
-                       <div className="flex items-center justify-between mb-8">
-                         <div className="text-[13px] font-bold text-black uppercase tracking-wider">Education</div>
-                         <Button variant="subtle" size="sm" className="h-8 px-4 rounded-full border-black/5"><Plus className="size-3.5 mr-1.5"/> Add School</Button>
-                       </div>
-                       
-                       <div className="flex flex-col gap-6">
-                         {[
-                           { name: "Thakur College of Science & Commerce", desc: "Bachelor's degree, Mass Communication", period: "Jan 2019 - Jan 2022" },
-                           { name: "RD & SH National College", desc: "Arts & Media Management", period: "Jan 2017 - Jan 2019" }
-                         ].map((edu) => (
-                          <div key={edu.name} className="flex justify-between items-start group p-4 rounded-[16px] hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-black/5">
-                            <div>
-                              <div className="text-[15px] font-semibold text-black">{edu.name}</div>
-                              <div className="text-[14px] text-black/40 mt-1">{edu.desc}</div>
-                              <div className="text-[12px] text-black/30 mt-2 font-medium">{edu.period}</div>
-                            </div>
-                            <PenIcon className="size-4 text-black/20 hover:text-black cursor-pointer transition-colors" />
-                          </div>
-                         ))}
-                       </div>
-                     </div>
-
-                     {/* Work History Block */}
-                     <div>
-                       <div className="flex items-center justify-between mb-8">
-                         <div className="text-[13px] font-bold text-black uppercase tracking-wider">Experience</div>
-                         <Button variant="subtle" size="sm" className="h-8 px-4 rounded-full border-black/5"><Plus className="size-3.5 mr-1.5"/> Add Role</Button>
-                       </div>
-
-                       <div className="flex flex-col gap-6">
-                         <div className="flex flex-col group p-4 rounded-[16px] hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-black/5">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="text-[15px] font-semibold text-black">Totem Interactive</div>
-                                <div className="text-[14px] text-[#ff6b3d] font-bold mt-0.5">Chief Executive Officer</div>
-                              </div>
-                              <PenIcon className="size-4 text-black/20 hover:text-black cursor-pointer transition-colors" />
-                            </div>
-                            <div className="text-[14px] text-black/40 leading-relaxed mt-4 line-clamp-2">Currently, here at Totem Interactive, we're building the future of founder productivity and AI development...</div>
-                            <div className="text-[12px] text-black/30 mt-4 font-medium italic">Apr 2022 - Present</div>
-                         </div>
-
-                         <div className="flex flex-col group p-4 rounded-[16px] hover:bg-white hover:shadow-sm transition-all border border-transparent hover:border-black/5">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <div className="text-[15px] font-semibold text-black">CrazyLabs</div>
-                                <div className="text-[14px] text-[#ff6b3d] font-bold mt-0.5">2022 Batch of Crazy Hubs</div>
-                              </div>
-                              <PenIcon className="size-4 text-black/20 hover:text-black cursor-pointer transition-colors" />
-                            </div>
-                            <div className="text-[14px] text-black/40 leading-relaxed mt-4 line-clamp-2">The hubs gave my spontaneous burst of creativity the structure and understanding of what makes products stick...</div>
-                            <div className="text-[12px] text-black/30 mt-4 font-medium italic">Jan 2023 - Nov 2023</div>
-                         </div>
-                       </div>
-                     </div>
-                  </motion.div>
-                )}
-               </AnimatePresence>
-                */}
+                {/* LinkedIn autofill + imported profile — disabled until LinkedIn import is wired up */}
 
                 <div className="flex justify-end pt-12 border-t border-black/5 mt-8">
                   <Button onClick={() => setStep(2)} size="lg" className="h-12 px-10 rounded-full" disabled={!name || !companyName}>
