@@ -29,6 +29,8 @@ type OnboardingDraft = {
   role?: string;
   companyName?: string;
   linkedIn?: string;
+  websiteUrl?: string;
+  xUrl?: string;
   notes?: string;
   files?: string[];
   imported?: boolean;
@@ -47,6 +49,8 @@ export default function OnboardingPage() {
   const [role, setRole] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [xUrl, setXUrl] = useState("");
 
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState<string[]>([]);
@@ -78,6 +82,8 @@ export default function OnboardingPage() {
     let nextRole = "";
     let nextCompanyName = "";
     let nextLinkedIn = "";
+    let nextWebsiteUrl = "";
+    let nextXUrl = "";
     let nextNotes = "";
     let nextFiles: string[] = [];
     let nextStep = 1;
@@ -95,6 +101,8 @@ export default function OnboardingPage() {
         if (parsed.role) nextRole = parsed.role;
         if (parsed.companyName) nextCompanyName = parsed.companyName;
         if (parsed.linkedIn) nextLinkedIn = parsed.linkedIn;
+        if (parsed.websiteUrl) nextWebsiteUrl = parsed.websiteUrl;
+        if (parsed.xUrl) nextXUrl = parsed.xUrl;
         if (parsed.notes) {
           nextNotes = parsed.notes;
           nextTypedOpen = true;
@@ -114,6 +122,8 @@ export default function OnboardingPage() {
       setRole(nextRole);
       setCompanyName(nextCompanyName);
       setLinkedIn(nextLinkedIn);
+      setWebsiteUrl(nextWebsiteUrl);
+      setXUrl(nextXUrl);
       setNotes(nextNotes);
       setFiles(nextFiles);
       setTypedOpen(nextTypedOpen);
@@ -142,12 +152,14 @@ export default function OnboardingPage() {
         role,
         companyName,
         linkedIn,
+        websiteUrl,
+        xUrl,
         notes,
         files,
         imported: hasImported
       })
     );
-  }, [hasHydrated, name, role, companyName, linkedIn, notes, files, hasImported]);
+  }, [hasHydrated, name, role, companyName, linkedIn, websiteUrl, xUrl, notes, files, hasImported]);
 
   // Step 4 Inline processing timer
   useEffect(() => {
@@ -173,7 +185,7 @@ export default function OnboardingPage() {
     if (step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
-        router.push("/thank-you");
+        router.push("/roast");
       }, 500);
       return () => clearTimeout(t);
     }
@@ -238,6 +250,8 @@ export default function OnboardingPage() {
           companyName: resolvedCompany,
           linkedIn: resolvedLinkedIn,
           notes: resolvedNotes,
+          websiteUrl,
+          xUrl,
         }),
       });
     } catch {
@@ -246,7 +260,7 @@ export default function OnboardingPage() {
       setIsSubmitting(false);
     }
 
-    router.push("/thank-you");
+    router.push("/roast");
   }
 
   if (!hasHydrated) {
@@ -360,11 +374,38 @@ export default function OnboardingPage() {
                   */}
                   <Field className="md:col-span-2">
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Company Name <span className="text-[#ff6b3d]">*</span></FieldLabel>
-                    <Input 
+                    <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
                       placeholder="e.g. Totem Interactive"
-                      onChange={(e) => setCompanyName(e.target.value)} 
-                      value={companyName} 
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      value={companyName}
+                    />
+                  </Field>
+                  <Field className="md:col-span-2">
+                    <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Website URL</FieldLabel>
+                    <Input
+                      className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
+                      placeholder="https://totem.io"
+                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                      value={websiteUrl}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">LinkedIn URL</FieldLabel>
+                    <Input
+                      className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
+                      placeholder="https://linkedin.com/in/..."
+                      onChange={(e) => setLinkedIn(e.target.value)}
+                      value={linkedIn}
+                    />
+                  </Field>
+                  <Field>
+                    <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">X (Twitter) URL</FieldLabel>
+                    <Input
+                      className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
+                      placeholder="https://x.com/..."
+                      onChange={(e) => setXUrl(e.target.value)}
+                      value={xUrl}
                     />
                   </Field>
                 </div>
