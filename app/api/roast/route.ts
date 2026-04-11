@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  if (!process.env.GROQ_API_KEY) {
+    return NextResponse.json(
+      { roast: "We couldn't complete the roast right now. Consider that a brief mercy — it won't last." },
+      { status: 200 }
+    );
+  }
   const body = await req.json() as {
     name?: string;
     companyName?: string;
@@ -56,7 +62,10 @@ Roast them end to end. Cover their founder story, their pitch, their business mo
     });
 
     if (!groqRes.ok) {
-      return NextResponse.json({ error: "GROQ request failed" }, { status: 500 });
+      return NextResponse.json(
+        { roast: "We couldn't complete the roast right now. Consider that a brief mercy — it won't last." },
+        { status: 200 }
+      );
     }
 
     const data = await groqRes.json() as {
