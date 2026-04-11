@@ -361,17 +361,6 @@ export default function OnboardingPage() {
                       value={role} 
                     />
                   </Field>
-                  {/* LinkedIn URL field — commented out until LinkedIn import is wired up
-                  <Field className="md:col-span-2">
-                    <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">LinkedIn URL</FieldLabel>
-                    <Input
-                      className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="https://linkedin.com/in/..."
-                      onChange={(e) => setLinkedIn(e.target.value)}
-                      value={linkedIn}
-                    />
-                  </Field>
-                  */}
                   <Field className="md:col-span-2">
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Company Name <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input
