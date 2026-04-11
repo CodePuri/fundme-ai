@@ -45,6 +45,8 @@ export async function POST(req: Request) {
     role?: string;
     companyName?: string;
     linkedIn?: string;
+    websiteUrl?: string;
+    xUrl?: string;
     notes?: string;
   };
 
@@ -59,6 +61,8 @@ export async function POST(req: Request) {
         role: body.role ?? null,
         company_name: body.companyName ?? null,
         linkedin_url: body.linkedIn ?? null,
+        website_url: body.websiteUrl ?? null,
+        x_url: body.xUrl ?? null,
         notes: body.notes ?? null,
       },
       { onConflict: "clerk_user_id" },
