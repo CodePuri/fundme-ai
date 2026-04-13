@@ -148,7 +148,7 @@ export function ApplicationWorkspaceView({
             <a
               className="inline-flex h-10 items-center justify-center rounded-[4px] border border-[var(--border)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--text-primary)] transition-colors duration-150 hover:border-[var(--border-strong)] hover:bg-[var(--surface-elevated)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]"
               href={externalApplyHref}
-              rel="noreferrer"
+              rel="noopener noreferrer"
               target="_blank"
             >
               Open application
