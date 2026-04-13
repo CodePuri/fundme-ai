@@ -163,7 +163,7 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
               <a
                 className="inline-flex h-11 w-full items-center justify-center rounded-[4px] border border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] px-5 text-sm font-medium text-[var(--button-primary-text)] transition-colors hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)]"
                 href={startupProgram.apply_url || startupProgram.website_url}
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 target="_blank"
               >
                 Apply
