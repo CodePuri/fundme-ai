@@ -1,0 +1,4 @@
+## 2026-04-14 - Fix Information Leakage in API Routes
+**Vulnerability:** API routes (e.g., `/api/onboarding`) were returning raw database error messages (`error.message`) directly to the client when a database operation failed. This could leak internal database schema, configuration details, or query structures.
+**Learning:** Returning service-level errors (like Supabase database errors) directly in HTTP responses is a common anti-pattern that violates the principle of failing securely, as attackers could exploit the leaked internal information.
+**Prevention:** Always catch service-level errors and log them server-side (e.g., using `console.error()`) for debugging purposes. Return generic, non-descriptive error messages (e.g., "Internal Server Error") to the client to ensure no internal details are exposed.
