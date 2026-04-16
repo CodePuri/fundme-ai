@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Supabase GET error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -69,7 +70,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Supabase POST error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
