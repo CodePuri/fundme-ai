@@ -1,0 +1,4 @@
+## 2025-02-20 - Information Leakage and Input Validation in Onboarding API
+**Vulnerability:** The onboarding API endpoints directly exposed database error messages (like `error.message` from Supabase) to the client upon failure. Additionally, the endpoints lacked length and format limits for incoming JSON body fields.
+**Learning:** Returning direct database error messages can expose internal architecture details (such as table structures or constraints) to malicious actors. Lack of input validation exposes the application to potential DoS attacks or database errors.
+**Prevention:** Always log detailed error messages server-side (e.g., using `console.error`) and return a generic error message like "Internal server error" to the client. Always implement input validation limits (e.g., max lengths and URL checks) even without validation libraries like `zod`.
