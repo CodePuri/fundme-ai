@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("GET /api/onboarding Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -50,6 +51,18 @@ export async function POST(req: Request) {
     notes?: string;
   };
 
+  if (body.name && body.name.length > 255) return NextResponse.json({ error: "Name too long" }, { status: 400 });
+  if (body.role && body.role.length > 255) return NextResponse.json({ error: "Role too long" }, { status: 400 });
+  if (body.companyName && body.companyName.length > 255) return NextResponse.json({ error: "Company Name too long" }, { status: 400 });
+  if (body.linkedIn && body.linkedIn.length > 500) return NextResponse.json({ error: "LinkedIn URL too long" }, { status: 400 });
+  if (body.websiteUrl && body.websiteUrl.length > 500) return NextResponse.json({ error: "Website URL too long" }, { status: 400 });
+  if (body.xUrl && body.xUrl.length > 500) return NextResponse.json({ error: "X URL too long" }, { status: 400 });
+  if (body.notes && body.notes.length > 5000) return NextResponse.json({ error: "Notes too long" }, { status: 400 });
+
+  if (body.linkedIn && !body.linkedIn.startsWith('http:') && !body.linkedIn.startsWith('https:')) return NextResponse.json({ error: "Invalid LinkedIn URL" }, { status: 400 });
+  if (body.websiteUrl && !body.websiteUrl.startsWith('http:') && !body.websiteUrl.startsWith('https:')) return NextResponse.json({ error: "Invalid Website URL" }, { status: 400 });
+  if (body.xUrl && !body.xUrl.startsWith('http:') && !body.xUrl.startsWith('https:')) return NextResponse.json({ error: "Invalid X URL" }, { status: 400 });
+
   const supabase = getSupabase();
   const { error } = await supabase
     .from("onboarding_submissions")
@@ -69,7 +82,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("POST /api/onboarding Error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
