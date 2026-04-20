@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database query failed during onboarding check:", error);
+    return NextResponse.json({ error: "An internal server error occurred." }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -69,7 +70,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database upsert failed during onboarding submission:", error);
+    return NextResponse.json({ error: "An internal server error occurred." }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
