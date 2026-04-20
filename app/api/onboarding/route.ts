@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database error fetching onboarding status:", error);
+    return NextResponse.json({ error: "Failed to fetch onboarding status" }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -69,7 +70,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database error saving onboarding data:", error);
+    return NextResponse.json({ error: "Failed to save onboarding data" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });

@@ -140,7 +140,7 @@ export function StartupProgramRow({
             <a
               className="inline-flex min-h-8 min-w-[156px] items-center justify-center rounded-[4px] border border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] px-3 text-[12px] font-medium text-[var(--button-primary-text)] transition-colors hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]"
               href={primaryHref}
-              rel="noreferrer"
+              rel="noopener noreferrer"
               target="_blank"
             >
               {program.display_primary_cta}
