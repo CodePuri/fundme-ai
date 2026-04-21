@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database error while fetching onboarding submission:", error);
+    return NextResponse.json({ error: "An internal server error occurred" }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -50,6 +51,33 @@ export async function POST(req: Request) {
     notes?: string;
   };
 
+  // Input validation
+  const errors: string[] = [];
+
+  if (body.name && body.name.length > 255) errors.push("Name must be less than 255 characters");
+  if (body.role && body.role.length > 255) errors.push("Role must be less than 255 characters");
+  if (body.companyName && body.companyName.length > 255) errors.push("Company name must be less than 255 characters");
+  if (body.notes && body.notes.length > 5000) errors.push("Notes must be less than 5000 characters");
+
+  const validateUrl = (url: string | undefined, name: string) => {
+    if (!url) return;
+    if (url.length > 500) {
+      errors.push(`${name} must be less than 500 characters`);
+      return;
+    }
+    if (!url.startsWith("http:") && !url.startsWith("https:")) {
+      errors.push(`${name} must start with http: or https:`);
+    }
+  };
+
+  validateUrl(body.linkedIn, "LinkedIn URL");
+  validateUrl(body.websiteUrl, "Website URL");
+  validateUrl(body.xUrl, "X URL");
+
+  if (errors.length > 0) {
+    return NextResponse.json({ error: "Validation failed", details: errors }, { status: 400 });
+  }
+
   const supabase = getSupabase();
   const { error } = await supabase
     .from("onboarding_submissions")
@@ -69,7 +97,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Database error while upserting onboarding submission:", error);
+    return NextResponse.json({ error: "An internal server error occurred" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
