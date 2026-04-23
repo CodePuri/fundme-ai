@@ -1,0 +1,4 @@
+## 2026-04-23 - Critical Authentication Bypass via Misnamed Middleware
+**Vulnerability:** Next.js middleware file was named `proxy.ts` instead of `middleware.ts`. This caused Next.js to ignore the middleware entirely, resulting in all routes (including those meant to be protected by Clerk auth) being publicly accessible without authentication.
+**Learning:** Next.js middleware relies strictly on specific file naming (`middleware.ts` or `middleware.js`) at the root of the project. If it is misnamed, Next.js fails silently and simply bypasses the logic, leading to catastrophic security failures (Authentication Bypass).
+**Prevention:** Always ensure the Next.js middleware file is strictly named `middleware.ts` and placed at the correct root or `src/` level. Consider adding linting rules or tests to verify middleware execution.
