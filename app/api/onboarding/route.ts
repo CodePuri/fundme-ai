@@ -24,7 +24,8 @@ export async function GET() {
     .maybeSingle();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Onboarding GET error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   return NextResponse.json({ submitted: !!data });
@@ -50,6 +51,24 @@ export async function POST(req: Request) {
     notes?: string;
   };
 
+  // Input Validation
+  if (body.name && body.name.length > 255) return NextResponse.json({ error: "Name too long" }, { status: 400 });
+  if (body.role && body.role.length > 255) return NextResponse.json({ error: "Role too long" }, { status: 400 });
+  if (body.companyName && body.companyName.length > 255) return NextResponse.json({ error: "Company name too long" }, { status: 400 });
+
+  const validateUrl = (url?: string) => {
+    if (!url) return true;
+    if (url.length > 500) return false;
+    return url.startsWith("http:") || url.startsWith("https:");
+  };
+
+  if (!validateUrl(body.linkedIn)) return NextResponse.json({ error: "Invalid LinkedIn URL" }, { status: 400 });
+  if (!validateUrl(body.websiteUrl)) return NextResponse.json({ error: "Invalid Website URL" }, { status: 400 });
+  if (!validateUrl(body.xUrl)) return NextResponse.json({ error: "Invalid X URL" }, { status: 400 });
+
+  if (body.notes && body.notes.length > 5000) return NextResponse.json({ error: "Notes too long" }, { status: 400 });
+
+
   const supabase = getSupabase();
   const { error } = await supabase
     .from("onboarding_submissions")
@@ -69,7 +88,8 @@ export async function POST(req: Request) {
     );
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Onboarding POST error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 
   return NextResponse.json({ success: true });
