@@ -1,9 +1,9 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
+import Image from "next/image";
 
-import { cn } from "@/lib/utils";
 import { getStartupProgramBrand } from "@/lib/startup-program-brands";
+import { cn } from "@/lib/utils";
 
 export function StartupProgramLogo({
   slug,
@@ -31,11 +31,14 @@ export function StartupProgramLogo({
       }}
     >
       {brand.assetPath ? (
-        <img
+        <Image
           alt={`${name} logo`}
           className="h-full w-full object-contain"
+          height={size}
           src={brand.assetPath}
           style={{ padding: brand.padding ?? "10px" }}
+          unoptimized
+          width={size}
         />
       ) : (
         <span
