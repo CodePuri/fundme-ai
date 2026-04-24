@@ -146,8 +146,9 @@ const defaultState: DemoState = {
 const DemoContext = createContext<DemoContextValue | null>(null);
 
 function hydrateState(saved: Partial<DemoState> & { ycQuestions?: ApplicationQuestion[] }): DemoState {
+  const savedOpportunitiesMap = new Map((saved.opportunities ?? []).map((item) => [item.slug, item]));
   const mergedOpportunities = defaultState.opportunities.map((opportunity) => {
-    const savedMatch = saved.opportunities?.find((item) => item.slug === opportunity.slug);
+    const savedMatch = savedOpportunitiesMap.get(opportunity.slug);
     return savedMatch ? { ...opportunity, ...savedMatch } : opportunity;
   });
 
@@ -165,10 +166,13 @@ function hydrateState(saved: Partial<DemoState> & { ycQuestions?: ApplicationQue
   delete mergedSessions[DEFAULT_APPLICATION_SLUG];
 
   const savedDefaultQuestions = savedSessions[DEFAULT_APPLICATION_SLUG]?.questions ?? saved.ycQuestions;
+  const savedDefaultQuestionsMap = new Map(
+    (savedDefaultQuestions ?? []).map((item) => [item.id, item]),
+  );
   const defaultQuestions = cloneQuestions(
     savedDefaultQuestions && savedDefaultQuestions.length
       ? defaultState.applicationSessions[DEFAULT_APPLICATION_SLUG].questions.map((question) => {
-          const savedMatch = savedDefaultQuestions.find((item) => item.id === question.id);
+          const savedMatch = savedDefaultQuestionsMap.get(question.id);
           return savedMatch ? { ...question, ...savedMatch } : question;
         })
       : defaultState.applicationSessions[DEFAULT_APPLICATION_SLUG].questions,
