@@ -78,12 +78,12 @@ export default function ProgramDetailPage({ params }: { params: Promise<{ slug: 
   return (
     <PageShell>
       <div className="flex flex-col gap-3">
-        <Link className="text-[13px] text-[var(--text-muted)] hover:text-[var(--text-primary)]" href="/explore">
+        <Link className="text-[13px] text-[var(--text-muted)] hover:text-[var(--text-primary)]" href="/search">
           ← Back
         </Link>
         <Breadcrumbs
           items={[
-            { label: "Explore", href: "/explore" },
+            { label: "Explore", href: "/search" },
             { label: program.name },
           ]}
         />
