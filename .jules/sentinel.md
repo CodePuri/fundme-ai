@@ -1,0 +1,4 @@
+## 2025-03-01 - Next.js Middleware Naming
+**Vulnerability:** The application was using a file named `proxy.ts` for route protection and authentication using Clerk.
+**Learning:** Next.js requires middleware files to be named exactly `middleware.ts` (or `.js`) and placed at the root of the project (or `src/` folder) to be registered correctly. Misnaming the file results in the middleware being ignored entirely, bypassing all route protection silently.
+**Prevention:** Always verify middleware naming and placement according to Next.js documentation. Implement automated tests to confirm that protected routes actually reject unauthorized access, rather than just relying on the presence of the code.
