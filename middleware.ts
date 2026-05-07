@@ -10,6 +10,10 @@ const isPublicRoute = createRouteMatcher([
   "/search(.*)",
 ]);
 
+// 🛡️ Sentinel: Enforce Next.js authentication middleware.
+// Security Concern: The middleware file was previously named `proxy.ts`, which bypasses
+// Next.js middleware execution entirely, leaving all non-public routes unauthenticated.
+// Renaming to `middleware.ts` correctly registers it to protect sensitive endpoints.
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {
     await auth.protect();

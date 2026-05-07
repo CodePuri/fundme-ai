@@ -1,0 +1,4 @@
+## 2024-05-24 - Missing Authentication due to Misnamed Next.js Middleware
+**Vulnerability:** The Next.js application's Clerk authentication middleware was placed in a file named `proxy.ts` at the root of the project. This is a critical security vulnerability.
+**Learning:** Next.js explicitly requires the middleware file to be strictly named `middleware.ts` (or `.js`, etc.) and located at the root of the project (or inside `src/`) to be correctly registered and executed. Due to the misnaming, the middleware silently failed to execute, bypassing authentication and route protections entirely, leaving ostensibly protected routes completely exposed.
+**Prevention:** Establish build/lint checks or automated testing specifically verifying the presence and correct location/naming of critical framework configuration files like `middleware.ts`. Use comprehensive integration testing to verify that protected routes actually reject unauthenticated requests.
