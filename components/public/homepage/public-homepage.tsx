@@ -54,7 +54,7 @@ const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
   { label: "For Founders", href: "#product-proof" },
-  { label: "Explore", href: "/explore" },
+  { label: "Explore", href: "/search" },
 ] as const;
 
 const stepIcons = {
@@ -905,7 +905,7 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
 
 const footerLinks = [
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Programs", href: "/explore" },
+  { label: "Programs", href: "/search" },
   { label: "Pricing", href: "#product-proof" },
   { label: "Privacy", href: "#" },
   { label: "Terms", href: "#" },
