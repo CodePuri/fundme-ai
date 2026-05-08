@@ -1,5 +1,9 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
+// Security Fix: Next.js middleware MUST be named middleware.ts (or .js) at the root.
+// Previously this file was misnamed proxy.ts, causing the authentication middleware
+// to be silently ignored and resulting in an authentication bypass vulnerability.
+// Renaming it to middleware.ts ensures the protections are correctly enforced.
 const isPublicRoute = createRouteMatcher([
   "/",
   "/sign-in(.*)",
