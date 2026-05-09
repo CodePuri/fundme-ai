@@ -18,3 +18,8 @@
 **Security Standards Enforced:**
 - Failing Securely: Ensuring the middleware is properly registered so that unprotected routes fail closed (require authentication) by default.
 - Defense in Depth: Multiple layers of protection (middleware routing + component-level state checks) are now properly aligned.
+
+## 2026-05-09 - Fix Open Redirect in Login Route
+**Vulnerability:** The application was vulnerable to Open Redirect in the `/login` route (`app/login/page.tsx`). The `redirect` search parameter was read and appended directly into the `redirect_url` of the Clerk `/sign-in` URL without validation. This allowed attackers to craft malicious URLs that would redirect users to arbitrary external domains after authentication.
+**Learning:** Never trust user input passed via query parameters (like `redirect`), especially when it's used for routing or redirection. Even if the application expects a relative path like `/onboarding`, attackers can supply absolute URLs (e.g., `//malicious.com`).
+**Prevention:** Always validate and sanitize user-provided redirect paths using a utility like `getSafeRedirect`, which ensures the path starts with exactly one slash `/` and is relative to the current origin.

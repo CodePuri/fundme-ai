@@ -17,3 +17,16 @@ export function formatTimestamp(date: string) {
 export function wordCount(value: string) {
   return value.trim().split(/\s+/).filter(Boolean).length;
 }
+
+export function getSafeRedirect(url: string | null | undefined, fallback = "/"): string {
+  if (!url) return fallback;
+  try {
+    // Only allow absolute paths that don't start with //
+    if (url.startsWith("/") && !url.startsWith("//")) {
+      return url;
+    }
+    return fallback;
+  } catch {
+    return fallback;
+  }
+}
