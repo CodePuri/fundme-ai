@@ -194,17 +194,31 @@ export default function AssessmentReportPage() {
   if (!report) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f6f1ea]">
-        <div className="text-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="text-5xl mb-4">📋</div>
+          <h2 className="text-[20px] font-semibold text-[#171513] mb-2">Your funding report is not ready yet</h2>
+          <p className="text-[15px] text-[#6f685f] leading-relaxed mb-6">Start the assessment to generate your founder and startup readiness report.</p>
           <Link href="/assessment">
-            <span className="text-[14px] text-[#ff6b3d] font-medium cursor-pointer hover:underline">← Back to assessment</span>
+            <span className="text-[14px] text-[#ff6b3d] font-medium cursor-pointer hover:underline inline-flex items-center gap-1.5">
+              <ArrowRight className="size-3.5" />
+              Start assessment
+            </span>
           </Link>
-          <p className="mt-4 text-[14px] text-[#6f685f]">Report not ready. Complete the assessment first.</p>
         </div>
       </main>
     );
   }
 
-  const { readinessScore, verdict, subscores, weaknesses, founderAssessment, startupAssessment, websiteAssessment, missingProofPoints, opportunityCategories, lockedMatchesPreview } = report;
+  // Guard against NaN in critical score values
+  const readinessScore = Number.isFinite(report.readinessScore) ? report.readinessScore : 0;
+  const subscores = {
+    founderCredibility: Number.isFinite(report.subscores.founderCredibility) ? report.subscores.founderCredibility : 0,
+    startupClarity: Number.isFinite(report.subscores.startupClarity) ? report.subscores.startupClarity : 0,
+    tractionProof: Number.isFinite(report.subscores.tractionProof) ? report.subscores.tractionProof : 0,
+    marketFit: Number.isFinite(report.subscores.marketFit) ? report.subscores.marketFit : 0,
+    applicationReadiness: Number.isFinite(report.subscores.applicationReadiness) ? report.subscores.applicationReadiness : 0,
+    opportunityFit: Number.isFinite(report.subscores.opportunityFit) ? report.subscores.opportunityFit : 0,
+  };
 
   return (
     <main className="min-h-screen bg-[#f6f1ea] pb-16 text-[#171513]" data-theme="public">
@@ -386,7 +400,7 @@ export default function AssessmentReportPage() {
           className="mb-12"
         >
           <h2 className="mb-6 text-[18px] font-semibold tracking-[-0.03em] text-[#171513]">Matched Opportunities (Locked)</h2>
-          <div className="space-y-4">
+          <div className="space-y-4" id="locked-matches">
             {lockedMatchesPreview.map((match) => (
               <LockedMatchPreview key={match.name} name={match.name} reason={match.reason} />
             ))}
@@ -417,7 +431,14 @@ export default function AssessmentReportPage() {
                 Fix this for me
                 <ArrowRight className="size-4" />
               </motion.button>
-              <button className="text-[13px] font-medium text-[#6f685f] transition-colors hover:text-[#171513]">
+              <button
+                className="text-[13px] font-medium text-[#6f685f] transition-colors hover:text-[#171513]"
+                onClick={() => {
+                  const el = document.getElementById("locked-matches");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                type="button"
+              >
                 Continue with free report
               </button>
             </div>

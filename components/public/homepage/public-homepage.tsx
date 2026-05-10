@@ -328,6 +328,17 @@ function FloatingCardMid({
 
 function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) {
   const shouldReduceMotion = useReducedMotion();
+  const [websiteUrl, setWebsiteUrl] = useState("");
+
+  function handleStart() {
+    // Persist the website URL to localStorage so AssessmentProvider can pick it up
+    if (websiteUrl.trim()) {
+      try {
+        localStorage.setItem("fundme-homepage-website", websiteUrl.trim());
+      } catch {/* ignore */}
+    }
+    onStartAssessment();
+  }
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -401,14 +412,16 @@ function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) 
                 <input
                   type="url"
                   placeholder="https://yourstartup.com"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
                   className="h-12 flex-1 rounded-full border border-black/[0.08] bg-white/90 px-6 text-[15px] text-[#171513] placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:outline-none focus:ring-2 focus:ring-[#ff6b3d]/10 transition-all"
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") onStartAssessment();
+                    if (e.key === "Enter") handleStart();
                   }}
                 />
                 <motion.button
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#171513] px-7 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                  onClick={onStartAssessment}
+                  onClick={handleStart}
                   type="button"
                   whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
                   whileTap={shouldReduceMotion ? undefined : tapCompress}

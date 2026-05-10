@@ -61,6 +61,19 @@ export default function AssessmentPage() {
     }
   }, [state.websiteUrl, setWebsiteUrl, setStartupName, setLinkedInUrl]);
 
+  // Hydrate website URL from homepage localStorage key
+  useEffect(() => {
+    if (!state.websiteUrl) {
+      try {
+        const savedUrl = window.localStorage.getItem("fundme-homepage-website");
+        if (savedUrl) {
+          setWebsite(savedUrl);
+          setWebsiteUrl(savedUrl);
+        }
+      } catch {/* ignore */}
+    }
+  }, [state.websiteUrl, setWebsiteUrl]);
+
   function handleStartAnalysis() {
     setError(null);
     if (!website.trim()) {

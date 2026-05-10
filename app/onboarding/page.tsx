@@ -190,7 +190,7 @@ export default function OnboardingPage() {
     if (step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
-        router.push("/roast");
+        mapOnboardingToAssessment(); router.push("/assessment/report");
       }, 500);
       return () => clearTimeout(t);
     }
