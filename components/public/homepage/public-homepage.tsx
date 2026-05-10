@@ -3,7 +3,6 @@
 import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
@@ -92,7 +91,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 /* ─── 1. Header ─────────────────────────────────────────────── */
 
-function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
+function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -132,12 +131,12 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         <div className="hidden items-center gap-3 md:flex">
           <motion.button
             className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_10px_28px_rgba(255,107,61,0.22)] transition-colors hover:bg-[#f45d2e]"
-            onClick={onOpenAuth}
+            onClick={onOpenAssessment}
             type="button"
             whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
             whileTap={shouldReduceMotion ? undefined : tapCompress}
           >
-            Request Invite →
+            Analyze my funding fit
           </motion.button>
         </div>
 
@@ -151,6 +150,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         </button>
       </div>
 
+      {/* Mobile menu */}
       {menuOpen ? (
         <motion.div
           animate={{ opacity: 1, y: 0 }}
@@ -173,11 +173,11 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               className="mt-2 rounded-2xl bg-[#ff6b3d] px-4 py-3 text-left text-[14px] font-medium text-white"
               onClick={() => {
                 setMenuOpen(false);
-                onOpenAuth();
+                onOpenAssessment();
               }}
               type="button"
             >
-              Request Invite
+              Analyze my funding fit
             </button>
           </div>
         </motion.div>
@@ -326,7 +326,7 @@ function FloatingCardMid({
   );
 }
 
-function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
+function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -367,7 +367,7 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
               Backed by real startup programs
             </motion.div>
 
-            {/* Headline — premium editorial mixed serif */}
+            {/* Headline */}
             <motion.h1
               className="mt-10 sm:mt-12"
               variants={fadeRise}
@@ -392,35 +392,37 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
               className="mx-auto mt-7 max-w-[500px] text-[16px] leading-[1.9] text-[#6f685f] sm:mt-8 sm:text-[17px]"
               variants={fadeRise}
             >
-              Upload your deck and traction once. See the programs that actually
-              fit. Draft the right angle for each one. Track every deadline in one place.
+              Drop your website. We scan your positioning, founder signals, and application readiness against real accelerator criteria.
             </motion.p>
 
-            {/* CTA row — lighter, refined */}
-            <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4" variants={fadeRise}>
-              <motion.button
-                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                onClick={onOpenAuth}
-                type="button"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                Get started free
-                <ArrowRight className="size-3.5" />
-              </motion.button>
-              <motion.a
-                className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[14px] font-medium text-[#645d54] transition-colors hover:text-[#171513]"
-                href="#how-it-works"
-                whileHover={shouldReduceMotion ? undefined : { x: 2 }}
-              >
-                See how it works
-                <ArrowRight className="size-3.5" />
-              </motion.a>
+            {/* Website Input + CTA */}
+            <motion.div className="mt-9 flex flex-col items-center gap-4 sm:mt-10" variants={fadeRise}>
+              <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+                <input
+                  type="url"
+                  placeholder="https://yourstartup.com"
+                  className="h-12 flex-1 rounded-full border border-black/[0.08] bg-white/90 px-6 text-[15px] text-[#171513] placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:outline-none focus:ring-2 focus:ring-[#ff6b3d]/10 transition-all"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") onStartAssessment();
+                  }}
+                />
+                <motion.button
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#171513] px-7 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                  onClick={onStartAssessment}
+                  type="button"
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+                  whileTap={shouldReduceMotion ? undefined : tapCompress}
+                >
+                  Analyze my funding fit
+                  <ArrowRight className="size-3.5" />
+                </motion.button>
+              </div>
+              <p className="text-[12px] text-[#8b8276]">Takes about 2 minutes. No credit card required.</p>
             </motion.div>
 
             {/* Trust row */}
             <motion.div
-              className="mt-12 flex flex-col items-center gap-3 sm:mt-14"
+              className="mt-10 flex flex-col items-center gap-3 sm:mt-12"
               variants={fadeRiseWithDelay(0.35)}
             >
               <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
@@ -786,7 +788,7 @@ function ProductProofSection() {
 
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
-function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
+function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () => void }) {
   const shouldReduceMotion = useReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
@@ -833,12 +835,12 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
 
             <motion.button
               className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
-              onClick={onOpenAuth}
+              onClick={onStartAssessment}
               type="button"
               whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
               whileTap={shouldReduceMotion ? undefined : tapCompress}
             >
-              Review & Apply →
+              Analyze my funding fit →
             </motion.button>
           </div>
 
@@ -887,11 +889,11 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
 
               <motion.button
                 className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
-                onClick={onOpenAuth}
+                onClick={onStartAssessment}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { x: 3 }}
               >
-                Review & Apply <ArrowRight className="size-3.5" />
+                Analyze my funding fit <ArrowRight className="size-3.5" />
               </motion.button>
             </motion.article>
           ))}
@@ -912,7 +914,7 @@ const footerLinks = [
   { label: "Contact", href: "#" },
 ];
 
-function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
+function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -960,12 +962,12 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <motion.button
                 className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
-                onClick={onOpenAuth}
+                onClick={onStartAssessment}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
               >
-                Get Started
+                Analyze my funding fit
                 <ArrowRight className="size-4" />
               </motion.button>
               <motion.a
@@ -1010,38 +1012,24 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
 export function PublicHomepage() {
   const router = useRouter();
-  const { isSignedIn } = useUser();
 
-  function openAuth(_destination = "/onboarding") {
-    if (isSignedIn) {
-      router.push("/thank-you");
-    } else {
-      router.push("/sign-up");
-    }
+  function startAssessment() {
+    router.push("/assessment");
   }
 
   return (
     <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
       <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] pb-8">
-        <Header onOpenAuth={() => openAuth()} />
-        <HomepageHero onOpenAuth={() => openAuth()} />
+        <Header onOpenAssessment={() => startAssessment()} />
+        <HomepageHero onStartAssessment={() => startAssessment()} />
         <LogoRailSection />
         <StatsStrip />
         <HowItWorksSection />
         <ProductProofSection />
-        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+        <MatchedProgramsSection onStartAssessment={() => startAssessment()} />
       </div>
 
-      <CinematicFooter onOpenAuth={() => openAuth()} />
-
-      {/* <Suspense fallback={null}>
-        <PublicAuthController
-          fallbackIntent={{
-            action: "default",
-            destination: "/onboarding",
-          }}
-        />
-      </Suspense> */}
+      <CinematicFooter onStartAssessment={() => startAssessment()} />
     </main>
   );
 }
