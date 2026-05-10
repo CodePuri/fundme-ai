@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
   Lock,
@@ -13,9 +14,11 @@ import {
   Eye,
   CheckCircle2,
   Target,
+  X,
 } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
+import { Button } from "@/components/ui/button";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { EASE_OUT } from "@/lib/animations";
 
@@ -115,11 +118,76 @@ function LockedMatchPreview({
   );
 }
 
+/* ─── Mock Paywall Modal ──────────────────────────────────────── */
+
+function PaywallModal({ onClose }: { onClose: () => void }) {
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={shouldReduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={shouldReduceMotion ? false : { opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4"
+        onClick={onClose}
+      >
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={shouldReduceMotion ? false : { opacity: 0, scale: 0.95, y: 20 }}
+          transition={{ duration: 0.3, ease: EASE_OUT }}
+          className="relative w-full max-w-[480px] rounded-[24px] border border-black/[0.08] bg-white p-8 shadow-[0_30px_80px_rgba(0,0,0,0.12)]"
+          onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Unlock your funding plan"
+        >
+          <button
+            onClick={onClose}
+            className="absolute right-4 top-4 flex size-8 items-center justify-center rounded-full bg-black/[0.04] text-[#6f685f] transition-colors hover:bg-black/[0.08] hover:text-[#171513]"
+            type="button"
+            aria-label="Close modal"
+          >
+            <X className="size-4" />
+          </button>
+
+          <div className="text-center">
+            <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-[#fff5f0] mb-4">
+              <Lock className="size-7 text-[#ff6b3d]" />
+            </div>
+            <h2 className="text-[24px] font-semibold leading-[1.15] tracking-[-0.03em] text-[#171513]">
+              Your diagnosis is ready. The fixes are locked.
+            </h2>
+            <p className="mt-3 text-[15px] leading-[1.7] text-[#6f685f] max-w-[380px] mx-auto">
+              Fundme found the gaps hurting your funding readiness. Unlock the improved founder profile, website fix prompts, matched opportunities, and application drafts.
+            </p>
+
+            <div className="mt-8 space-y-3">
+              <Button className="w-full" size="lg">
+                Unlock my funding plan
+              </Button>
+              <Button variant="ghost" className="w-full" onClick={onClose}>
+                Continue with free report
+              </Button>
+            </div>
+
+            <p className="mt-5 text-[12px] text-[#8b8276]">
+              Plan: Early Access Pro · ₹499/mo
+            </p>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
 /* ─── Main Report Page ────────────────────────────────────────── */
 
 export default function AssessmentReportPage() {
   const { state } = useAssessment();
   const shouldReduceMotion = useReducedMotion();
+  const [paywallOpen, setPaywallOpen] = useState(false);
 
   const report = state.report;
 
@@ -127,7 +195,10 @@ export default function AssessmentReportPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#f6f1ea]">
         <div className="text-center">
-          <p className="text-[14px] text-[#6f685f]">Report not ready. Complete the assessment first.</p>
+          <Link href="/assessment">
+            <span className="text-[14px] text-[#ff6b3d] font-medium cursor-pointer hover:underline">← Back to assessment</span>
+          </Link>
+          <p className="mt-4 text-[14px] text-[#6f685f]">Report not ready. Complete the assessment first.</p>
         </div>
       </main>
     );
@@ -149,6 +220,9 @@ export default function AssessmentReportPage() {
         </div>
       </header>
 
+      {/* Paywall Modal */}
+      <PaywallModal onClose={() => setPaywallOpen(false)} />
+
       <div className="mx-auto max-w-[800px] px-4 pt-10 sm:px-6 lg:pt-14">
         {/* Score Hero */}
         <motion.section
@@ -162,7 +236,6 @@ export default function AssessmentReportPage() {
             Funding Readiness Report
           </div>
 
-          {/* Main Score */}
           <div className="mt-8 flex flex-col items-center">
             <div className="relative flex size-40 items-center justify-center">
               <svg className="size-40 -rotate-90" viewBox="0 0 160 160">
@@ -188,7 +261,6 @@ export default function AssessmentReportPage() {
             </div>
           </div>
 
-          {/* Verdict */}
           <h1 className="mt-6 text-[28px] font-semibold leading-[1.15] tracking-[-0.04em] text-[#171513] sm:text-[34px]">
             {verdict}
           </h1>
@@ -332,11 +404,12 @@ export default function AssessmentReportPage() {
             <div className="text-center sm:text-left">
               <h3 className="text-[16px] font-semibold text-[#171513]">Your diagnosis is ready. The fixes are locked.</h3>
               <p className="mt-1 text-[13px] leading-[1.7] text-[#6f685f]">
-                Fundme found the gaps hurting your funding readiness. Unlock the improved profile, website fix prompts, matched opportunities, and application drafts.
+                Fundme found the gaps hurting your funding readiness. Unlock the improved founder profile, website fix prompts, matched opportunities, and application drafts.
               </p>
             </div>
             <div className="flex shrink-0 flex-col gap-3">
               <motion.button
+                onClick={() => setPaywallOpen(true)}
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
                 whileTap={shouldReduceMotion ? undefined : { scale: 0.97 }}
                 className="inline-flex h-12 items-center gap-2 rounded-full bg-[#ff6b3d] px-7 text-[14px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"

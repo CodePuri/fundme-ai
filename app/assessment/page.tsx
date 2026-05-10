@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
@@ -10,15 +10,56 @@ import { BrandLockup } from "@/components/ui/brand-lockup";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { EASE_OUT } from "@/lib/animations";
 
+function hydrateFromOnboarding() {
+  if (typeof window === "undefined") return null;
+  try {
+    const draft = window.localStorage.getItem("onboardingDraft");
+    if (!draft) return null;
+    const parsed = JSON.parse(draft);
+    return {
+      name: parsed.name || "",
+      role: parsed.role || "",
+      companyName: parsed.companyName || "",
+      linkedIn: parsed.linkedIn || "",
+      websiteUrl: parsed.websiteUrl || "",
+      notes: parsed.notes || "",
+      files: parsed.files || [],
+    };
+  } catch {
+    return null;
+  }
+}
+
 export default function AssessmentPage() {
   const router = useRouter();
   const { state, setWebsiteUrl, setStartupName, setLinkedInUrl } = useAssessment();
 
   const [website, setWebsite] = useState(state.websiteUrl);
   const [startup, setStartup] = useState(state.startupName);
-  const [linkedin, setLinkedin] = useState(state.linkedInUrl);
+  const [linkedin, setLinkedIn] = useState(state.linkedInUrl);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Hydrate from onboarding data on first load
+  useEffect(() => {
+    if (!state.websiteUrl) {
+      const onboardingData = hydrateFromOnboarding();
+      if (onboardingData) {
+        if (onboardingData.websiteUrl) {
+          setWebsite(onboardingData.websiteUrl);
+          setWebsiteUrl(onboardingData.websiteUrl);
+        }
+        if (onboardingData.companyName) {
+          setStartup(onboardingData.companyName);
+          setStartupName(onboardingData.companyName);
+        }
+        if (onboardingData.linkedIn) {
+          setLinkedIn(onboardingData.linkedIn);
+          setLinkedInUrl(onboardingData.linkedIn);
+        }
+      }
+    }
+  }, [state.websiteUrl, setWebsiteUrl, setStartupName, setLinkedInUrl]);
 
   function handleStartAnalysis() {
     setError(null);
@@ -27,7 +68,6 @@ export default function AssessmentPage() {
       return;
     }
 
-    // Basic URL validation
     const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[^\s]*)?$/i;
     const cleanUrl = website.trim();
     if (!urlPattern.test(cleanUrl)) {
@@ -40,7 +80,6 @@ export default function AssessmentPage() {
     if (startup.trim()) setStartupName(startup.trim());
     if (linkedin.trim()) setLinkedInUrl(linkedin.trim());
 
-    // Small delay to let localStorage sync
     setTimeout(() => {
       router.push("/assessment/questions");
     }, 200);
@@ -48,7 +87,6 @@ export default function AssessmentPage() {
 
   return (
     <main className="min-h-screen bg-[#f6f1ea] text-[#171513]" data-theme="public">
-      {/* Header */}
       <header className="fixed inset-x-0 top-0 z-50 border-b border-[#e7ddd0] bg-[#f6f1ea]/92 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-6 px-4 sm:px-6 xl:px-8 py-3">
           <Link href="/">
@@ -60,7 +98,6 @@ export default function AssessmentPage() {
         </div>
       </header>
 
-      {/* Content */}
       <div className="flex min-h-screen items-center justify-center px-4 pt-24 pb-16 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -68,7 +105,6 @@ export default function AssessmentPage() {
           transition={{ duration: 0.7, ease: EASE_OUT }}
           className="w-full max-w-[520px]"
         >
-          {/* Badge */}
           <div className="mb-8 flex items-center gap-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-2 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#8b8276]">
               <Sparkles className="size-3 text-[#ff6b3d]" />
@@ -80,10 +116,9 @@ export default function AssessmentPage() {
             Analyze your funding fit
           </h1>
           <p className="mt-4 text-[16px] leading-[1.7] text-[#6f685f]">
-            Drop your website. We will scan your positioning, founder signals, and application readiness against real accelerator and grant criteria.
+            Drop your website. We will scan your positioning, founder signals, and application readiness against real accelerator criteria.
           </p>
 
-          {/* Form */}
           <div className="mt-10 space-y-5">
             <div>
               <label className="block text-[12px] font-medium uppercase tracking-[0.12em] text-[#6f685f] mb-2.5">

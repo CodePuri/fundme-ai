@@ -19,6 +19,7 @@ import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploadArea } from "@/components/ui/file-upload";
+import { mapOnboardingToAssessment } from "@/components/assessment/onboarding-bridge";
 
 const rambleText =
   "Totem Interactive is a Mumbai-based software development company building products across AI, apps, platforms, games, AR/VR, and digital solutions. Makers of Velocity, an AI prompt-improvement product. Founded in 2022.";
@@ -51,7 +52,6 @@ export default function OnboardingPage() {
   const [linkedIn, setLinkedIn] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [xUrl, setXUrl] = useState("");
-
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState<string[]>([]);
   
@@ -63,15 +63,20 @@ export default function OnboardingPage() {
   const [isImporting, setIsImporting] = useState(false);
   const [elapsed, setElapsed] = useState(0);
 
-  // Redirect already-submitted users straight to /thank-you
+  // Redirect already-submitted users straight to /assessment/report
   useEffect(() => {
     if (!isClerkLoaded || !isSignedIn) return;
-    fetch("/api/onboarding")
-      .then((res) => res.json())
-      .then((data: { submitted?: boolean }) => {
-        if (data.submitted) router.replace("/thank-you");
-      })
-      .catch(() => {/* ignore, let user proceed */});
+    async function checkSubmission() {
+      try {
+        const res = await fetch("/api/onboarding");
+        const data = await res.json();
+        if (data.submitted) {
+          mapOnboardingToAssessment();
+          router.replace("/assessment/report");
+        }
+      } catch {/* ignore, let user proceed */}
+    }
+    checkSubmission();
   }, [isClerkLoaded, isSignedIn, router]);
 
   useEffect(() => {
@@ -255,12 +260,14 @@ export default function OnboardingPage() {
         }),
       });
     } catch {
-      // If the save fails, still proceed to thank-you — don't block the user
+      // If the save fails, still proceed to report — don't block the user
     } finally {
       setIsSubmitting(false);
     }
 
-    router.push("/roast");
+    // Bridge onboarding data into assessment state before redirecting
+    mapOnboardingToAssessment();
+    router.push("/assessment/report");
   }
 
   if (!hasHydrated) {
@@ -381,16 +388,16 @@ export default function OnboardingPage() {
                   </Field>
                   <Field>
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">LinkedIn URL</FieldLabel>
-                    <Input
+                    <Input 
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
                       placeholder="https://linkedin.com/in/..."
-                      onChange={(e) => setLinkedIn(e.target.value)}
-                      value={linkedIn}
+                      onChange={(e) => setLinkedIn(e.target.value)} 
+                      value={linkedIn} 
                     />
                   </Field>
                   <Field>
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">X (Twitter) URL</FieldLabel>
-                    <Input
+                    <Input 
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
                       placeholder="https://x.com/..."
                       onChange={(e) => setXUrl(e.target.value)}
@@ -433,12 +440,12 @@ export default function OnboardingPage() {
                       {Array.from({ length: 16 }).map((_, index) => {
                          const h = 12 + Math.random() * 32;
                          return (
-                          <motion.span
-                            key={index}
-                            className="w-[3px] rounded-full bg-white"
-                            animate={{ height: [`${h}px`, `${h * 1.8}px`, `${h}px`] }}
-                            transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.05, ease: "easeInOut" }}
-                          />
+                           <motion.span
+                             key={index}
+                             className="w-[3px] rounded-full bg-white"
+                             animate={{ height: [`${h}px`, `${h * 1.8}px`, `${h}px`] }}
+                             transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.05, ease: "easeInOut" }}
+                           />
                          )
                       })}
                     </div>
@@ -474,7 +481,7 @@ export default function OnboardingPage() {
                     </motion.div>
                   )}
                 </div>
-
+                
                 {typedOpen && (
                   <motion.div animate={{ opacity: 1, y: 0 }} className="mt-12 w-full text-left" initial={{ opacity: 0, y: 32 }}>
                     <Textarea
@@ -550,7 +557,7 @@ export default function OnboardingPage() {
                     Review and Confirm
                   </h1>
                   <p className="text-[18px] text-black/50 mt-4 max-w-[480px]">
-                    Check your details before we start finding yours matches.
+                    Check your details before we start finding your matches.
                   </p>
                 </div>
 
@@ -646,9 +653,6 @@ export default function OnboardingPage() {
                       const active = i === activeIndex && elapsed < 5000;
                       return (
                          <motion.div 
-                           initial={{ opacity: 0, scale: 0.96 }}
-                           animate={{ opacity: 1, scale: 1 }}
-                           transition={{ delay: i * 0.1 }}
                            key={text} 
                            className={`flex items-center gap-4 rounded-[20px] border p-4 transition-all duration-300 ${active ? "bg-white shadow-lg border-black/5 scale-[1.02] z-10" : done ? "bg-black/[0.02] border-transparent opacity-60" : "bg-transparent border-black/5 opacity-30"}`}
                          >
@@ -657,7 +661,9 @@ export default function OnboardingPage() {
                                <CheckCircle2 className="size-3.5" />
                              </div>
                            ) : active ? (
-                             <div className="flex size-[26px] items-center justify-center rounded-full border-2 border-[#ff6b3d] border-t-transparent animate-spin" />
+                             <div className="flex size-[26px] items-center justify-center rounded-full border-2 border-[#ff6b3d] border-t-transparent">
+                               <LoaderCircle className="size-3.5 animate-spin" />
+                             </div>
                            ) : (
                              <div className="flex size-[26px] items-center justify-center rounded-full border border-black/10">
                                <span className="size-1.5 rounded-full bg-black/10" />

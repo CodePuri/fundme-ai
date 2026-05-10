@@ -27,7 +27,7 @@ export default function SearchPage() {
           }
         >
           <StartupProgramsPage
-            description="Search accelerators, incubators, fellowships, and equity-free programs by thesis, geography, stage, and check profile."
+            description="Search accelerators, incubators, fellowships, and equity-free programs by thesis, geography, stage, and check size."
             mode="public"
             title="Startup Programs"
           />
