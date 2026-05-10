@@ -211,13 +211,24 @@ export default function AssessmentReportPage() {
 
   // Guard against NaN in critical score values
   const readinessScore = Number.isFinite(report.readinessScore) ? report.readinessScore : 0;
+  const {
+    verdict = "No verdict available",
+    weaknesses = [],
+    founderAssessment = "",
+    startupAssessment = "",
+    websiteAssessment = "",
+    missingProofPoints = [],
+    opportunityCategories = [],
+    lockedMatchesPreview = [],
+    subscores: rawSubscores = {},
+  } = report;
   const subscores = {
-    founderCredibility: Number.isFinite(report.subscores.founderCredibility) ? report.subscores.founderCredibility : 0,
-    startupClarity: Number.isFinite(report.subscores.startupClarity) ? report.subscores.startupClarity : 0,
-    tractionProof: Number.isFinite(report.subscores.tractionProof) ? report.subscores.tractionProof : 0,
-    marketFit: Number.isFinite(report.subscores.marketFit) ? report.subscores.marketFit : 0,
-    applicationReadiness: Number.isFinite(report.subscores.applicationReadiness) ? report.subscores.applicationReadiness : 0,
-    opportunityFit: Number.isFinite(report.subscores.opportunityFit) ? report.subscores.opportunityFit : 0,
+    founderCredibility: Number.isFinite(rawSubscores.founderCredibility) ? rawSubscores.founderCredibility : 0,
+    startupClarity: Number.isFinite(rawSubscores.startupClarity) ? rawSubscores.startupClarity : 0,
+    tractionProof: Number.isFinite(rawSubscores.tractionProof) ? rawSubscores.tractionProof : 0,
+    marketFit: Number.isFinite(rawSubscores.marketFit) ? rawSubscores.marketFit : 0,
+    applicationReadiness: Number.isFinite(rawSubscores.applicationReadiness) ? rawSubscores.applicationReadiness : 0,
+    opportunityFit: Number.isFinite(rawSubscores.opportunityFit) ? rawSubscores.opportunityFit : 0,
   };
 
   return (
