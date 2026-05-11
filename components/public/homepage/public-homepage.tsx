@@ -136,7 +136,7 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
             whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
             whileTap={shouldReduceMotion ? undefined : tapCompress}
           >
-            Analyze my funding fit
+            Get Assessment
           </motion.button>
         </div>
 
@@ -177,7 +177,7 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
               }}
               type="button"
             >
-              Analyze my funding fit
+              Get Assessment
             </button>
           </div>
         </motion.div>
@@ -329,9 +329,22 @@ function FloatingCardMid({
 function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) {
   const shouldReduceMotion = useReducedMotion();
   const [websiteUrl, setWebsiteUrl] = useState("");
+  const [placeholderIndex, setPlaceholderIndex] = useState(0);
+
+  const placeholders = [
+    "Paste your startup website",
+    "Paste your LinkedIn profile",
+    "Upload your pitch deck",
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPlaceholderIndex((i) => (i + 1) % placeholders.length);
+    }, 3500);
+    return () => clearInterval(interval);
+  }, []);
 
   function handleStart() {
-    // Persist the website URL to localStorage so AssessmentProvider can pick it up
     if (websiteUrl.trim()) {
       try {
         localStorage.setItem("fundme-homepage-website", websiteUrl.trim());
@@ -360,7 +373,7 @@ function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) 
         {/* ── Central content stack ── */}
         <motion.div
           animate="visible"
-          className="relative z-20 flex min-h-[600px] flex-col items-center justify-center sm:min-h-[660px] lg:min-h-[680px]"
+          className="relative z-20 flex min-h-[540px] flex-col items-center justify-center sm:min-h-[580px] lg:min-h-[620px]"
           initial={shouldReduceMotion ? false : "hidden"}
           variants={heroStagger}
         >
@@ -400,46 +413,46 @@ function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) 
 
             {/* Supporting copy */}
             <motion.p
-              className="mx-auto mt-7 max-w-[500px] text-[16px] leading-[1.9] text-[#6f685f] sm:mt-8 sm:text-[17px]"
+              className="mx-auto mt-6 max-w-[500px] text-[16px] leading-[1.9] text-[#6f685f] sm:mt-7 sm:text-[17px]"
               variants={fadeRise}
             >
               Drop your website. We scan your positioning, founder signals, and application readiness against real accelerator criteria.
             </motion.p>
 
-            {/* Website Input + CTA */}
-            <motion.div className="mt-9 flex flex-col items-center gap-4 sm:mt-10" variants={fadeRise}>
-              <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
+            {/* High-intent Input Module */}
+            <motion.div className="mt-8 flex w-full max-w-lg flex-col items-center sm:mt-9" variants={fadeRise}>
+              <div className="flex w-full items-center rounded-full border border-black/[0.08] bg-white/90 pl-6 pr-2 shadow-[0_8px_28px_rgba(18,15,11,0.06)] transition-all focus-within:border-[#ff6b3d]/30 focus-within:ring-2 focus-within:ring-[#ff6b3d]/10">
                 <input
                   type="url"
-                  placeholder="https://yourstartup.com"
+                  placeholder={placeholders[placeholderIndex]}
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="h-12 flex-1 rounded-full border border-black/[0.08] bg-white/90 px-6 text-[15px] text-[#171513] placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:outline-none focus:ring-2 focus:ring-[#ff6b3d]/10 transition-all"
+                  className="h-14 flex-1 bg-transparent text-[15px] text-[#171513] placeholder:text-[#b5ad9f] focus:outline-none transition-all"
                   onKeyDown={(e) => {
                     if (e.key === "Enter") handleStart();
                   }}
                 />
                 <motion.button
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#171513] px-7 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                  className="inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#171513] px-5 text-[13px] font-semibold text-white shadow-[0_8px_20px_rgba(18,15,11,0.1)] transition-all hover:bg-[#2a2622]"
                   onClick={handleStart}
                   type="button"
                   whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
                   whileTap={shouldReduceMotion ? undefined : tapCompress}
                 >
-                  Analyze my funding fit
+                  Analyze
                   <ArrowRight className="size-3.5" />
                 </motion.button>
               </div>
-              <p className="text-[12px] text-[#8b8276]">Takes about 2 minutes. No credit card required.</p>
+              <p className="mt-3 text-[12px] text-[#8b8276]">Takes about 3 minutes. No credit card required.</p>
             </motion.div>
 
-            {/* Trust row */}
+            {/* Trust row — now "Now matching with" */}
             <motion.div
-              className="mt-10 flex flex-col items-center gap-3 sm:mt-12"
+              className="mt-8 flex flex-col items-center gap-3 sm:mt-9"
               variants={fadeRiseWithDelay(0.35)}
             >
               <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
-                Programs already in the room
+                Now matching with
               </span>
               <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
                 {trustLogos.map((logo) => (
@@ -493,7 +506,7 @@ function LogoRailSection() {
   return (
     <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-6">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Programs already in the room</div>
+        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
       </SectionReveal>
 
       <motion.div
@@ -521,6 +534,15 @@ function LogoRailSection() {
           ))}
         </div>
       </motion.div>
+
+      {/* Mobile compact badges fallback */}
+      <div className="mt-4 flex flex-wrap justify-center gap-2 px-4 sm:hidden">
+        {ecosystemPrograms.map((p) => (
+          <span key={p.id} className="rounded-full border border-black/[0.08] bg-white/70 px-3 py-1 text-[11px] font-medium text-[#6f685f]">
+            {p.name}
+          </span>
+        ))}
+      </div>
     </section>
   );
 }
@@ -853,7 +875,7 @@ function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () =
               whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
               whileTap={shouldReduceMotion ? undefined : tapCompress}
             >
-              Analyze my funding fit →
+              Get Assessment →
             </motion.button>
           </div>
 
@@ -906,7 +928,7 @@ function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () =
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { x: 3 }}
               >
-                Analyze my funding fit <ArrowRight className="size-3.5" />
+                Get Assessment <ArrowRight className="size-3.5" />
               </motion.button>
             </motion.article>
           ))}
