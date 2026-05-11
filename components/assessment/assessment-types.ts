@@ -40,6 +40,7 @@ export type AssessmentState = {
   websiteUrl: string;
   startupName: string;
   linkedInUrl: string;
+  startupNotes: string;
   uploadedFiles: string[];
   answers: AssessmentAnswer[];
   analysisStatus: AnalysisStatus;

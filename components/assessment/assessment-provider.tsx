@@ -4,12 +4,13 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 import type { AssessmentState, AssessmentAnswer, AnalysisStatus, AssessmentReport } from "./assessment-types";
 
-const ASSESSMENT_STORAGE_KEY = "fundme-assessment-v1";
+export const ASSESSMENT_STORAGE_KEY = "fundme-assessment-v1";
 
 const defaultState: AssessmentState = {
   websiteUrl: "",
   startupName: "",
   linkedInUrl: "",
+  startupNotes: "",
   uploadedFiles: [],
   answers: [],
   analysisStatus: "idle",
@@ -37,6 +38,8 @@ export type AssessmentContextValue = {
   setWebsiteUrl: (url: string) => void;
   setStartupName: (name: string) => void;
   setLinkedInUrl: (url: string) => void;
+  setStartupNotes: (notes: string) => void;
+  setUploadedFiles: (files: string[]) => void;
   setAnswer: (questionId: number, selectedOption: string) => void;
   setAnalysisStatus: (status: AnalysisStatus) => void;
   generateReport: () => void;
@@ -73,6 +76,12 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       },
       setLinkedInUrl: (url: string) => {
         setState((current) => ({ ...current, linkedInUrl: url }));
+      },
+      setStartupNotes: (notes: string) => {
+        setState((current) => ({ ...current, startupNotes: notes }));
+      },
+      setUploadedFiles: (files: string[]) => {
+        setState((current) => ({ ...current, uploadedFiles: files }));
       },
       setAnswer: (questionId: number, selectedOption: string) => {
         setState((current) => {
