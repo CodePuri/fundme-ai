@@ -6,6 +6,7 @@ import {
   Building2,
   Compass,
   FilePenLine,
+  FileText,
   LayoutDashboard,
   PlusCircle,
   Settings2,
@@ -37,6 +38,7 @@ const sections: Array<{ label: string; items: SidebarItem[] }> = [
   {
     label: "Opportunities",
     items: [
+      { href: "/app/report", label: "Funding Report", icon: FileText },
       { href: "/app/matches", label: "Matches", icon: Sparkles },
       { href: "/explore", label: "Explore", icon: Compass },
       { href: "/app/applications", label: "Applications", icon: FilePenLine },

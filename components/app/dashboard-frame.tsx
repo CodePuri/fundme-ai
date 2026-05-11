@@ -11,6 +11,7 @@ import { NavSearch } from "@/components/startup-programs/nav-search";
 import { buildAuthEntryHref } from "@/lib/auth-intent";
 
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string }> = [
+  { match: (pathname) => pathname === "/app/report", title: "Funding Report" },
   { match: (pathname) => pathname === "/app/startup-profile", title: "Your Startup" },
   { match: (pathname) => pathname === "/app/founder-profile", title: "Your Profile" },
   { match: (pathname) => pathname === "/app/matches", title: "Your Matches" },
