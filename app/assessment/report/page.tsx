@@ -11,15 +11,19 @@ import {
   User,
   Lightbulb,
   FileText,
-  Eye,
   CheckCircle2,
-  Target,
   X,
   Zap,
   TrendingUp,
   ShieldCheck,
   AlertCircle,
-  Brain as BrainCircuit
+  Brain as BrainCircuit,
+  Coins,
+  ChevronRight,
+  RefreshCw,
+  Layout,
+  Search,
+  Target
 } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -62,30 +66,60 @@ function ScoreRing({ score, label, color = "#ff6b3d" }: { score: number; label: 
   );
 }
 
-/* ─── Weakness Card ───────────────────────────────────────────── */
+/* ─── Credit Meter Component ───────────────────────────────────── */
 
-function WeaknessCard({
+function CreditMeter({ credits }: { credits: number }) {
+  return (
+    <div className="flex items-center gap-2.5 rounded-full bg-white/80 border border-black/[0.05] pl-3 pr-4 py-1.5 shadow-sm backdrop-blur-sm">
+      <div className="flex size-6 items-center justify-center rounded-full bg-[#ff6b3d]/10 text-[#ff6b3d]">
+        <Coins className="size-3.5" />
+      </div>
+      <div className="flex flex-col">
+        <span className="text-[9px] font-bold uppercase tracking-widest text-[#8b8276] leading-none">Credits</span>
+        <span className="text-[12px] font-bold text-[#171513]">{credits}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Locked Fix Card ─────────────────────────────────────────── */
+
+function LockedFixCard({
   title,
   whyItHurts,
-  quickHint,
+  onUnlock,
 }: {
   title: string;
   whyItHurts: string;
-  quickHint: string;
+  onUnlock: () => void;
 }) {
   return (
-    <div className="rounded-[20px] border border-black/[0.06] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-      <div className="flex items-start gap-3">
-        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-[#fff5f0] text-[#ff6b3d]">
-          <AlertCircle className="size-4.5" />
+    <div className="group relative overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-6 shadow-sm transition-all hover:shadow-md">
+      <div className="relative z-10">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex size-10 items-center justify-center rounded-xl bg-[#fff5f0] text-[#ff6b3d]">
+            <Zap className="size-5" />
+          </div>
+          <span className="rounded-full bg-[#f6f1ea] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-[#8b8276]">Locked Fix</span>
         </div>
-        <div className="flex-1">
-          <h4 className="text-[15px] font-bold text-[#171513]">{title}</h4>
-          <p className="mt-1 text-[13px] leading-[1.6] text-[#6f685f]">{whyItHurts}</p>
-          <div className="mt-3 rounded-[12px] border border-black/[0.04] bg-[#f6f1ea]/40 px-4 py-3">
-            <p className="text-[12px] leading-[1.6] text-[#8b8276]">
-              <span className="font-bold text-[#ff6b3d] uppercase tracking-wider text-[10px] mr-2">Action:</span> {quickHint}
-            </p>
+        <h4 className="text-[16px] font-bold text-[#171513] mb-2">{title}</h4>
+        <p className="text-[13px] leading-[1.6] text-[#6f685f] mb-6">{whyItHurts}</p>
+        
+        {/* Blurred Preview Overlay */}
+        <div className="relative mt-4 h-24 overflow-hidden rounded-xl bg-[#f6f1ea]/30 p-4 border border-black/[0.03]">
+          <div className="space-y-2 blur-[6px] select-none opacity-50">
+            <div className="h-3 w-3/4 rounded-full bg-[#8b8276]/30" />
+            <div className="h-3 w-1/2 rounded-full bg-[#8b8276]/20" />
+            <div className="h-3 w-2/3 rounded-full bg-[#8b8276]/30" />
+          </div>
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px]">
+             <Button 
+              onClick={onUnlock}
+              variant="outline"
+              className="h-9 px-4 rounded-full border-[#ff6b3d] text-[#ff6b3d] text-[11px] font-bold uppercase tracking-wider bg-white shadow-sm hover:bg-[#ff6b3d] hover:text-white transition-all"
+             >
+               View Fix
+             </Button>
           </div>
         </div>
       </div>
@@ -98,35 +132,50 @@ function WeaknessCard({
 function LockedMatchPreview({
   name,
   reason,
+  type,
+  onUnlock,
 }: {
   name: string;
   reason: string;
+  type: string;
+  onUnlock: () => void;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-[20px] border border-black/[0.06] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
+    <div 
+      onClick={onUnlock}
+      className="group relative cursor-pointer overflow-hidden rounded-[20px] border border-black/[0.06] bg-white p-5 shadow-[0_4px_12px_rgba(0,0,0,0.02)] transition-all hover:border-[#ff6b3d]/30"
+    >
       <div className="flex items-center justify-between gap-3">
-        <div>
-          <h4 className="text-[15px] font-bold text-[#171513]">{name}</h4>
-          <p className="mt-1 text-[13px] leading-[1.6] text-[#6f685f]">{reason}</p>
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-[#ff6b3d]">{type}</span>
+            <div className="size-1 rounded-full bg-[#b5ad9f]" />
+            <span className="text-[9px] font-bold uppercase tracking-widest text-[#8b8276]">High Fit</span>
+          </div>
+          <h4 className="text-[15px] font-bold text-[#171513] blur-[3px] group-hover:blur-0 transition-all duration-500">{name}</h4>
+          <p className="mt-1 text-[13px] leading-[1.6] text-[#6f685f] line-clamp-1">{reason}</p>
         </div>
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f6f1ea] text-[#8b8276]">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#f6f1ea] text-[#8b8276] group-hover:bg-[#ff6b3d] group-hover:text-white transition-colors">
           <Lock className="size-4" />
-        </div>
-      </div>
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-white/40 backdrop-blur-[2px]">
-        <div className="rounded-full border border-black/[0.08] bg-white px-4 py-2 text-[11px] font-bold text-[#8b8276] uppercase tracking-wider shadow-sm">
-          <Lock className="mr-1.5 inline-block size-3" />
-          Locked
         </div>
       </div>
     </div>
   );
 }
 
-/* ─── Mock Paywall Modal ──────────────────────────────────────── */
+/* ─── Paywall Modal ───────────────────────────────────────────── */
 
 function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [isCheckoutState, setIsCheckoutState] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+
+  // Reset state when closed
+  useEffect(() => {
+    if (!isOpen) {
+      const timer = setTimeout(() => setIsCheckoutState(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   return (
     <AnimatePresence>
@@ -135,7 +184,7 @@ function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-md px-4"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-md px-4"
           onClick={onClose}
         >
           <motion.div
@@ -143,7 +192,7 @@ function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 40 }}
             transition={{ duration: 0.5, ease: EASE_OUT }}
-            className="relative w-full max-w-[500px] overflow-hidden rounded-[40px] border border-white/20 bg-white shadow-[0_40px_100px_rgba(0,0,0,0.3)]"
+            className="relative w-full max-w-[540px] overflow-hidden rounded-[40px] border border-white/20 bg-white shadow-[0_40px_100px_rgba(0,0,0,0.4)]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header Decoration */}
@@ -156,54 +205,78 @@ function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               <X className="size-5" />
             </button>
 
-            <div className="p-10 text-center">
-              <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-[#fff5f0] shadow-inner">
-                <ShieldCheck className="size-10 text-[#ff6b3d]" />
-              </div>
-              
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f1ea] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#8b8276] mb-4">
-                Unlock Full Intelligence
-              </div>
-              
-              <h2 className="text-[28px] font-bold leading-[1.1] tracking-[-0.03em] text-[#171513]">
-                Your Verdict is Ready.
-                <br />
-                The Fixes are Locked.
-              </h2>
-              
-              <p className="mt-4 text-[15px] leading-[1.6] text-[#6f685f]">
-                Get the improved founder profile, tailored website copy, matched opportunities, and direct application drafts based on your diagnosis.
-              </p>
+            <div className="p-8 sm:p-12">
+              {!isCheckoutState ? (
+                <>
+                  <div className="text-center mb-8">
+                    <div className="mx-auto mb-6 flex size-20 items-center justify-center rounded-full bg-[#fff5f0] shadow-inner">
+                      <ShieldCheck className="size-10 text-[#ff6b3d]" />
+                    </div>
+                    
+                    <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f1ea] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#8b8276] mb-4">
+                      Intelligence Unlock
+                    </div>
+                    
+                    <h2 className="text-[32px] font-bold leading-[1.05] tracking-[-0.03em] text-[#171513]">
+                      Your Diagnosis is Ready.
+                      <br />
+                      <span className="text-[#ff6b3d]">The Fixes are Locked.</span>
+                    </h2>
+                  </div>
 
-              <div className="mt-10 space-y-4">
-                <button 
-                  className="w-full flex h-16 items-center justify-center gap-3 rounded-full bg-[#ff6b3d] text-[16px] font-bold text-white shadow-[0_20px_40px_rgba(255,107,61,0.25)] hover:bg-[#f45d2e] transition-all transform hover:scale-[1.02]"
-                >
-                  Fix this for me
-                  <ArrowRight className="size-5" />
-                </button>
-                <Button 
-                  className="w-full h-12 text-[14px] font-bold text-[#8b8276] hover:text-[#171513] transition-colors"
-                  onClick={onClose}
-                >
-                  Continue with free report
-                </Button>
-              </div>
+                  <div className="grid gap-4 sm:grid-cols-2 mb-10">
+                    {[
+                      { icon: User, label: "Founder profile fixes" },
+                      { icon: Layout, label: "Website positioning" },
+                      { icon: FileText, label: "Pitch deck roadmap" },
+                      { icon: Search, label: "Matched opportunities" },
+                      { icon: BrainCircuit, label: "Application draft support" },
+                      { icon: RefreshCw, label: "Weekly opportunity refresh" }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-center gap-3 rounded-2xl bg-[#f6f1ea]/50 p-3.5 border border-black/[0.02]">
+                        <div className="flex size-8 items-center justify-center rounded-lg bg-white text-[#ff6b3d] shadow-sm">
+                          <item.icon className="size-4" />
+                        </div>
+                        <span className="text-[13px] font-bold text-[#6f685f]">{item.label}</span>
+                      </div>
+                    ))}
+                  </div>
 
-              <div className="mt-8 flex items-center justify-center gap-6 border-t border-black/[0.05] pt-6 text-[11px] font-bold uppercase tracking-widest text-[#b5ad9f]">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3 text-[#22c55e]" />
-                  Full Report
+                  <div className="space-y-4">
+                    <button 
+                      onClick={() => setIsCheckoutState(true)}
+                      className="w-full flex h-16 items-center justify-center gap-3 rounded-full bg-[#171513] text-[16px] font-bold text-white shadow-[0_20px_40px_rgba(0,0,0,0.1)] hover:bg-black transition-all transform hover:scale-[1.02]"
+                    >
+                      Unlock my funding plan
+                      <ArrowRight className="size-5" />
+                    </button>
+                    <button 
+                      className="w-full h-12 text-[14px] font-bold text-[#8b8276] hover:text-[#171513] transition-colors"
+                      onClick={onClose}
+                    >
+                      Continue with free report
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="py-12 text-center">
+                   <div className="mx-auto mb-8 flex size-24 items-center justify-center rounded-full bg-[#f6f1ea] border-2 border-dashed border-[#ff6b3d]/30">
+                    <Zap className="size-10 text-[#ff6b3d]" />
+                  </div>
+                  <h2 className="text-[28px] font-bold leading-tight tracking-tight text-[#171513] mb-4">
+                    Early Access Coming Soon
+                  </h2>
+                  <p className="text-[15px] leading-[1.6] text-[#6f685f] mb-10 max-w-[320px] mx-auto">
+                    We're finalizing our AI matching engine. You'll be notified the moment your personalized funding plan is ready to unlock.
+                  </p>
+                  <button 
+                    onClick={onClose}
+                    className="w-full h-14 rounded-full bg-[#ff6b3d] text-[15px] font-bold text-white shadow-lg hover:bg-[#f45d2e] transition-all"
+                  >
+                    Got it, thanks
+                  </button>
                 </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3 text-[#22c55e]" />
-                  VC Matches
-                </div>
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3 text-[#22c55e]" />
-                  AI Drafts
-                </div>
-              </div>
+              )}
             </div>
           </motion.div>
         </motion.div>
@@ -254,9 +327,7 @@ export default function AssessmentReportPage() {
     weaknesses = [],
     founderAssessment = "",
     startupAssessment = "",
-    websiteAssessment = "",
     missingProofPoints = [],
-    opportunityCategories = [],
     lockedMatchesPreview = [],
     subscores: rawSubscores = {},
   } = report;
@@ -278,12 +349,10 @@ export default function AssessmentReportPage() {
             <BrandLockup />
           </Link>
           <div className="flex items-center gap-4">
-             <div className="hidden sm:block text-[10px] font-bold uppercase tracking-[0.2em] text-[#8b8276]">
-              Founder: {state.startupName || "Anonymous"}
-            </div>
+             <CreditMeter credits={state.creditsRemaining} />
             <button 
               onClick={() => setPaywallOpen(true)}
-              className="h-10 rounded-full bg-[#171513] px-5 text-[12px] font-bold text-white shadow-lg transition-all hover:bg-black"
+              className="h-10 rounded-full bg-[#171513] px-6 text-[12px] font-bold text-white shadow-lg transition-all hover:bg-black"
             >
               Unlock Fixes
             </button>
@@ -293,35 +362,35 @@ export default function AssessmentReportPage() {
 
       <PaywallModal isOpen={paywallOpen} onClose={() => setPaywallOpen(false)} />
 
-      <div className="mx-auto max-w-[840px] px-4 pt-32 sm:px-6 lg:pt-40">
+      <div className="mx-auto max-w-[940px] px-4 pt-32 sm:px-6 lg:pt-40">
         
         {/* Verdict Hero */}
         <motion.section
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: EASE_OUT }}
-          className="mb-16"
+          className="mb-20"
         >
-          <div className="grid gap-10 md:grid-cols-[1fr_240px] items-center">
+          <div className="grid gap-12 md:grid-cols-[1fr_280px] items-center">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff6b3d] mb-6">
+              <div className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#ff6b3d] mb-8">
                 <Sparkles className="size-3" />
-                Intelligence Verdict
+                Diagnosis Complete
               </div>
-              <h1 className="text-[42px] font-bold leading-[1] tracking-[-0.05em] text-[#171513] sm:text-[54px] mb-6">
+              <h1 className="text-[48px] font-bold leading-[0.95] tracking-[-0.05em] text-[#171513] sm:text-[64px] mb-8">
                 {verdict}
               </h1>
-              <p className="text-[18px] leading-[1.6] text-[#6f685f] max-w-[480px]">
-                We've analyzed your materials against our proprietary funding signals database. Here is your current readiness state.
+              <p className="text-[20px] leading-[1.6] text-[#6f685f] max-w-[520px]">
+                We've scanned your startup signals. Your readiness profile is established.
               </p>
             </div>
 
-            <div className="flex flex-col items-center justify-center p-8 rounded-[40px] bg-white border border-black/[0.05] shadow-[0_20px_50px_rgba(0,0,0,0.04)] relative overflow-hidden group">
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-[#ff6b3d]" />
+            <div className="flex flex-col items-center justify-center p-10 rounded-[48px] bg-white border border-black/[0.05] shadow-[0_20px_60px_rgba(0,0,0,0.05)] relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#ff6b3d] to-[#ff9068]" />
               <div className="relative z-10 text-center">
-                <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#8b8276] mb-2">Readiness Score</div>
-                <div className="text-[72px] font-bold leading-none tracking-[-0.06em] text-[#171513] mb-2">{readinessScore}</div>
-                <div className="h-1.5 w-full bg-[#f6f1ea] rounded-full overflow-hidden mb-4">
+                <div className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#8b8276] mb-4">Readiness</div>
+                <div className="text-[84px] font-bold leading-none tracking-[-0.06em] text-[#171513] mb-4">{readinessScore}</div>
+                <div className="h-2 w-40 bg-[#f6f1ea] rounded-full overflow-hidden mb-6 mx-auto">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${readinessScore}%` }}
@@ -329,9 +398,9 @@ export default function AssessmentReportPage() {
                     className="h-full bg-[#ff6b3d] rounded-full"
                   />
                 </div>
-                <div className="text-[10px] font-bold uppercase tracking-widest text-[#ff6b3d] flex items-center justify-center gap-1.5">
-                  <TrendingUp className="size-3" />
-                  Top 15% Percentile
+                <div className="text-[11px] font-bold uppercase tracking-widest text-[#ff6b3d] flex items-center justify-center gap-2">
+                  <TrendingUp className="size-4" />
+                  Strong Signal
                 </div>
               </div>
             </div>
@@ -344,13 +413,13 @@ export default function AssessmentReportPage() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-20"
+          className="mb-24"
         >
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-[14px] font-bold uppercase tracking-[0.15em] text-[#171513]">Core Signals Breakdown</h2>
-            <div className="h-px flex-1 bg-black/[0.05] ml-6" />
+          <div className="flex items-center justify-between mb-10">
+            <h2 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#8b8276]">Core Signals Analysis</h2>
+            <div className="h-px flex-1 bg-black/[0.05] ml-8" />
           </div>
-          <div className="grid grid-cols-2 gap-y-10 gap-x-4 sm:grid-cols-3 lg:grid-cols-6">
+          <div className="grid grid-cols-2 gap-y-12 gap-x-6 sm:grid-cols-3 lg:grid-cols-6">
             <ScoreRing score={subscores.founderCredibility} label="Founder" />
             <ScoreRing score={subscores.startupClarity} label="Clarity" />
             <ScoreRing score={subscores.tractionProof} label="Traction" />
@@ -360,164 +429,154 @@ export default function AssessmentReportPage() {
           </div>
         </motion.section>
 
-        {/* High Prominence Fix CTA */}
-        <motion.section
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          className="mb-20 rounded-[40px] bg-[#171513] p-10 text-white shadow-[0_30px_70px_rgba(0,0,0,0.15)] relative overflow-hidden"
-        >
-          <div className="absolute top-0 right-0 p-8 opacity-10">
-            <Zap className="size-40" />
+        {/* NEW: What Fundme Can Fix Section */}
+        <section className="mb-24">
+          <div className="flex items-center gap-4 mb-10">
+            <h2 className="text-[28px] font-bold tracking-tight">What Fundme can fix</h2>
+            <div className="h-px flex-1 bg-black/[0.05]" />
           </div>
-          <div className="relative z-10">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/80 mb-6">
-              AI Powered Correction
-            </div>
-            <h3 className="text-[32px] font-bold leading-[1.1] tracking-[-0.04em] mb-4">
-              Fix your funding gaps in 5 minutes.
-            </h3>
-            <p className="text-[16px] text-white/60 mb-10 max-w-[480px]">
-              Unlock your tailored action plan. We'll rewrite your positioning, suggest missing proof points, and generate direct applications to the programs you match.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <button 
-                onClick={() => setPaywallOpen(true)}
-                className="w-full sm:w-auto h-16 px-10 rounded-full bg-[#ff6b3d] text-[16px] font-bold text-white shadow-[0_15px_30px_rgba(255,107,61,0.3)] transition-all transform hover:scale-[1.05] hover:bg-[#f45d2e] flex items-center justify-center gap-3"
-              >
-                Fix this for me
-                <ArrowRight className="size-5" />
-              </button>
-              <div className="text-[12px] font-bold uppercase tracking-widest text-white/40">
-                142 Founders fixed today
-              </div>
-            </div>
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+             <LockedFixCard 
+                title="Founder Narrative Fix"
+                whyItHurts="Your current profile lacks a 'Why You' hook. We'll rewrite it to highlight domain unfair advantages."
+                onUnlock={() => setPaywallOpen(true)}
+              />
+              <LockedFixCard 
+                title="Website Positioning"
+                whyItHurts="Your landing page copy is too technical. We'll generate 3 editorial headlines for 2x clarity."
+                onUnlock={() => setPaywallOpen(true)}
+              />
+              <LockedFixCard 
+                title="Traction Proof Points"
+                whyItHurts="Missing specific growth metrics. We'll draft the exact missing proof points needed for top tier apps."
+                onUnlock={() => setPaywallOpen(true)}
+              />
           </div>
-        </motion.section>
+        </section>
 
-        <div className="grid gap-12 lg:grid-cols-[1fr_300px]">
+        <div className="grid gap-16 lg:grid-cols-[1fr_320px]">
           {/* Main Analysis Column */}
-          <div className="space-y-16">
-            {/* Top Weaknesses */}
-            <section>
-              <h2 className="mb-8 text-[14px] font-bold uppercase tracking-[0.15em] text-[#171513] flex items-center gap-3">
-                <AlertCircle className="size-4 text-[#ff6b3d]" />
-                Critical Weaknesses
+          <div className="space-y-20">
+            {/* Qualitative Assessments */}
+            <section className="space-y-10">
+               <h2 className="text-[14px] font-bold uppercase tracking-[0.15em] text-[#171513] flex items-center gap-3">
+                <BrainCircuit className="size-4 text-[#ff6b3d]" />
+                Intelligence Scan
               </h2>
-              <div className="space-y-4">
-                {weaknesses.map((w) => (
-                  <WeaknessCard key={w.title} title={w.title} whyItHurts={w.whyItHurts} quickHint={w.quickHint} />
-                ))}
+
+              <div className="rounded-[32px] border border-black/[0.06] bg-white p-10 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
+                  <User className="size-32" />
+                </div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#fff5f0] text-[#ff6b3d]">
+                    <User className="size-6" />
+                  </div>
+                  <h3 className="text-[20px] font-bold text-[#171513]">Founder Signal</h3>
+                </div>
+                <p className="text-[16px] leading-[1.8] text-[#6f685f]">{founderAssessment}</p>
+              </div>
+
+              <div className="rounded-[32px] border border-black/[0.06] bg-white p-10 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03]">
+                  <Lightbulb className="size-32" />
+                </div>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex size-12 items-center justify-center rounded-2xl bg-[#f0f7ff] text-[#60a5fa]">
+                    <Lightbulb className="size-6" />
+                  </div>
+                  <h3 className="text-[20px] font-bold text-[#171513]">Startup Clarity</h3>
+                </div>
+                <p className="text-[16px] leading-[1.8] text-[#6f685f]">{startupAssessment}</p>
               </div>
             </section>
 
-            {/* Qualitative Assessments */}
-            <section className="space-y-8">
-               <h2 className="text-[14px] font-bold uppercase tracking-[0.15em] text-[#171513] flex items-center gap-3">
-                <BrainCircuit className="size-4 text-[#8b5cf6]" />
-                Intelligence Modules
-              </h2>
-
-              <div className="rounded-[24px] border border-black/[0.06] bg-white p-8 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="flex size-10 items-center justify-center rounded-[12px] bg-[#f5f0ff] text-[#8b5cf6]">
-                    <User className="size-5" />
-                  </div>
-                  <h3 className="text-[16px] font-bold text-[#171513]">Founder Profile Scan</h3>
-                </div>
-                <p className="text-[15px] leading-[1.8] text-[#6f685f]">{founderAssessment}</p>
+            {/* Locked Opportunity Radar */}
+            <section>
+               <div className="flex items-center justify-between mb-8">
+                <h2 className="text-[14px] font-bold uppercase tracking-[0.15em] text-[#171513] flex items-center gap-3">
+                  <Target className="size-4 text-[#ff6b3d]" />
+                  Opportunity Radar
+                </h2>
+                <button 
+                  onClick={() => setPaywallOpen(true)}
+                  className="text-[12px] font-bold text-[#ff6b3d] hover:underline flex items-center gap-1.5"
+                >
+                  Unlock All Matches
+                  <ChevronRight className="size-3.5" />
+                </button>
               </div>
 
-              <div className="rounded-[24px] border border-black/[0.06] bg-white p-8 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="flex size-10 items-center justify-center rounded-[12px] bg-[#f0f7ff] text-[#60a5fa]">
-                    <Lightbulb className="size-5" />
-                  </div>
-                  <h3 className="text-[16px] font-bold text-[#171513]">Startup Clarity Analysis</h3>
-                </div>
-                <p className="text-[15px] leading-[1.8] text-[#6f685f]">{startupAssessment}</p>
-              </div>
-
-              <div className="rounded-[24px] border border-black/[0.06] bg-white p-8 shadow-[0_4px_12px_rgba(0,0,0,0.02)]">
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="flex size-10 items-center justify-center rounded-[12px] bg-[#f0fff4] text-[#22c55e]">
-                    <Globe className="size-5" />
-                  </div>
-                  <h3 className="text-[16px] font-bold text-[#171513]">Positioning Audit</h3>
-                </div>
-                <p className="text-[15px] leading-[1.8] text-[#6f685f]">{websiteAssessment}</p>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <LockedMatchPreview 
+                  name="Y Combinator W26" 
+                  type="Accelerator" 
+                  reason="Strong stage fit. Needs sharpened traction story." 
+                  onUnlock={() => setPaywallOpen(true)}
+                />
+                <LockedMatchPreview 
+                  name="Antler India" 
+                  type="Venture Builder" 
+                  reason="Founder background matches portfolio signals." 
+                  onUnlock={() => setPaywallOpen(true)}
+                />
+                <LockedMatchPreview 
+                  name="Google for Startups" 
+                  type="Grant / Support" 
+                  reason="Matches tech vertical. Requires positioning fix." 
+                  onUnlock={() => setPaywallOpen(true)}
+                />
+                <LockedMatchPreview 
+                  name="Sequoia Surge" 
+                  type="Seed Program" 
+                  reason="High market opportunity fit. Missing team proof." 
+                  onUnlock={() => setPaywallOpen(true)}
+                />
               </div>
             </section>
           </div>
 
           {/* Sidebar Column */}
-          <div className="space-y-12">
-            {/* Missing Proof Points */}
-            <section>
-              <h2 className="mb-6 text-[12px] font-bold uppercase tracking-[0.15em] text-[#171513]">Missing Proof Points</h2>
-              <div className="rounded-[24px] border border-black/[0.06] bg-white p-6 shadow-sm">
-                <ul className="space-y-5">
+          <div className="space-y-16">
+             {/* Sticky Action CTA */}
+            <div className="sticky top-28 space-y-6">
+              <div className="rounded-[40px] bg-[#171513] p-8 text-white shadow-xl relative overflow-hidden group">
+                <div className="absolute -right-4 -top-4 size-24 bg-white/5 rounded-full group-hover:scale-110 transition-transform" />
+                <h4 className="text-[22px] font-bold leading-tight mb-4">Fix your funding gaps now.</h4>
+                <p className="text-[14px] text-white/60 mb-8 leading-relaxed">
+                  Free report shows diagnosis. Paid unlock gives you the exact fixes and direct drafts.
+                </p>
+                <button 
+                  onClick={() => setPaywallOpen(true)}
+                  className="w-full h-14 rounded-full bg-[#ff6b3d] text-[15px] font-bold text-white shadow-lg transition-all hover:bg-[#f45d2e] transform hover:scale-[1.02] flex items-center justify-center gap-2"
+                >
+                  Unlock Fixes
+                  <ArrowRight className="size-4" />
+                </button>
+              </div>
+
+              {/* Missing Signal Checklist */}
+              <div className="rounded-[32px] border border-black/[0.06] bg-white p-8">
+                <h3 className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#8b8276] mb-6">Missing Signals</h3>
+                <ul className="space-y-6">
                   {missingProofPoints.map((point) => (
-                    <li key={point} className="flex items-start gap-3 text-[13px] leading-[1.5] text-[#6f685f]">
-                      <div className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#fff5f0] text-[#ff6b3d]">
-                        <CheckCircle2 className="size-3" />
+                    <li key={point} className="flex items-start gap-4 text-[13px] leading-[1.6] text-[#6f685f]">
+                      <div className="mt-1 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#f6f1ea] text-[#b5ad9f]">
+                        <div className="size-1.5 rounded-full bg-[#ff6b3d]" />
                       </div>
                       {point}
                     </li>
                   ))}
                 </ul>
               </div>
-            </section>
-
-            {/* Opportunity Radar */}
-            <section>
-              <h2 className="mb-6 text-[12px] font-bold uppercase tracking-[0.15em] text-[#171513]">Opportunity Radar</h2>
-              <div className="flex flex-wrap gap-2 mb-8">
-                {opportunityCategories.map((cat) => (
-                  <span key={cat} className="rounded-full bg-[#f6f1ea] px-4 py-2 text-[11px] font-bold text-[#8b8276] uppercase tracking-wider">
-                    {cat}
-                  </span>
-                ))}
-              </div>
-              
-              <div className="space-y-4">
-                <div className="flex items-center justify-between px-2">
-                  <span className="text-[12px] font-bold uppercase tracking-widest text-[#b5ad9f]">Matches</span>
-                  <button 
-                    onClick={() => setPaywallOpen(true)}
-                    className="text-[11px] font-bold text-[#ff6b3d] hover:underline"
-                  >
-                    Unlock All
-                  </button>
-                </div>
-                {lockedMatchesPreview.map((match) => (
-                  <LockedMatchPreview key={match.name} name={match.name} reason={match.reason} />
-                ))}
-              </div>
-            </section>
-            
-            {/* Sticky Secondary CTA */}
-            <div className="sticky top-28 p-6 rounded-[32px] border border-dashed border-[#d9cbbd] text-center">
-              <div className="inline-flex size-12 items-center justify-center rounded-full bg-[#f6f1ea] mb-4">
-                <TrendingUp className="size-6 text-[#ff6b3d]" />
-              </div>
-              <h4 className="text-[14px] font-bold text-[#171513] mb-2">Ready to improve?</h4>
-              <p className="text-[12px] text-[#8b8276] mb-6">
-                Our AI will rebuild your profile to hit these missing signals.
-              </p>
-              <button 
-                onClick={() => setPaywallOpen(true)}
-                className="w-full h-11 rounded-full bg-[#171513] text-[12px] font-bold text-white shadow-md hover:bg-black transition-all"
-              >
-                Start Fixing
-              </button>
             </div>
           </div>
         </div>
       </div>
       
       {/* Footer Secondary Actions */}
-      <footer className="mt-20 border-t border-black/[0.05] pt-12 text-center">
+      <footer className="mt-32 border-t border-black/[0.05] py-20 text-center">
         <button 
           className="text-[13px] font-bold text-[#8b8276] hover:text-[#171513] transition-colors"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
