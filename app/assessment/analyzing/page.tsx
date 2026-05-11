@@ -13,7 +13,16 @@ import {
   ArrowRight,
   ShieldCheck,
   BrainCircuit,
-  Fingerprint
+  Fingerprint,
+  Lightbulb,
+  Shield,
+  Zap,
+  Layout,
+  Search,
+  Lock,
+  LineChart,
+  Terminal,
+  Activity
 } from "lucide-react";
 
 import { useAssessment } from "@/components/assessment/assessment-provider";
@@ -158,113 +167,89 @@ const assessmentQuestions: Question[] = [
   },
 ];
 
-const analysisSteps = [
-  "Reading website positioning",
-  "Extracting startup category",
-  "Identifying founder signals",
-  "Checking traction and proof points",
-  "Mapping stage and geography",
-  "Comparing against accelerator patterns",
-  "Scanning grants, credits, fellowships, and startup programs",
-  "Finding weak application signals",
-  "Preparing funding readiness report",
+const scanSteps = [
+  { id: "read", label: "Reading website", icon: Globe },
+  { id: "position", label: "Mapping position", icon: Target },
+  { id: "signal", label: "Founder signal", icon: User },
+  { id: "readiness", label: "Startup clarity", icon: Lightbulb },
+  { id: "matching", label: "Opportunity fit", icon: Search },
 ];
 
-const microcopy = [
-  "Looking for traction signals...",
-  "Checking if your homepage explains who this is for...",
-  "Mapping your startup against common accelerator criteria...",
-  "Scanning for missing proof points...",
-  "Checking founder story strength...",
-  "Finding opportunity categories that match your stage...",
-  "Preparing your application readiness report...",
+const realityChecks = [
+  {
+    id: "A",
+    title: "Founders often fail before they even hit 'Submit'.",
+    body: "Most rejections happen because of 'mismatched signal'. You apply for a growth grant with a seed deck, or a tech accelerator with a services website.",
+    insight: "We're scanning your materials to ensure your signal matches the stage.",
+    icon: Shield,
+    triggerAt: 3, // After question 2
+  },
+  {
+    id: "B",
+    title: "Your website is your first interview.",
+    body: "Accelerators spend an average of 45 seconds on your homepage before deciding to read your deck. If they don't get it in 15, they're already leaning towards 'No'.",
+    insight: "Identifying the core friction in your current positioning.",
+    icon: Layout,
+    triggerAt: 5, // After question 4
+  },
+  {
+    id: "C",
+    title: "The 'Traction' trap.",
+    body: "Investors don't just want numbers; they want a story of inevitability. Even low-traction startups win when they demonstrate a clear, compounding path to growth.",
+    insight: "Mapping your current proof points to the 'Inevitability Scale'.",
+    icon: LineChart,
+    triggerAt: 8, // After question 7
+  },
+  {
+    id: "D",
+    title: "The Intelligence layer is almost complete.",
+    body: "We've mapped your startup against the criteria of 1,200+ active programs. Your final report is being synthesized with a specific focus on your highest-probability matches.",
+    insight: "Finalizing your verdict and funding readiness score.",
+    icon: BrainCircuit,
+    triggerAt: 11, // After question 10
+  }
 ];
 
-function WebsiteCard({ websiteUrl }: { websiteUrl: string }) {
-  const displayUrl = websiteUrl.replace(/^https?:\/\//, "").slice(0, 24);
+function ProgressHeader({ progress }: { progress: number }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.1 }}
-      className="rounded-[16px] border border-black/[0.08] bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-[10px] bg-[#f0f7ff] text-[#60a5fa]">
-          <Globe className="size-4" />
-        </div>
-        <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#8b8276]">Website</div>
-          <div className="text-[14px] font-semibold text-[#171513]">{displayUrl}</div>
+    <div className="fixed inset-x-0 top-0 z-[60] px-4 pt-4 sm:px-6">
+      <div className="mx-auto max-w-[600px]">
+        <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-white/40 border border-black/[0.03] shadow-sm">
+          <motion.div
+            className="absolute inset-y-0 left-0 bg-[#ff6b3d] shadow-[0_0_12px_rgba(255,107,61,0.4)]"
+            initial={{ width: 0 }}
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.8, ease: EASE_OUT }}
+          />
         </div>
       </div>
-      <div className="mt-3 h-2 rounded-full bg-[#eee3d6]">
-        <motion.div
-          className="h-full rounded-full bg-[#60a5fa]"
-          initial={{ width: 0 }}
-          animate={{ width: "65%" }}
-          transition={{ duration: 2, ease: EASE_OUT, delay: 0.5 }}
-        />
-      </div>
-    </motion.div>
+    </div>
   );
 }
 
-function FounderSignalCard() {
+function ScanStatus({ activeId }: { activeId: string }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.2 }}
-      className="rounded-[16px] border border-black/[0.08] bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-[10px] bg-[#f5f0ff] text-[#8b5cf6]">
-          <User className="size-4" />
-        </div>
-        <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#8b8276]">Founder</div>
-          <div className="text-[14px] font-semibold text-[#171513]">Signals</div>
-        </div>
-      </div>
-      <div className="mt-3 h-2 rounded-full bg-[#eee3d6]">
-        <motion.div
-          className="h-full rounded-full bg-[#8b5cf6]"
-          initial={{ width: 0 }}
-          animate={{ width: "45%" }}
-          transition={{ duration: 2, ease: EASE_OUT, delay: 0.7 }}
-        />
-      </div>
-    </motion.div>
-  );
-}
-
-function OpportunityCard() {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: EASE_OUT, delay: 0.3 }}
-      className="rounded-[16px] border border-black/[0.08] bg-white p-5 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex size-9 items-center justify-center rounded-[10px] bg-[#fff5f0] text-[#ff6b3d]">
-          <Target className="size-4" />
-        </div>
-        <div>
-          <div className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#8b8276]">Opportunity</div>
-          <div className="text-[14px] font-semibold text-[#171513]">Matching</div>
-        </div>
-      </div>
-      <div className="mt-3 h-2 rounded-full bg-[#eee3d6]">
-        <motion.div
-          className="h-full rounded-full bg-[#ff6b3d]"
-          initial={{ width: 0 }}
-          animate={{ width: "30%" }}
-          transition={{ duration: 2, ease: EASE_OUT, delay: 0.9 }}
-        />
-      </div>
-    </motion.div>
+    <div className="grid grid-cols-5 gap-2 sm:gap-4 mb-12">
+      {scanSteps.map((step) => {
+        const Icon = step.icon;
+        const isActive = step.id === activeId;
+        const isDone = scanSteps.findIndex(s => s.id === step.id) < scanSteps.findIndex(s => s.id === activeId);
+        
+        return (
+          <div key={step.id} className="flex flex-col items-center gap-2">
+            <div className={`flex size-10 items-center justify-center rounded-xl transition-all duration-500 ${
+              isActive ? "bg-[#ff6b3d] text-white shadow-lg scale-110" : 
+              isDone ? "bg-[#22c55e] text-white" : "bg-white/60 text-[#b5ad9f] border border-black/[0.05]"
+            }`}>
+              <Icon className="size-5" />
+            </div>
+            <span className={`text-[9px] font-bold uppercase tracking-widest text-center whitespace-nowrap ${isActive ? "text-[#171513]" : "text-[#b5ad9f]"}`}>
+              {step.label.split(" ")[1] || step.label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -273,259 +258,240 @@ export default function AssessmentAnalyzingPage() {
   const { state, generateReport, setAnswer, getAnswerForQuestion } = useAssessment();
   const shouldReduceMotion = useReducedMotion();
 
-  const [elapsed, setElapsed] = useState(0);
-  const [currentInsight, setCurrentInsight] = useState(0);
-  const TOTAL_DURATION = 15000; // Longer to account for questions
-
+  const [progress, setProgress] = useState(0);
+  const [activeScanId, setActiveScanId] = useState("read");
   const [isQuestionActive, setIsQuestionActive] = useState(false);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [isRealityActive, setIsRealityActive] = useState(false);
+  
+  const [currentStepIndex, setCurrentStepIndex] = useState(0); // Total steps: 1 (start) + 10 questions + 4 reality + 1 final = 16 steps
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const hasGeneratedRef = useRef(false);
-  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const totalSteps = 16;
 
-  // Timer for progress - pauses when question is active
+  // Sync scan ID with progress
   useEffect(() => {
-    if (isQuestionActive) return;
+    if (progress < 20) setActiveScanId("read");
+    else if (progress < 40) setActiveScanId("position");
+    else if (progress < 60) setActiveScanId("signal");
+    else if (progress < 80) setActiveScanId("readiness");
+    else setActiveScanId("matching");
+  }, [progress]);
 
-    const timer = window.setInterval(() => {
-      setElapsed((current) => {
-        const next = current + 100;
-        if (next >= TOTAL_DURATION) {
-          window.clearInterval(timer);
-          return TOTAL_DURATION;
-        }
-        return next;
-      });
-    }, 100);
-
-    return () => window.clearInterval(timer);
-  }, [isQuestionActive]);
-
-  // Logic to trigger questions at specific intervals
+  // Initial scan start
   useEffect(() => {
-    const progress = (elapsed / TOTAL_DURATION) * 100;
-    
-    // Trigger questions at 20%, 40%, 60%, 80%, etc.
-    // We have 10 questions, let's space them out
-    const nextQuestionIndex = Math.floor(progress / 9); // Roughly 10 segments
-    
-    if (nextQuestionIndex > currentQuestionIndex && nextQuestionIndex <= assessmentQuestions.length) {
-      const qIndex = nextQuestionIndex - 1;
-      const q = assessmentQuestions[qIndex];
-      
-      // Check if already answered
-      if (!getAnswerForQuestion(q.id)) {
-        setIsQuestionActive(true);
-        setCurrentQuestionIndex(nextQuestionIndex);
-        setSelectedOption(null);
-      } else {
-        // Skip if already answered
-        setCurrentQuestionIndex(nextQuestionIndex);
+    const timer = setTimeout(() => {
+      if (currentStepIndex === 0) {
+        handleNextStep();
       }
+    }, 1500);
+    return () => clearTimeout(timer);
+  }, [currentStepIndex]);
+
+  const handleNextStep = useCallback(() => {
+    const nextIndex = currentStepIndex + 1;
+    
+    // Safety check to prevent going past final synthesis
+    if (nextIndex > totalSteps - 1) {
+      if (!hasGeneratedRef.current && state.websiteUrl) {
+        hasGeneratedRef.current = true;
+        generateReport();
+        setTimeout(() => router.push("/assessment/report"), 1500);
+      }
+      return;
     }
-  }, [elapsed, currentQuestionIndex, getAnswerForQuestion]);
 
-  // Rotating insights
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      setCurrentInsight((i) => (i + 1) % microcopy.length);
-    }, 2500);
+    setCurrentStepIndex(nextIndex);
+    setProgress((nextIndex / (totalSteps - 1)) * 100);
 
-    return () => window.clearInterval(interval);
-  }, []);
+    // Final synthesis step logic
+    if (nextIndex === totalSteps - 1) {
+      // Stay on scanning view for synthesis
+      setIsQuestionActive(false);
+      setIsRealityActive(false);
+      
+      if (!hasGeneratedRef.current && state.websiteUrl) {
+        hasGeneratedRef.current = true;
+        generateReport();
+        setTimeout(() => router.push("/assessment/report"), 2000);
+      }
+      return;
+    }
 
-  // Generate report when finished
-  useEffect(() => {
-    if (elapsed < TOTAL_DURATION) return;
-    if (hasGeneratedRef.current) return;
-    if (!state.websiteUrl) return;
-    if (state.reportGenerated) return;
+    // Check for Reality Check
+    const reality = realityChecks.find(r => r.triggerAt === nextIndex);
+    if (reality) {
+      setIsRealityActive(true);
+      return;
+    }
 
-    hasGeneratedRef.current = true;
-    generateReport();
-
-    redirectTimerRef.current = window.setTimeout(() => {
-      router.push("/assessment/report");
-    }, 1000);
-
-    return () => {
-      if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
-    };
-  }, [elapsed, state.websiteUrl, state.reportGenerated, router, generateReport]);
-
-  const progressValue = (elapsed / TOTAL_DURATION) * 100;
-  const activeStepIndex = Math.min(
-    analysisSteps.length - 1,
-    Math.floor((elapsed / TOTAL_DURATION) * analysisSteps.length)
-  );
+    // Check for Question
+    const questionSequence = [1, 2, 4, 6, 7, 9, 10, 12, 13, 14];
+    const questionIdIndex = questionSequence.indexOf(nextIndex);
+    
+    if (questionIdIndex !== -1) {
+      setIsQuestionActive(true);
+      setSelectedOption(null);
+    } else {
+      // Auto-progress system steps
+      setTimeout(handleNextStep, 2000);
+    }
+  }, [currentStepIndex, router, state.websiteUrl, generateReport, totalSteps]);
 
   function handleAnswer(option: string) {
     setSelectedOption(option);
-    const q = assessmentQuestions[currentQuestionIndex - 1];
-    setAnswer(q.id, option);
+    const questionSequence = [1, 2, 4, 6, 7, 9, 10, 12, 13, 14];
+    const questionId = questionSequence.indexOf(currentStepIndex) + 1;
+    setAnswer(questionId, option);
     
-    // Small delay before resuming
     setTimeout(() => {
       setIsQuestionActive(false);
+      handleNextStep();
     }, 600);
   }
 
-  const websiteUrl = state.websiteUrl || "yourstartup.com";
+  function handleRealityContinue() {
+    setIsRealityActive(false);
+    handleNextStep();
+  }
+
+  const currentQuestionId = [1, 2, 4, 6, 7, 9, 10, 12, 13, 14].indexOf(currentStepIndex) + 1;
+  const currentReality = realityChecks.find(r => r.triggerAt === currentStepIndex);
 
   return (
-    <main className="min-h-screen bg-[#f6f1ea] text-[#171513]" data-theme="public">
-      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-16 sm:px-6">
-        <div className="w-full max-w-[640px]">
+    <main className="min-h-screen bg-[#f6f1ea] text-[#171513] overflow-x-hidden" data-theme="public">
+      <ProgressHeader progress={progress} />
+
+      <div className="flex min-h-screen flex-col items-center justify-center px-4 py-20 sm:px-6">
+        <div className="w-full max-w-[540px]">
           
           <AnimatePresence mode="wait">
-            {!isQuestionActive ? (
+            {isQuestionActive ? (
               <motion.div
-                key="analyzing"
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.98 }}
-                transition={{ duration: 0.4, ease: EASE_OUT }}
+                key="question"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5, ease: EASE_OUT }}
+                className="w-full"
               >
-                <div className="mb-10 text-center">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-1.5 text-[10.5px] font-bold uppercase tracking-[0.2em] text-[#ff6b3d]">
-                    <LoaderCircle className="size-3 animate-spin" />
-                    Deep Scanning...
+                <div className="mb-8 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#ff6b3d]">
+                    <Terminal className="size-3.5" />
+                    System Input Required
                   </div>
-                  <h1 className="mt-5 text-[32px] font-semibold leading-[1.12] tracking-[-0.04em] text-[#171513] sm:text-[40px]">
-                    Fundme is scanning your
-                    <br />
-                    <span className="text-[#ff6b3d]">startup signature</span>
-                  </h1>
-                </div>
-
-                <div className="mb-10">
-                  <div className="h-1.5 rounded-full bg-[#e7ddd0]">
-                    <motion.div
-                      className="h-full rounded-full bg-[#ff6b3d]"
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progressValue}%` }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                    />
-                  </div>
-                  <div className="mt-3 flex justify-between text-[11px] font-medium uppercase tracking-[0.14em] text-[#8b8276]">
-                    <span>{Math.round(progressValue)}% complete</span>
-                    <span className="text-right">{microcopy[currentInsight]}</span>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#b5ad9f]">
+                    {currentQuestionId} / 10
                   </div>
                 </div>
 
-                <div className="mb-10 grid gap-4 sm:grid-cols-3">
-                  <WebsiteCard websiteUrl={websiteUrl} />
-                  <FounderSignalCard />
-                  <OpportunityCard />
-                </div>
+                <h2 className="instrument-serif text-[32px] italic leading-[1.15] text-[#171513] sm:text-[40px] mb-8">
+                  {assessmentQuestions[currentQuestionId - 1].text}
+                </h2>
 
-                <div className="space-y-2.5">
-                  {analysisSteps.map((step, index) => {
-                    const isDone = index < activeStepIndex;
-                    const isActive = index === activeStepIndex;
-
-                    return (
-                      <div
-                        key={step}
-                        className={`flex items-center gap-4 rounded-[14px] border px-5 py-3.5 transition-all duration-300 ${
-                          isDone
-                            ? "border-transparent bg-black/[0.02] opacity-60"
-                            : isActive
-                            ? "border-[#ff6b3d]/20 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.04)]"
-                            : "border-black/[0.05] bg-transparent opacity-30"
-                        }`}
-                      >
-                        {isDone ? (
-                          <div className="flex size-7 items-center justify-center rounded-full bg-[#22c55e] text-white">
-                            <CheckCircle2 className="size-3.5" />
-                          </div>
-                        ) : isActive ? (
-                          <div className="flex size-7 items-center justify-center rounded-full border-2 border-[#ff6b3d] border-t-transparent">
-                            <LoaderCircle className="size-3.5 animate-spin text-[#ff6b3d]" />
-                          </div>
-                        ) : (
-                          <div className="flex size-7 items-center justify-center rounded-full border border-[#d9cbbd]">
-                            <span className="size-1.5 rounded-full bg-[#d9cbbd]" />
-                          </div>
-                        )}
-                        <span className={`text-[14px] font-medium ${isActive ? "text-[#171513]" : "text-[#6f685f]"}`}>
-                          {step}
-                        </span>
+                <div className="space-y-3">
+                  {assessmentQuestions[currentQuestionId - 1].options.map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => handleAnswer(option)}
+                      className={`group flex w-full items-center justify-between rounded-[24px] border p-6 transition-all duration-300 ${
+                        selectedOption === option
+                          ? "border-[#ff6b3d] bg-white shadow-[0_12px_32px_rgba(255,107,61,0.08)] ring-1 ring-[#ff6b3d]"
+                          : "border-black/[0.06] bg-white/60 hover:bg-white hover:border-black/[0.12]"
+                      }`}
+                    >
+                      <span className={`text-[17px] font-medium transition-colors ${selectedOption === option ? "text-[#171513]" : "text-[#6f685f]"}`}>
+                        {option}
+                      </span>
+                      <div className={`flex size-6 items-center justify-center rounded-full border transition-all ${
+                        selectedOption === option ? "border-[#ff6b3d] bg-[#ff6b3d] text-white" : "border-black/[0.1] group-hover:border-black/[0.2]"
+                      }`}>
+                        {selectedOption === option ? <CheckCircle2 className="size-3.5" /> : <ArrowRight className="size-3.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
                       </div>
-                    );
-                  })}
+                    </button>
+                  ))}
+                </div>
+              </motion.div>
+            ) : isRealityActive ? (
+              <motion.div
+                key="reality"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.6, ease: EASE_OUT }}
+                className="w-full"
+              >
+                <div className="rounded-[40px] border border-black/[0.05] bg-white p-8 sm:p-12 shadow-[0_40px_80px_rgba(0,0,0,0.06)] text-center">
+                  <div className="mx-auto mb-8 flex size-16 items-center justify-center rounded-2xl bg-[#f6f1ea] text-[#ff6b3d]">
+                    {currentReality && <currentReality.icon className="size-8" />}
+                  </div>
+
+                  <h2 className="instrument-serif text-[28px] italic leading-[1.2] text-[#171513] sm:text-[36px] mb-6">
+                    {currentReality?.title}
+                  </h2>
+                  
+                  <p className="text-[17px] leading-relaxed text-[#6f685f] mb-8">
+                    {currentReality?.body}
+                  </p>
+
+                  <div className="mb-10 rounded-2xl bg-[#ff6b3d]/[0.03] border border-[#ff6b3d]/10 p-5">
+                    <div className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#ff6b3d] mb-2">
+                      <Zap className="size-3.5" />
+                      Scan Insight
+                    </div>
+                    <p className="text-[14px] font-medium text-[#171513]">
+                      {currentReality?.insight}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleRealityContinue}
+                    className="inline-flex h-14 items-center justify-center gap-3 rounded-full bg-[#171513] px-10 text-[16px] font-bold text-white shadow-xl transition-all hover:bg-black active:scale-95"
+                  >
+                    I understand
+                    <ArrowRight className="size-4" />
+                  </button>
                 </div>
               </motion.div>
             ) : (
               <motion.div
-                key="question"
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                transition={{ duration: 0.5, ease: EASE_OUT }}
-                className="w-full"
+                key="scanning"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="w-full text-center"
               >
-                <div className="rounded-[32px] border border-black/[0.05] bg-white/90 p-8 shadow-[0_40px_80px_rgba(0,0,0,0.08)] backdrop-blur-xl">
-                  <div className="mb-6 flex items-center justify-between">
-                    <div className="inline-flex items-center gap-2 rounded-full bg-[#f6f1ea] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#8b8276]">
-                      <BrainCircuit className="size-3 text-[#ff6b3d]" />
-                      Refining Diagnosis
-                    </div>
-                    <div className="text-[10px] font-bold uppercase tracking-widest text-[#b5ad9f]">
-                      Step {currentQuestionIndex} / 10
+                <ScanStatus activeId={activeScanId} />
+
+                <div className="space-y-4">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-[#ff6b3d]">
+                    <Activity className="size-3.5 animate-pulse" />
+                    Intelligent Analysis
+                  </div>
+                  
+                  <h1 className="instrument-serif text-[36px] italic leading-[1.1] text-[#171513] sm:text-[48px]">
+                    {progress < 30 ? "Initializing environment..." : 
+                     progress < 60 ? "Deconstructing signals..." :
+                     progress < 90 ? "Identifying opportunity..." : "Synthesizing verdict..."}
+                  </h1>
+
+                  <div className="mt-12 flex justify-center">
+                    <div className="relative flex size-24 items-center justify-center">
+                      <motion.div 
+                        className="absolute inset-0 rounded-full border-2 border-black/[0.05]" 
+                      />
+                      <motion.div 
+                        className="absolute inset-0 rounded-full border-2 border-t-[#ff6b3d] border-r-transparent border-b-transparent border-l-transparent"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                      />
+                      <BrainCircuit className="size-10 text-[#ff6b3d]/40" />
                     </div>
                   </div>
 
-                  <h2 className="text-[24px] font-semibold leading-[1.2] tracking-[-0.04em] text-[#171513] sm:text-[28px]">
-                    {assessmentQuestions[currentQuestionIndex - 1].text}
-                  </h2>
-                  <p className="mt-3 text-[14px] text-[#6f685f]">
-                    Required to sharpen your funding readiness report.
+                  <p className="mt-8 text-[15px] font-medium text-[#8b8276] uppercase tracking-[0.15em]">
+                    Compiling your founder signature...
                   </p>
-
-                  <div className="mt-8 space-y-3">
-                    {assessmentQuestions[currentQuestionIndex - 1].options.map((option) => {
-                      const isSelected = selectedOption === option;
-                      return (
-                        <button
-                          key={option}
-                          onClick={() => handleAnswer(option)}
-                          className={`flex w-full items-center justify-between rounded-[16px] border px-5 py-4 transition-all duration-200 ${
-                            isSelected
-                              ? "border-[#ff6b3d] bg-[#ff6b3d]/5 ring-1 ring-[#ff6b3d]"
-                              : "border-black/[0.08] bg-white hover:border-[#ff6b3d]/30"
-                          }`}
-                        >
-                          <span className={`text-[15px] font-medium ${isSelected ? "text-[#171513]" : "text-[#6f685f]"}`}>
-                            {option}
-                          </span>
-                          {isSelected ? (
-                            <CheckCircle2 className="size-5 text-[#ff6b3d]" />
-                          ) : (
-                            <ArrowRight className="size-4 text-[#b5ad9f]" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="mt-8 flex items-center gap-3 rounded-2xl bg-black/[0.02] p-4 border border-black/[0.04]">
-                    <ShieldCheck className="size-4 text-[#22c55e]" />
-                    <span className="text-[11px] font-medium text-[#8b8276] uppercase tracking-wider">
-                      Analysis Paused — Interaction required
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mt-12 flex flex-col items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Fingerprint className="size-5 text-[#ff6b3d]/20" />
-                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-[#d9cbbd] to-transparent" />
-                    <div className="size-1.5 rounded-full bg-[#ff6b3d]" />
-                    <div className="h-px w-24 bg-gradient-to-r from-transparent via-[#d9cbbd] to-transparent" />
-                    <Fingerprint className="size-5 text-[#ff6b3d]/20" />
-                  </div>
                 </div>
               </motion.div>
             )}

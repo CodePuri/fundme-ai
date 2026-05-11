@@ -18,7 +18,8 @@ import {
   Zap,
   TrendingUp,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Brain as BrainCircuit
 } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -181,13 +182,12 @@ function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                   Fix this for me
                   <ArrowRight className="size-5" />
                 </button>
-                <button 
-                  variant="ghost" 
+                <Button 
                   className="w-full h-12 text-[14px] font-bold text-[#8b8276] hover:text-[#171513] transition-colors"
                   onClick={onClose}
                 >
                   Continue with free report
-                </button>
+                </Button>
               </div>
 
               <div className="mt-8 flex items-center justify-center gap-6 border-t border-black/[0.05] pt-6 text-[11px] font-bold uppercase tracking-widest text-[#b5ad9f]">

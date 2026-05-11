@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
 
 import type { AssessmentState, AssessmentAnswer, AnalysisStatus, AssessmentReport } from "./assessment-types";
 
@@ -64,57 +64,92 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     window.localStorage.setItem(ASSESSMENT_STORAGE_KEY, JSON.stringify(state));
   }, [hasHydrated, state]);
 
+  const setWebsiteUrl = useCallback((url: string) => {
+    setState((current) => ({ ...current, websiteUrl: url }));
+  }, []);
+
+  const setStartupName = useCallback((name: string) => {
+    setState((current) => ({ ...current, startupName: name }));
+  }, []);
+
+  const setLinkedInUrl = useCallback((url: string) => {
+    setState((current) => ({ ...current, linkedInUrl: url }));
+  }, []);
+
+  const setStartupNotes = useCallback((notes: string) => {
+    setState((current) => ({ ...current, startupNotes: notes }));
+  }, []);
+
+  const setUploadedFiles = useCallback((files: string[]) => {
+    setState((current) => ({ ...current, uploadedFiles: files }));
+  }, []);
+
+  const setAnswer = useCallback((questionId: number, selectedOption: string) => {
+    setState((current) => {
+      const nextAnswers = current.answers.filter((a) => a.questionId !== questionId);
+      return {
+        ...current,
+        answers: [...nextAnswers, { questionId, selectedOption }],
+      };
+    });
+  }, []);
+
+  const getAnswerForQuestion = useCallback((questionId: number) => {
+    return state.answers.find((a) => a.questionId === questionId)?.selectedOption;
+  }, [state.answers]);
+
+  const setAnalysisStatus = useCallback((status: AnalysisStatus) => {
+    setState((current) => ({ ...current, analysisStatus: status }));
+  }, []);
+
+  const generateReport = useCallback(() => {
+    setState((current) => {
+      const report = generateMockReport(current);
+      return {
+        ...current,
+        reportGenerated: true,
+        analysisStatus: "complete",
+        report,
+      };
+    });
+  }, []);
+
+  const resetAssessment = useCallback(() => {
+    setState(defaultState);
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(ASSESSMENT_STORAGE_KEY);
+    }
+  }, []);
+
   const value = useMemo<AssessmentContextValue>(
     () => ({
       state,
       hasHydrated,
-      setWebsiteUrl: (url: string) => {
-        setState((current) => ({ ...current, websiteUrl: url }));
-      },
-      setStartupName: (name: string) => {
-        setState((current) => ({ ...current, startupName: name }));
-      },
-      setLinkedInUrl: (url: string) => {
-        setState((current) => ({ ...current, linkedInUrl: url }));
-      },
-      setStartupNotes: (notes: string) => {
-        setState((current) => ({ ...current, startupNotes: notes }));
-      },
-      setUploadedFiles: (files: string[]) => {
-        setState((current) => ({ ...current, uploadedFiles: files }));
-      },
-      setAnswer: (questionId: number, selectedOption: string) => {
-        setState((current) => {
-          const nextAnswers = current.answers.filter((a) => a.questionId !== questionId);
-          return {
-            ...current,
-            answers: [...nextAnswers, { questionId, selectedOption }],
-          };
-        });
-      },
-      getAnswerForQuestion: (questionId: number) => {
-        return state.answers.find((a) => a.questionId === questionId)?.selectedOption;
-      },
-      setAnalysisStatus: (status: AnalysisStatus) => {
-        setState((current) => ({ ...current, analysisStatus: status }));
-      },
-      generateReport: () => {
-        const report = generateMockReport(state);
-        setState((current) => ({
-          ...current,
-          reportGenerated: true,
-          analysisStatus: "complete",
-          report,
-        }));
-      },
-      resetAssessment: () => {
-        setState(defaultState);
-        if (typeof window !== "undefined") {
-          window.localStorage.removeItem(ASSESSMENT_STORAGE_KEY);
-        }
-      },
+      setWebsiteUrl,
+      setStartupName,
+      setLinkedInUrl,
+      setStartupNotes,
+      setUploadedFiles,
+      setAnswer,
+      setAnalysisStatus,
+      generateReport,
+      resetAssessment,
+      getAnswerForQuestion,
     }),
-    [state, hasHydrated]
+    [
+      state,
+      hasHydrated,
+      setWebsiteUrl,
+      setStartupName,
+      setLinkedInUrl,
+      setStartupNotes,
+      setUploadedFiles,
+      setAnswer,
+      setAnalysisStatus,
+      generateReport,
+      resetAssessment,
+      getAnswerForQuestion,
+    ]
   );
 
   return (
