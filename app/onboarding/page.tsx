@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -20,14 +20,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploadArea } from "@/components/ui/file-upload";
 
-const rambleText =
-  "Totem Interactive is a Mumbai-based software development company building products across AI, apps, platforms, games, AR/VR, and digital solutions. Makers of Velocity, an AI prompt-improvement product. Founded in 2022.";
+const defaultPitchText =
+  "Building an automated platform that helps founders prepare institutional-grade application materials and securely manage funding intake rounds efficiently.";
 
 type OnboardingDraft = {
   step?: number;
   name?: string;
   role?: string;
   companyName?: string;
+  email?: string;
   linkedIn?: string;
   websiteUrl?: string;
   xUrl?: string;
@@ -48,16 +49,19 @@ export default function OnboardingPage() {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [companyName, setCompanyName] = useState("");
+  const [email, setEmail] = useState("");
   const [linkedIn, setLinkedIn] = useState("");
   const [websiteUrl, setWebsiteUrl] = useState("");
   const [xUrl, setXUrl] = useState("");
 
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState<string[]>([]);
+  const [fileMeta, setFileMeta] = useState<{name: string; size: number; type: string}[]>([]);
   
   const [listening, setListening] = useState(false);
   const [typedOpen, setTypedOpen] = useState(false);
   const [doneFlash, setDoneFlash] = useState(false);
+  const recognitionRef = useRef<any>(null);
 
   const [hasImported, setHasImported] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -81,6 +85,7 @@ export default function OnboardingPage() {
     let nextName = "";
     let nextRole = "";
     let nextCompanyName = "";
+    let nextEmail = "";
     let nextLinkedIn = "";
     let nextWebsiteUrl = "";
     let nextXUrl = "";
@@ -100,6 +105,7 @@ export default function OnboardingPage() {
         if (parsed.name) nextName = parsed.name;
         if (parsed.role) nextRole = parsed.role;
         if (parsed.companyName) nextCompanyName = parsed.companyName;
+        if (parsed.email) nextEmail = parsed.email;
         if (parsed.linkedIn) nextLinkedIn = parsed.linkedIn;
         if (parsed.websiteUrl) nextWebsiteUrl = parsed.websiteUrl;
         if (parsed.xUrl) nextXUrl = parsed.xUrl;
@@ -121,6 +127,7 @@ export default function OnboardingPage() {
       setName(nextName);
       setRole(nextRole);
       setCompanyName(nextCompanyName);
+      setEmail(nextEmail);
       setLinkedIn(nextLinkedIn);
       setWebsiteUrl(nextWebsiteUrl);
       setXUrl(nextXUrl);
@@ -151,6 +158,7 @@ export default function OnboardingPage() {
         name,
         role,
         companyName,
+        email,
         linkedIn,
         websiteUrl,
         xUrl,
@@ -159,7 +167,7 @@ export default function OnboardingPage() {
         imported: hasImported
       })
     );
-  }, [hasHydrated, name, role, companyName, linkedIn, websiteUrl, xUrl, notes, files, hasImported]);
+  }, [hasHydrated, name, role, companyName, email, linkedIn, websiteUrl, xUrl, notes, files, hasImported]);
 
   // Step 4 Inline processing timer
   useEffect(() => {
@@ -185,48 +193,94 @@ export default function OnboardingPage() {
     if (step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
-        router.push("/roast");
+        router.push("/thank-you");
       }, 500);
       return () => clearTimeout(t);
     }
   }, [step, elapsed, router]);
 
-  async function handleListen() {
-    if (listening) return;
-
-    setListening(true);
-    setTypedOpen(false);
-    await new Promise((resolve) => setTimeout(resolve, 6000));
-    setTypedOpen(true);
-    let typed = "";
-    for (const character of rambleText) {
-      typed += character;
-      setNotes(typed);
-      await new Promise((resolve) => setTimeout(resolve, 20));
+  const handleListen = () => {
+    if (listening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+      setListening(false);
+      return;
     }
-    setListening(false);
-    setDoneFlash(true);
-    window.setTimeout(() => setDoneFlash(false), 1200);
-  }
+
+    if (typeof window === "undefined") return;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Voice input is unavailable in this browser. Please type your idea instead.");
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+
+      const baseNotes = notes ? notes + " " : "";
+
+      recognition.onstart = () => {
+        setListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        let interimTranscript = "";
+        let finalTranscript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + " ";
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        setNotes(baseNotes + finalTranscript + interimTranscript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.error("Speech recognition error", event.error);
+        setListening(false);
+      };
+
+      recognition.onend = () => {
+        setListening(false);
+        setDoneFlash(true);
+        setTimeout(() => setDoneFlash(false), 2000);
+      };
+
+      recognition.start();
+    } catch (e) {
+      console.error(e);
+      alert("Voice input is unavailable in this browser. Please type your idea instead.");
+      setListening(false);
+    }
+  };
 
   function handleSkipToDemo() {
     completeOnboarding({
-      founderName: "Aakash Puri",
-      founderRole: "CEO & Founder",
-      companyName: "Totem Interactive",
-      linkedIn: "https://www.linkedin.com/in/aakash-puri-a44aa594/",
-      notes: rambleText,
-      files: ["totem_interactive_deck.pdf", "velocity_memo.docx"],
+      founderName: "Priya Sharma",
+      founderRole: "Founder",
+      companyName: "Orbit Labs",
+      linkedIn: "https://linkedin.com/in/yourname",
+      notes: defaultPitchText,
+      files: ["pitch_deck.pdf"],
     });
     setStep(5);
   }
 
   async function finishOnboarding() {
-    const resolvedName = name || "Aakash Puri";
-    const resolvedRole = role || "CEO & Founder";
-    const resolvedCompany = companyName || "Totem Interactive";
-    const resolvedLinkedIn = linkedIn || "https://www.linkedin.com/in/aakash-puri-a44aa594/";
-    const resolvedNotes = notes || rambleText;
+    const resolvedName = name || "Priya Sharma";
+    const resolvedRole = role || "Founder";
+    const resolvedCompany = companyName || "Orbit Labs";
+    const resolvedLinkedIn = linkedIn || "https://linkedin.com/in/yourname";
+    const resolvedNotes = notes || defaultPitchText;
 
     // Update demo state for in-session use
     completeOnboarding({
@@ -248,10 +302,13 @@ export default function OnboardingPage() {
           name: resolvedName,
           role: resolvedRole,
           companyName: resolvedCompany,
+          email,
           linkedIn: resolvedLinkedIn,
           notes: resolvedNotes,
           websiteUrl,
           xUrl,
+          files,
+          filesMetadata: fileMeta,
         }),
       });
     } catch {
@@ -260,7 +317,7 @@ export default function OnboardingPage() {
       setIsSubmitting(false);
     }
 
-    router.push("/roast");
+    router.push("/thank-you");
   }
 
   if (!hasHydrated) {
@@ -347,7 +404,7 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Full Name <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input 
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="e.g. Aakash Puri" 
+                      placeholder="e.g. Priya Sharma" 
                       onChange={(e) => setName(e.target.value)} 
                       value={name} 
                     />
@@ -356,7 +413,7 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Role</FieldLabel>
                     <Input 
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="e.g. CEO & Founder"
+                      placeholder="e.g. Founder"
                       onChange={(e) => setRole(e.target.value)} 
                       value={role} 
                     />
@@ -365,16 +422,27 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Company Name <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="e.g. Totem Interactive"
+                      placeholder="e.g. Orbit Labs"
                       onChange={(e) => setCompanyName(e.target.value)}
                       value={companyName}
                     />
                   </Field>
                   <Field className="md:col-span-2">
+                    <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Email <span className="text-[#ff6b3d]">*</span></FieldLabel>
+                    <Input
+                      type="email"
+                      className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
+                      placeholder="founder@startup.com"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
+                    <div className="text-[12px] text-black/40 mt-1.5">Email OR LinkedIn URL is required to proceed.</div>
+                  </Field>
+                  <Field className="md:col-span-2">
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">Website URL</FieldLabel>
                     <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="https://totem.io"
+                      placeholder="https://yourstartup.com"
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       value={websiteUrl}
                     />
@@ -383,7 +451,7 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">LinkedIn URL</FieldLabel>
                     <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="https://linkedin.com/in/..."
+                      placeholder="https://linkedin.com/in/yourname"
                       onChange={(e) => setLinkedIn(e.target.value)}
                       value={linkedIn}
                     />
@@ -392,7 +460,7 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[13px] font-bold text-black uppercase tracking-wider mb-2.5">X (Twitter) URL</FieldLabel>
                     <Input
                       className="h-12 rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[16px]"
-                      placeholder="https://x.com/..."
+                      placeholder="https://x.com/yourhandle"
                       onChange={(e) => setXUrl(e.target.value)}
                       value={xUrl}
                     />
@@ -402,7 +470,7 @@ export default function OnboardingPage() {
                 {/* LinkedIn autofill + imported profile — disabled until LinkedIn import is wired up */}
 
                 <div className="flex justify-end pt-12 border-t border-black/5 mt-8">
-                  <Button onClick={() => setStep(2)} size="lg" className="h-12 px-10 rounded-full" disabled={!name || !companyName}>
+                  <Button onClick={() => setStep(2)} size="lg" className="h-12 px-10 rounded-full" disabled={!name || !companyName || (!email && !linkedIn)}>
                     Continue <ArrowRight className="size-4 ml-2" />
                   </Button>
                 </div>
@@ -415,86 +483,90 @@ export default function OnboardingPage() {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
-                className="flex flex-col items-center justify-center text-center w-full min-h-[40vh]"
+                className="flex flex-col gap-8 w-full"
               >
-                <div className="text-[12px] font-bold text-[#ff6b3d] uppercase tracking-[0.2em] mb-12">Startup Pitch</div>
-                
-                <button
-                  className={`relative flex size-32 items-center justify-center rounded-full border transition-all duration-500 ${
-                    listening
-                      ? "border-[#ff6b3d] bg-[#ff6b3d] text-white shadow-[0_0_0_20px_rgba(255,107,61,0.1)] scale-110"
-                      : "border-black/5 bg-black/[0.02] text-black hover:scale-105 hover:bg-black/[0.04]"
-                  }`}
-                  onClick={handleListen}
-                  type="button"
-                >
-                  {listening && (
-                    <div className="absolute inset-[-30px] flex items-center justify-center gap-[4px] opacity-80">
-                      {Array.from({ length: 16 }).map((_, index) => {
-                         const h = 12 + Math.random() * 32;
-                         return (
-                          <motion.span
-                            key={index}
-                            className="w-[3px] rounded-full bg-white"
-                            animate={{ height: [`${h}px`, `${h * 1.8}px`, `${h}px`] }}
-                            transition={{ duration: 0.8, repeat: Infinity, delay: index * 0.05, ease: "easeInOut" }}
-                          />
-                         )
-                      })}
-                    </div>
-                  )}
-                  <Mic className={`relative z-10 ${listening ? "size-14" : "size-12 opacity-40"}`} />
-                </button>
-
-                <div className="mt-16">
-                  <h1 className="text-[36px] sm:text-[48px] font-semibold tracking-[-0.04em] leading-tight text-black">
-                    Tap to speak and <br/>describe it naturally
+                <div>
+                  <h1 className="text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black">
+                    Startup Pitch
                   </h1>
-                  <p className="mt-6 text-[18px] text-black/40 max-w-[480px] mx-auto">
-                    Just tell us what you're building, the problem you're solving, and why it matters. We'll handle the rest.
+                  <p className="text-[18px] text-black/50 mt-4 max-w-[520px]">
+                    Describe your idea naturally using voice input or type directly below. You can edit the transcribed notes freely.
                   </p>
                 </div>
 
-                <div className="mt-10 flex flex-col items-center gap-4">
-                  <button 
-                    className="text-[15px] text-[#ff6b3d] hover:underline font-semibold" 
-                    onClick={() => setTypedOpen(true)} 
-                    type="button"
-                  >
-                    prefer to type →
-                  </button>
-                  
-                  {doneFlash && (
-                    <motion.div 
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-[14px] font-bold text-[#22c55e] flex items-center gap-2 bg-[#f0fdf4] px-4 py-2 rounded-full border border-[#22c55e]/10"
+                <div className="flex flex-col md:flex-row gap-8 items-start mt-4">
+                  {/* Voice Controls */}
+                  <div className="flex flex-col items-center justify-center p-8 rounded-[24px] bg-black/[0.02] border border-black/5 w-full md:w-[240px] shrink-0 text-center">
+                    <button
+                      className={`relative flex size-24 items-center justify-center rounded-full border transition-all duration-500 ${
+                        listening
+                          ? "border-[#ff6b3d] bg-[#ff6b3d] text-white shadow-[0_0_0_15px_rgba(255,107,61,0.1)] scale-105"
+                          : "border-black/5 bg-white text-black hover:scale-105 hover:bg-black/[0.01] shadow-sm"
+                      }`}
+                      onClick={handleListen}
+                      type="button"
                     >
-                      <CheckCircle2 className="size-4" /> Captured your thoughts
-                    </motion.div>
-                  )}
-                </div>
+                      {listening && (
+                        <div className="absolute inset-[-20px] flex items-center justify-center gap-[3px] opacity-80 pointer-events-none">
+                          {Array.from({ length: 12 }).map((_, index) => {
+                             const h = 8 + Math.random() * 24;
+                             return (
+                              <motion.span
+                                key={index}
+                                className="w-[2px] rounded-full bg-white"
+                                animate={{ height: [`${h}px`, `${h * 1.5}px`, `${h}px`] }}
+                                transition={{ duration: 0.6, repeat: Infinity, delay: index * 0.05, ease: "easeInOut" }}
+                              />
+                             )
+                          })}
+                        </div>
+                      )}
+                      <Mic className={`relative z-10 ${listening ? "size-10" : "size-8 opacity-60"}`} />
+                    </button>
+                    <div className="mt-4 text-[15px] font-semibold text-black">
+                      {listening ? "Listening..." : "Tap to speak"}
+                    </div>
+                    <div className="text-[12px] text-black/40 mt-1">
+                      {listening ? "Tap again to stop" : "Voice transcription mode"}
+                    </div>
+                    {doneFlash && (
+                      <div className="mt-3 text-[13px] font-bold text-[#22c55e] flex items-center justify-center gap-1.5 bg-[#f0fdf4] px-3 py-1 rounded-full border border-[#22c55e]/10">
+                        <CheckCircle2 className="size-3.5" /> Captured
+                      </div>
+                    )}
+                  </div>
 
-                {typedOpen && (
-                  <motion.div animate={{ opacity: 1, y: 0 }} className="mt-12 w-full text-left" initial={{ opacity: 0, y: 32 }}>
+                  {/* Text Mode */}
+                  <div className="flex-1 w-full text-left">
                     <Textarea
-                      className="min-h-[220px] text-[17px] rounded-[16px] bg-black/[0.02] border-black/5 focus:bg-white p-6 leading-relaxed"
-                      placeholder="I'm building a platform that..."
+                      className="min-h-[240px] text-[16px] rounded-[24px] bg-black/[0.02] border-black/5 focus:bg-white p-6 leading-relaxed resize-y"
+                      placeholder={`Describe your idea naturally.\nWhat problem are you solving?\nWho is it for?\nWhy you?\nWhy now?`}
                       onChange={(event) => setNotes(event.target.value)}
                       value={notes}
                     />
-                  </motion.div>
-                )}
+                  </div>
+                </div>
                 
-                <div className="flex justify-between items-center w-full mt-24 pt-8 border-t border-black/5">
+                <div className="flex justify-between items-center w-full mt-12 pt-8 border-t border-black/5">
                    <button
                      className="text-[15px] font-bold text-black/30 hover:text-black transition-colors"
-                     onClick={() => setStep(1)}
+                     onClick={() => {
+                       if (listening) handleListen();
+                       setStep(1);
+                     }}
                      type="button"
                    >
                      ← Go Back
                    </button>
-                   <Button onClick={() => setStep(3)} size="lg" className="h-12 px-10 rounded-full" disabled={!notes && !listening}>
+                   <Button 
+                     onClick={() => {
+                       if (listening) handleListen();
+                       setStep(3);
+                     }} 
+                     size="lg" 
+                     className="h-12 px-10 rounded-full" 
+                     disabled={!notes.trim() && !listening}
+                   >
                      Continue <ArrowRight className="size-4 ml-2" />
                    </Button>
                 </div>
@@ -519,7 +591,16 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="mt-4 bg-black/[0.01] rounded-[32px] p-2 border border-black/5">
-                   <FileUploadArea files={files} onChange={setFiles} />
+                   <FileUploadArea 
+                     files={files} 
+                     onChange={setFiles} 
+                     onFilesAdded={(newFiles) => {
+                       setFileMeta(prev => [
+                         ...prev, 
+                         ...newFiles.map(f => ({ name: f.name, size: f.size, type: f.type || "application/octet-stream" }))
+                       ]);
+                     }}
+                   />
                 </div>
 
                 <div className="flex justify-between items-center mt-12 pt-8 border-t border-black/5">
@@ -555,17 +636,26 @@ export default function OnboardingPage() {
                 </div>
 
                 <div className="flex flex-col gap-4 mt-4">
-                  <div className="p-6 rounded-[24px] bg-black/[0.02] border border-black/5 flex items-center justify-between group hover:bg-white hover:shadow-sm transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="size-12 rounded-[16px] bg-[#fff5f0] border border-[#ff6b3d]/10 flex items-center justify-center text-[#ff6b3d]">
-                        <User className="size-6" />
+                  <div className="p-6 rounded-[24px] bg-black/[0.02] border border-black/5 flex flex-col gap-4 group hover:bg-white hover:shadow-sm transition-all relative">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="size-12 rounded-[16px] bg-[#fff5f0] border border-[#ff6b3d]/10 flex items-center justify-center text-[#ff6b3d]">
+                          <User className="size-6" />
+                        </div>
+                        <div>
+                          <div className="text-[13px] font-bold text-black/30 uppercase tracking-tighter">Founder Profile</div>
+                          <div className="text-[17px] font-semibold text-black">{name || "Priya Sharma"} {role ? `• ${role}` : ""}</div>
+                        </div>
                       </div>
-                      <div>
-                        <div className="text-[13px] font-bold text-black/30 uppercase tracking-tighter">Founder Profile</div>
-                        <div className="text-[17px] font-semibold text-black">{name || "Aakash Puri"}</div>
-                      </div>
+                      <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(1)} />
                     </div>
-                    <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(1)} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3 border-t border-black/5 text-[14px]">
+                      <div><span className="text-black/40">Company:</span> <span className="font-medium text-black">{companyName || "Orbit Labs"}</span></div>
+                      <div><span className="text-black/40">Email:</span> <span className="font-medium text-black">{email || "Not provided"}</span></div>
+                      {websiteUrl && <div><span className="text-black/40">Website:</span> <span className="font-medium text-black truncate block">{websiteUrl}</span></div>}
+                      {linkedIn && <div><span className="text-black/40">LinkedIn:</span> <span className="font-medium text-black truncate block">{linkedIn}</span></div>}
+                      {xUrl && <div><span className="text-black/40">X:</span> <span className="font-medium text-black truncate block">{xUrl}</span></div>}
+                    </div>
                   </div>
 
                   <div className="p-6 rounded-[24px] bg-black/[0.02] border border-black/5 flex items-center justify-between group hover:bg-white hover:shadow-sm transition-all">
@@ -575,7 +665,7 @@ export default function OnboardingPage() {
                       </div>
                       <div>
                         <div className="text-[13px] font-bold text-black/30 uppercase tracking-tighter">Startup Pitch</div>
-                        <div className="text-[17px] font-semibold text-black line-clamp-1 max-w-[300px]">{notes || "Captured pitch description..."}</div>
+                        <div className="text-[15px] font-medium text-black/80 line-clamp-2 max-w-[420px] mt-0.5">{notes || "Captured pitch description..."}</div>
                       </div>
                     </div>
                     <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(2)} />
@@ -589,6 +679,11 @@ export default function OnboardingPage() {
                       <div>
                         <div className="text-[13px] font-bold text-black/30 uppercase tracking-tighter">Documents</div>
                         <div className="text-[17px] font-semibold text-black">{files.length} material{files.length !== 1 ? "s" : ""} uploaded</div>
+                        {fileMeta.length > 0 && (
+                          <div className="text-[12px] text-black/40 mt-0.5">
+                            {fileMeta.map(f => `${f.name} (${Math.round(f.size/1024)}KB)`).join(', ')}
+                          </div>
+                        )}
                       </div>
                     </div>
                     <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(3)} />
@@ -603,8 +698,8 @@ export default function OnboardingPage() {
                    >
                      ← Go Back
                    </button>
-                   <Button onClick={finishOnboarding} size="lg" className="h-14 px-12 rounded-full text-[16px] font-bold bg-[#ff6b3d] shadow-xl shadow-[#ff6b3d]/20">
-                     Confirm and Submit
+                   <Button onClick={finishOnboarding} disabled={isSubmitting} size="lg" className="h-14 px-10 rounded-full text-[16px] font-bold bg-[#ff6b3d] hover:bg-[#ff6b3d]/90 shadow-xl shadow-[#ff6b3d]/20">
+                     {isSubmitting ? "Submitting..." : "Submit for early access"}
                    </Button>
                 </div>
               </motion.div>
