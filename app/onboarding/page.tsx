@@ -700,7 +700,7 @@ export default function OnboardingPage() {
                   <h1 className="text-[26px] sm:text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black">
                     Upload your materials
                   </h1>
-                  <p className="text-[13px] sm:text-[18px] text-black/50 mt-1 sm:mt-4 max-w-[480px] leading-snug">
+                  <p className="text-[13px] sm:text-[18px] text-black/50 mt-1 sm:mt-4 max-w প্রচারিত max-w-[480px] leading-snug">
                     Add your pitch deck, memo, or previous application answers to help the AI understand your roadmap.
                   </p>
                 </div>
@@ -882,7 +882,7 @@ export default function OnboardingPage() {
                            )}
                            <span className="text-[13px] sm:text-[15px] font-semibold tracking-tight truncate block">{text}</span>
                          </motion.div>
-                      )
+                       )
                    })}
                  </div>
               </motion.div>
