@@ -70,10 +70,15 @@ export default function OnboardingPage() {
   const [hasImported, setHasImported] = useState(false);
   const [elapsed, setElapsed] = useState(0);
 
-  // Derived first name
+  // Derived first name with robust regex sanitization
   const derivedFirstName = useMemo(() => {
     if (!name.trim()) return "";
-    return name.trim().split(/\s+/)[0];
+    const cleaned = name.trim().replace(/[^a-zA-Z\s]/g, "");
+    const first = cleaned.split(/\s+/)[0];
+    if (!first || first.length < 2 || first.toLowerCase() === "validation" || first.toLowerCase() === "tester") {
+      return "";
+    }
+    return first;
   }, [name]);
 
   // Word count validator (35 to 250 words)
@@ -234,10 +239,11 @@ export default function OnboardingPage() {
     }
   }, [step, elapsed, router]);
 
-  // Robust voice input recognition triggers
+  // Robust voice input recognition triggers with continuous background silence recovery loops
   const stopRecognition = () => {
     if (recognitionRef.current) {
       try {
+        recognitionRef.current.onend = null; // Disable auto-restart hook
         recognitionRef.current.stop();
       } catch {}
     }
@@ -276,10 +282,13 @@ export default function OnboardingPage() {
       recognition.onstart = () => {
         setListening(true);
         setVoiceState("listening");
-        // Auto-stop after 2 minutes
-        recognitionTimeoutRef.current = window.setTimeout(() => {
-          stopRecognition();
-        }, 120000);
+        
+        // Auto-stop permanently after 2 full minutes
+        if (!recognitionTimeoutRef.current) {
+          recognitionTimeoutRef.current = window.setTimeout(() => {
+            stopRecognition();
+          }, 120000);
+        }
       };
 
       recognition.onresult = (event: any) => {
@@ -304,23 +313,25 @@ export default function OnboardingPage() {
       };
 
       recognition.onerror = (event: any) => {
+        if (event.error === "no-speech") {
+          // Native browser audio silence pause timeout; allow onend hook to auto-restart the listener loop smoothly
+          return;
+        }
         console.error("Speech recognition error", event.error);
         stopRecognition();
         setVoiceErrorText("We couldn’t capture your voice clearly. Please try again or type your idea instead.");
       };
 
       recognition.onend = () => {
-        stopRecognition();
-        // Delay validation slightly to guarantee state updates finish
-        setTimeout(() => {
-          setNotes((currentNotes) => {
-            const added = currentNotes.slice(baseNotesRef.current.length).trim();
-            if (added.length < 3 && currentNotes.trim().length === baseNotesRef.current.length) {
-              setVoiceErrorText("We couldn’t capture your voice clearly. Please try again or type your idea instead.");
-            }
-            return currentNotes;
-          });
-        }, 150);
+        // If the intended 2-minute session timeout hasn't elapsed, auto-resume listening seamlessly
+        if (recognitionTimeoutRef.current) {
+          try {
+            baseNotesRef.current = notes ? notes.trim() : "";
+            recognition.start();
+          } catch {
+            stopRecognition();
+          }
+        }
       };
 
       recognition.start();
@@ -335,7 +346,10 @@ export default function OnboardingPage() {
   useEffect(() => {
     return () => {
       if (recognitionRef.current) {
-        try { recognitionRef.current.stop(); } catch {}
+        try { 
+          recognitionRef.current.onend = null;
+          recognitionRef.current.stop(); 
+        } catch {}
       }
       if (recognitionTimeoutRef.current) {
         window.clearTimeout(recognitionTimeoutRef.current);
@@ -645,16 +659,18 @@ export default function OnboardingPage() {
                     {/* Word Counter Rules Display */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mt-2 px-1 text-[11px] sm:text-[12px]">
                       <span className={`font-medium transition-colors ${
-                        wordCount < 35 ? "text-[#ff6b3d]" : wordCount > 250 ? "text-[#ff6b3d]" : "text-[#22c55e]"
+                        wordCount === 0 ? "text-black/40" : wordCount < 35 || wordCount > 250 ? "text-[#ff6b3d]" : "text-[#22c55e]"
                       }`}>
-                        {wordCount < 35 
+                        {wordCount === 0
+                          ? "Aim for 35 to 250 words describing your core value proposition."
+                          : wordCount < 35 
                           ? "Add a little more context so we can understand what you’re building." 
                           : wordCount > 250 
                           ? `You are ${wordCount - 250} words over the limit. Keep it under 250 words for now.`
                           : "Excellent pitch context. Ready to proceed."}
                       </span>
                       <span className={`font-semibold tracking-tight self-end sm:self-auto transition-colors ${
-                        wordCount < 35 || wordCount > 250 ? "text-[#ff6b3d]" : "text-black/40"
+                        wordCount > 0 && (wordCount < 35 || wordCount > 250) ? "text-[#ff6b3d]" : "text-black/40"
                       }`}>
                         {wordCount} / 250 words
                       </span>
