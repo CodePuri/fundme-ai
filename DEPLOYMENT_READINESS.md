@@ -113,9 +113,13 @@ The structured intelligence foundation is in place but **not yet wired to the ru
 | Validation | `lib/assessment/validate.ts` | ✅ Score ranges, confidence labels, blocked pattern detection, sanitize |
 | Model Adapter | `lib/assessment/model-adapter.ts` | ✅ Provider-agnostic interface (Groq, OpenAI, Anthropic, xAI), primary/fallback/emergency chain |
 | Env Config | `.env.example` | ✅ Documents all required env vars |
+| Anonymous ID | `lib/assessment/anonymous.ts` | ✅ `getOrCreateAnonymousId()` using `crypto.randomUUID()` + `fundme-anonymous-id` localStorage key |
+| Rate-limit helpers | `lib/assessment/rate-limit.ts` | ✅ Types + pure helper functions. Server-side enforcement NOT LIVE. `localStorage` cannot be trusted. |
+| SQL schema | `scripts/create-assessments-table.sql` | ✅ Documented with indexes + RLS. NOT executed — manual Supabase SQL Editor. |
+| Server-side rate limiting | — | ❌ Not built. Must happen in API routes using `assessment_rate_limits` table. |
 | Runtime | `component/assessment/assessment-provider.tsx` | ⏳ Still uses `generateMockReport()` — next chunk |
 | Website extraction | `app/api/website/extract` | ❌ Not yet built — Chunk C |
 | Analysis API | `app/api/assessment/analyze` | ❌ Not yet built — Chunk D |
 | Connect to flow | `/assessment/analyzing` | ❌ Not yet connected — Chunk E |
-| Server persistence | `assessments` table | ❌ SQL written but not executed — Chunk F |
+| Server persistence | `assessments` table | ❌ SQL documented, not executed — Chunk F |
 | Dashboard server read | `/app/report` | ❌ Not yet connected — Chunk G |
