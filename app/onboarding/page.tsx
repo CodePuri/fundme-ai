@@ -66,6 +66,7 @@ export default function OnboardingPage() {
   const recognitionRef = useRef<any>(null);
   const recognitionTimeoutRef = useRef<number | null>(null);
   const baseNotesRef = useRef<string>("");
+  const isManualStopRef = useRef<boolean>(false); // Track absolute termination intent
 
   const [hasImported, setHasImported] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -239,11 +240,13 @@ export default function OnboardingPage() {
     }
   }, [step, elapsed, router]);
 
-  // Robust voice input recognition triggers with continuous background silence recovery loops
-  const stopRecognition = () => {
+  // Forceful session teardown ensuring absolute termination intent
+  const terminateSession = (status: "idle" | "captured" = "idle") => {
+    isManualStopRef.current = true;
     if (recognitionRef.current) {
       try {
-        recognitionRef.current.onend = null; // Disable auto-restart hook
+        recognitionRef.current.onend = null;
+        recognitionRef.current.onerror = null;
         recognitionRef.current.stop();
       } catch {}
     }
@@ -252,14 +255,18 @@ export default function OnboardingPage() {
       recognitionTimeoutRef.current = null;
     }
     setListening(false);
-    setVoiceState((current) => current === "listening" ? "captured" : current);
+    setVoiceState(status);
+  };
+
+  const stopRecognition = () => {
+    terminateSession("captured");
   };
 
   const handleListen = () => {
     setVoiceErrorText(null);
 
     if (listening) {
-      stopRecognition();
+      terminateSession("captured");
       return;
     }
 
@@ -269,6 +276,8 @@ export default function OnboardingPage() {
       setVoiceErrorText("Voice input is unavailable in this browser. Please type your idea instead.");
       return;
     }
+
+    isManualStopRef.current = false;
 
     try {
       const recognition = new SpeechRecognition();
@@ -283,10 +292,10 @@ export default function OnboardingPage() {
         setListening(true);
         setVoiceState("listening");
         
-        // Auto-stop permanently after 2 full minutes
+        // Ensure hard ceiling of exactly 2 minutes
         if (!recognitionTimeoutRef.current) {
           recognitionTimeoutRef.current = window.setTimeout(() => {
-            stopRecognition();
+            terminateSession("captured");
           }, 120000);
         }
       };
@@ -314,23 +323,27 @@ export default function OnboardingPage() {
 
       recognition.onerror = (event: any) => {
         if (event.error === "no-speech") {
-          // Native browser audio silence pause timeout; allow onend hook to auto-restart the listener loop smoothly
+          // Soft native audio drop; rely on onend to auto-restart smoothly without setting state to captured
           return;
         }
         console.error("Speech recognition error", event.error);
-        stopRecognition();
+        terminateSession("idle");
         setVoiceErrorText("We couldn’t capture your voice clearly. Please try again or type your idea instead.");
       };
 
       recognition.onend = () => {
-        // If the intended 2-minute session timeout hasn't elapsed, auto-resume listening seamlessly
+        if (isManualStopRef.current) return;
+
+        // If not manually halted and timeout hasn't elapsed, auto-restart the listener loop seamlessly
         if (recognitionTimeoutRef.current) {
           try {
             baseNotesRef.current = notes ? notes.trim() : "";
             recognition.start();
           } catch {
-            stopRecognition();
+            terminateSession("idle");
           }
+        } else {
+          terminateSession("captured");
         }
       };
 
@@ -338,22 +351,14 @@ export default function OnboardingPage() {
     } catch (e) {
       console.error(e);
       setVoiceErrorText("Voice input is unavailable in this browser. Please type your idea instead.");
-      stopRecognition();
+      terminateSession("idle");
     }
   };
 
   // Cleanup native listeners on component dismount
   useEffect(() => {
     return () => {
-      if (recognitionRef.current) {
-        try { 
-          recognitionRef.current.onend = null;
-          recognitionRef.current.stop(); 
-        } catch {}
-      }
-      if (recognitionTimeoutRef.current) {
-        window.clearTimeout(recognitionTimeoutRef.current);
-      }
+      terminateSession("idle");
     };
   }, []);
 
@@ -662,9 +667,9 @@ export default function OnboardingPage() {
                         wordCount === 0 ? "text-black/40" : wordCount < 35 || wordCount > 250 ? "text-[#ff6b3d]" : "text-[#22c55e]"
                       }`}>
                         {wordCount === 0
-                          ? "Aim for 35 to 250 words describing your core value proposition."
+                          ? "Aim for at least 35 words describing your core value proposition."
                           : wordCount < 35 
-                          ? "Add a little more context so we can understand what you’re building." 
+                          ? `Please add at least ${35 - wordCount} more word${35 - wordCount > 1 ? "s" : ""} to provide enough funding signal.` 
                           : wordCount > 250 
                           ? `You are ${wordCount - 250} words over the limit. Keep it under 250 words for now.`
                           : "Excellent pitch context. Ready to proceed."}
@@ -672,7 +677,7 @@ export default function OnboardingPage() {
                       <span className={`font-semibold tracking-tight self-end sm:self-auto transition-colors ${
                         wordCount > 0 && (wordCount < 35 || wordCount > 250) ? "text-[#ff6b3d]" : "text-black/40"
                       }`}>
-                        {wordCount} / 250 words
+                        {wordCount} / 250 words (Min: 35)
                       </span>
                     </div>
                   </div>
