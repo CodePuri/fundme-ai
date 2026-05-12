@@ -4,7 +4,7 @@
 
 | Feature | Status | Notes |
 |---------|--------|-------|
-| AI analysis | **MOCK** | `generateMockReport()` in `assessment-provider.tsx` produces randomized scores. No real AI/NLP. |
+| AI analysis | **FOUNDATION IN PLACE** | Structured schema, prompt templates, validation, and model adapter created in `lib/assessment/`. Still uses `generateMockReport()` at runtime until Chunks C-D-E connect the real AI pipeline. |
 | Auth | **LIVE** | Clerk auth is configured and active. `/sign-in`, `/sign-up` routes functional. |
 | Paywall | **MOCK** | Unlock modal shows "Early Access Coming Soon" placeholder. No real payment integration. |
 | Data persistence | **LIVE** | `localStorage` via `fundme-assessment-v1` key. No backend database. |
@@ -101,3 +101,21 @@
 - [ ] Accessibility audit: keyboard nav, screen reader, contrast
 - [ ] Test on 390px mobile, tablet, desktop
 - [ ] Test with prefers-reduced-motion
+
+## Intelligence Pipeline Status
+
+The structured intelligence foundation is in place but **not yet wired to the runtime flow**.
+
+| Layer | File | Status |
+|-------|------|--------|
+| Schema | `lib/assessment/schema.ts` | ✅ `StructuredReport` type, signal/issue models, `mapToLegacyReport()` mapper, `getScoreLabel()` |
+| Prompts | `lib/assessment/prompt.ts` | ✅ System prompt with safety rules, user prompt builder, emergency fallback |
+| Validation | `lib/assessment/validate.ts` | ✅ Score ranges, confidence labels, blocked pattern detection, sanitize |
+| Model Adapter | `lib/assessment/model-adapter.ts` | ✅ Provider-agnostic interface (Groq, OpenAI, Anthropic, xAI), primary/fallback/emergency chain |
+| Env Config | `.env.example` | ✅ Documents all required env vars |
+| Runtime | `component/assessment/assessment-provider.tsx` | ⏳ Still uses `generateMockReport()` — next chunk |
+| Website extraction | `app/api/website/extract` | ❌ Not yet built — Chunk C |
+| Analysis API | `app/api/assessment/analyze` | ❌ Not yet built — Chunk D |
+| Connect to flow | `/assessment/analyzing` | ❌ Not yet connected — Chunk E |
+| Server persistence | `assessments` table | ❌ SQL written but not executed — Chunk F |
+| Dashboard server read | `/app/report` | ❌ Not yet connected — Chunk G |
