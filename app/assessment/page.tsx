@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, useReducedMotion } from "framer-motion";
@@ -40,6 +40,7 @@ function SourceInput({
   placeholder,
   type = "text",
   required,
+  onFocus,
 }: {
   icon: any;
   label: string;
@@ -48,6 +49,7 @@ function SourceInput({
   placeholder: string;
   type?: string;
   required?: boolean;
+  onFocus?: () => void;
 }) {
   return (
     <div>
@@ -61,6 +63,7 @@ function SourceInput({
           type={type}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          onFocus={onFocus}
           placeholder={placeholder}
           className="h-12 w-full rounded-2xl border border-black/[0.08] bg-white/80 px-4 text-[14px] text-[#171513] placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#ff6b3d]/5 transition-all"
         />
@@ -89,8 +92,13 @@ export default function AssessmentPage() {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
 
-  const fileInputRef = useState<HTMLInputElement | null>(null);
+  function scrollToCTA() {
+    setTimeout(() => {
+      submitRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 350);
+  }
 
   useEffect(() => {
     if (!state.websiteUrl) {
@@ -170,7 +178,7 @@ export default function AssessmentPage() {
         </div>
       </header>
 
-      <div className="flex min-h-screen flex-col items-center px-4 pt-28 pb-28 sm:px-6">
+      <div className="flex min-h-screen flex-col items-center px-4 pt-28 pb-36 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -214,6 +222,7 @@ export default function AssessmentPage() {
                   placeholder="google.com"
                   value={website}
                   onChange={setWebsite}
+                  onFocus={scrollToCTA}
                   required
                 />
 
@@ -233,6 +242,7 @@ export default function AssessmentPage() {
                     placeholder="linkedin.com/in/..."
                     value={linkedin}
                     onChange={setLinkedIn}
+                    onFocus={scrollToCTA}
                   />
                 </div>
 
@@ -274,6 +284,7 @@ export default function AssessmentPage() {
                     <Textarea
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
+                      onFocus={scrollToCTA}
                       placeholder="Describe your startup naturally... What problem are you solving? Why now?"
                       className="min-h-[120px] rounded-2xl border-black/[0.08] bg-[#f6f1ea]/20 text-[14px] p-5 leading-relaxed placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:ring-4 focus:ring-[#ff6b3d]/5"
                     />
@@ -295,6 +306,7 @@ export default function AssessmentPage() {
                 )}
 
                 <motion.button
+                  ref={submitRef}
                   onClick={handleStartAnalysis}
                   disabled={isSubmitting}
                   whileHover={shouldReduceMotion ? undefined : { scale: 1.01 }}

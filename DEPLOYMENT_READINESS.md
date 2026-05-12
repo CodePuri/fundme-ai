@@ -25,6 +25,17 @@
 - `/sign-in` and `/sign-up` are active.
 - Currently, the assessment funnel does NOT require auth to view the report.
 
+## Route Safety Status
+
+| Route | Access | Notes |
+|-------|--------|-------|
+| `/search` | Public | No auth required |
+| `/assessment` | Public | Intake form, no auth |
+| `/assessment/report` | Public | Shows "No Diagnosis Found" if no report in localStorage |
+| `/explore` | Protected | Redirects to sign-in if unauthenticated |
+| `/app` | Protected | Redirects to sign-in if unauthenticated |
+| `/app/report` | Protected | Dashboard continuation WIP — redirects to sign-in if unauthenticated |
+
 ## Paywall
 
 - **MOCK**: The unlock modal displays an "Early Access Coming Soon" state.
@@ -67,6 +78,10 @@
 - Dashboard continuation (`/app/report`) is still WIP (checkpointed but not wired)
 - Questions are duplicated between `/assessment/questions` and `/assessment/analyzing`
 - No real file upload to server — uploaded file names stored in localStorage only
+
+## Vercel / Domain Mismatch Note
+
+- Ensure the active live domain (`fundme-ai.vercel.app`) is correctly mapped to the current production Vercel project linked to the `CodePuri/fundme-ai` GitHub repository. Any legacy custom domain DNS bindings must be audited to prevent pointing to deprecated static project deployments.
 
 ## Production Checklist
 

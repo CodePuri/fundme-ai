@@ -259,7 +259,6 @@ function ScanStatus({ activeId, scanResults }: { activeId: string; scanResults: 
       {scanSteps.map((step) => {
         const Icon = step.icon;
         const isActive = step.id === activeId;
-        const isDone = scanSteps.findIndex(s => s.id === step.id) < scanSteps.findIndex(s => s.id === activeId);
         const result = scanResults[step.id];
 
         return (
@@ -270,7 +269,6 @@ function ScanStatus({ activeId, scanResults }: { activeId: string; scanResults: 
               result === "needsWork" ? "bg-[#f59e0b] text-white" :
               result === "weak" ? "bg-[#f97316] text-white" :
               result === "missing" ? "bg-[#9ca3af] text-white" :
-              isDone ? "bg-[#22c55e] text-white" :
               "bg-white/60 text-[#b5ad9f] border border-black/[0.05]"
             }`}>
               <Icon className="size-5" />

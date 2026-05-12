@@ -501,47 +501,20 @@ function LogoRailCard({
 }
 
 function LogoRailSection() {
-  const shouldReduceMotion = useReducedMotion();
-
   return (
-    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-6">
-      <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
-      </SectionReveal>
-
-      <motion.div
-        className="logo-rail-viewport relative mt-5"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
-        viewport={{ once: true }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
-      >
-        <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
-
-        <div className={cn("logo-rail-strip px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}>
-          {ecosystemPrograms.map((program) => (
-            <LogoRailCard key={program.id} {...program} />
+    <section className="border-y border-[#e3d6c7]/60 bg-[#eee3d6]/70 py-4">
+      <div className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
+        <div className="text-center text-[10px] uppercase tracking-[0.2em] text-[#8b8276] mb-3">Now matching with</div>
+        {/* Desktop: compact badge strip */}
+        <div className="hidden sm:flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          {ecosystemPrograms.map((p) => (
+            <span key={p.id} className="inline-flex items-center gap-2 text-[12px] font-medium text-[#6f685f]">
+              <ProgramMark program={{ name: p.name, slug: p.slug, mark: p.mark }} size={16} className="opacity-60" />
+              {p.name}
+            </span>
           ))}
         </div>
-
-        <div
-          aria-hidden="true"
-          className={cn("logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}
-        >
-          {ecosystemPrograms.map((program) => (
-            <LogoRailCard key={`${program.id}-duplicate`} {...program} />
-          ))}
-        </div>
-      </motion.div>
-
-      {/* Mobile compact badges fallback */}
-      <div className="mt-4 flex flex-wrap justify-center gap-2 px-4 sm:hidden">
-        {ecosystemPrograms.map((p) => (
-          <span key={p.id} className="rounded-full border border-black/[0.08] bg-white/70 px-3 py-1 text-[11px] font-medium text-[#6f685f]">
-            {p.name}
-          </span>
-        ))}
+        {/* Mobile: hide trust strip entirely */}
       </div>
     </section>
   );

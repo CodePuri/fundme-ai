@@ -75,10 +75,12 @@ function CreditMeter({ credits }: { credits: number }) {
 function LockedFixCard({
   title,
   whyItHurts,
+  previewText,
   onUnlock,
 }: {
   title: string;
   whyItHurts: string;
+  previewText: string;
   onUnlock: () => void;
 }) {
   return (
@@ -93,13 +95,12 @@ function LockedFixCard({
         <h4 className="text-[16px] font-bold text-[#171513] mb-2">{title}</h4>
         <p className="text-[13px] leading-[1.6] text-[#6f685f] mb-4">{whyItHurts}</p>
 
-        <p className="mb-4 text-[12px] font-semibold text-[#ff6b3d] uppercase tracking-wider">Why it matters</p>
+        <p className="mb-3 text-[11px] font-bold text-[#ff6b3d] uppercase tracking-wider">Preview</p>
 
-        <div className="relative mt-4 h-20 overflow-hidden rounded-xl bg-[#f6f1ea]/40 p-4 border border-black/[0.03]">
-          <div className="space-y-2 blur-[5px] select-none opacity-40">
-            <div className="h-3 w-3/4 rounded-full bg-[#8b8276]/30" />
-            <div className="h-3 w-1/2 rounded-full bg-[#8b8276]/20" />
-          </div>
+        <div className="relative overflow-hidden rounded-xl bg-[#f6f1ea]/40 p-4 border border-black/[0.03]">
+          <p className="blur-[5px] select-none text-[13px] text-[#171513] leading-relaxed opacity-40">
+            {previewText}
+          </p>
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px]">
             <Button
               onClick={onUnlock}
@@ -338,7 +339,8 @@ export default function AssessmentReportPage() {
               onClick={() => setPaywallOpen(true)}
               className="h-9 rounded-full bg-[#171513] px-5 text-[11px] font-bold text-white shadow-lg transition-all hover:bg-black"
             >
-              Unlock Improvement Plan
+              <span className="hidden sm:inline">Unlock Improvement Plan</span>
+              <span className="sm:hidden">Unlock Plan</span>
             </button>
           </div>
         </div>
@@ -498,16 +500,19 @@ export default function AssessmentReportPage() {
             <LockedFixCard
               title="Founder Narrative Fix"
               whyItHurts="Your current profile lacks a 'Why You' hook."
+              previewText="Rewrite your founder narrative around your domain edge. Highlight your unfair advantage and past wins to build a compelling founder story that selection committees remember."
               onUnlock={() => setPaywallOpen(true)}
             />
             <LockedFixCard
               title="Website Positioning"
               whyItHurts="Your landing page copy is too technical."
+              previewText="Sharpen homepage positioning for accelerators and grants. Replace jargon with clear value propositions that communicate your startup's purpose in under 8 seconds."
               onUnlock={() => setPaywallOpen(true)}
             />
             <LockedFixCard
               title="Traction Proof Points"
               whyItHurts="Missing specific growth metrics."
+              previewText="Reframe traction proof using your strongest metric. Surface growth signals that demonstrate momentum, even at early stage, to make your application stand out."
               onUnlock={() => setPaywallOpen(true)}
             />
           </div>
@@ -610,7 +615,8 @@ export default function AssessmentReportPage() {
                   onClick={() => setPaywallOpen(true)}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[#ff6b3d] text-[14px] font-bold text-white shadow-lg transition-all hover:bg-[#f45d2e] transform hover:scale-[1.02]"
                 >
-                  Unlock Improvement Plan
+                  <span className="hidden sm:inline">Unlock Improvement Plan</span>
+                  <span className="sm:hidden">Unlock Plan</span>
                   <ArrowRight className="size-4" />
                 </button>
               </div>
