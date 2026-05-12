@@ -1,14 +1,28 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { motion } from "framer-motion";
 import { CheckCircle2, Sparkles } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
+import { ONBOARDING_DRAFT_KEY } from "@/components/app/demo-provider";
 
 export default function ThankYouPage() {
   const { user } = useUser();
-  const firstName = user?.firstName ?? user?.fullName?.split(" ")[0] ?? null;
+  const [draftData, setDraftData] = useState<{ name?: string; email?: string } | null>(null);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
+      if (saved) {
+        setDraftData(JSON.parse(saved));
+      }
+    } catch {}
+  }, []);
+
+  const firstName = user?.firstName ?? user?.fullName?.split(" ")[0] ?? draftData?.name?.split(" ")[0] ?? null;
+  const resolvedEmail = user?.emailAddresses?.[0]?.emailAddress ?? draftData?.email ?? "your submitted email";
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-white px-6">
@@ -37,7 +51,7 @@ export default function ThankYouPage() {
           transition={{ delay: 0.25, duration: 0.4 }}
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#fff5f0] border border-[#ff6b3d]/10 text-[#ff6b3d] text-[12px] font-bold uppercase tracking-wider mb-6"
         >
-          <Sparkles className="size-3" /> You&apos;re on the list
+          <Sparkles className="size-3" /> Assessment Scheduled
         </motion.div>
 
         <motion.h1
@@ -46,7 +60,7 @@ export default function ThankYouPage() {
           transition={{ delay: 0.3, duration: 0.4 }}
           className="text-[40px] sm:text-[48px] font-semibold tracking-[-0.04em] leading-[1.1] text-black"
         >
-          {firstName ? `Thanks, ${firstName}!` : "Thank you for registering!"}
+          {firstName ? `Thanks, ${firstName}!` : "Intake Successful!"}
         </motion.h1>
 
         <motion.p
@@ -55,19 +69,16 @@ export default function ThankYouPage() {
           transition={{ delay: 0.38, duration: 0.4 }}
           className="mt-6 text-[18px] text-black/50 leading-relaxed max-w-[420px]"
         >
-          We&apos;ve received your details. Our team will review your profile
-          and get you onboarded soon.
+          We&apos;ve securely stored your assessment profile. Our advisory team will evaluate your deck and startup roadmap shortly.
         </motion.p>
-
-
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.7, duration: 0.4 }}
-          className="mt-10 text-[13px] text-black/30"
+          className="mt-10 text-[13px] text-black/30 font-medium"
         >
-          We&apos;ll reach out to {user?.emailAddresses?.[0]?.emailAddress ?? "your email"} when you&apos;re ready.
+          Updates will be routed to <span className="text-black/60 underline decoration-black/10 underline-offset-4">{resolvedEmail}</span>
         </motion.p>
       </motion.div>
     </main>

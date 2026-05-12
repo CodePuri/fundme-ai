@@ -58,8 +58,12 @@ export default function OnboardingPage() {
   const [files, setFiles] = useState<string[]>([]);
   const [fileMeta, setFileMeta] = useState<{name: string; size: number; type: string}[]>([]);
   const [voiceTranscript, setVoiceTranscript] = useState<string | null>(null);
+  const pastTranscriptsRef = useRef<string>("");
+  const latestTranscriptRef = useRef<string>("");
+  const initialNotesRef = useRef<string>("");
   
   const [listening, setListening] = useState(false);
+  const [voiceState, setVoiceState] = useState<"idle" | "listening" | "processing" | "captured">("idle");
   const [typedOpen, setTypedOpen] = useState(false);
   const [doneFlash, setDoneFlash] = useState(false);
   const recognitionRef = useRef<any>(null);
@@ -208,6 +212,16 @@ export default function OnboardingPage() {
         } catch {}
       }
       setListening(false);
+      setVoiceState("processing");
+      setTimeout(() => {
+        setVoiceState("captured");
+        setDoneFlash(true);
+        pastTranscriptsRef.current = latestTranscriptRef.current;
+        setTimeout(() => {
+          setVoiceState("idle");
+          setDoneFlash(false);
+        }, 2000);
+      }, 600);
       return;
     }
 
@@ -225,37 +239,50 @@ export default function OnboardingPage() {
       recognition.interimResults = true;
       recognition.lang = "en-US";
 
-      const baseNotes = notes ? notes + " " : "";
+      initialNotesRef.current = notes ? notes.trim() : "";
 
       recognition.onstart = () => {
         setListening(true);
+        setVoiceState("listening");
       };
 
       recognition.onresult = (event: any) => {
-        let interimTranscript = "";
-        let finalTranscript = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript + " ";
-          } else {
-            interimTranscript += transcript;
-          }
+        let currentDictation = "";
+        for (let i = 0; i < event.results.length; i++) {
+          currentDictation += event.results[i][0].transcript;
         }
-        const fullSpoken = finalTranscript + interimTranscript;
-        setNotes(baseNotes + fullSpoken);
-        setVoiceTranscript((prev) => (prev ? prev + " " + fullSpoken : fullSpoken));
+        const separator = initialNotesRef.current ? " " : "";
+        const completeNotes = initialNotesRef.current + separator + currentDictation;
+        setNotes(completeNotes);
+        
+        const pastSeparator = pastTranscriptsRef.current ? "\n" : "";
+        const updatedTranscript = pastTranscriptsRef.current + pastSeparator + currentDictation;
+        latestTranscriptRef.current = updatedTranscript;
+        setVoiceTranscript(updatedTranscript);
       };
 
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error", event.error);
         setListening(false);
+        setVoiceState("idle");
       };
 
       recognition.onend = () => {
-        setListening(false);
-        setDoneFlash(true);
-        setTimeout(() => setDoneFlash(false), 2000);
+        if (listening) {
+          setListening(false);
+          setVoiceState("processing");
+          setTimeout(() => {
+            setVoiceState("captured");
+            setDoneFlash(true);
+            pastTranscriptsRef.current = latestTranscriptRef.current;
+            setTimeout(() => {
+              setVoiceState("idle");
+              setDoneFlash(false);
+            }, 2000);
+          }, 600);
+        } else {
+          pastTranscriptsRef.current = latestTranscriptRef.current;
+        }
       };
 
       recognition.start();
@@ -263,6 +290,7 @@ export default function OnboardingPage() {
       console.error(e);
       alert("Voice input is unavailable in this browser. Please type your idea instead.");
       setListening(false);
+      setVoiceState("idle");
     }
   };
 
@@ -504,14 +532,18 @@ export default function OnboardingPage() {
                   <div className="flex flex-col items-center justify-center p-8 rounded-[24px] bg-black/[0.02] border border-black/5 w-full md:w-[240px] shrink-0 text-center">
                     <button
                       className={`relative flex size-24 items-center justify-center rounded-full border transition-all duration-500 ${
-                        listening
+                        voiceState === "listening"
                           ? "border-[#ff6b3d] bg-[#ff6b3d] text-white shadow-[0_0_0_15px_rgba(255,107,61,0.1)] scale-105"
+                          : voiceState === "processing"
+                          ? "border-amber-500 bg-amber-50 text-amber-600 animate-pulse"
+                          : voiceState === "captured"
+                          ? "border-[#22c55e] bg-[#f0fdf4] text-[#22c55e]"
                           : "border-black/5 bg-white text-black hover:scale-105 hover:bg-black/[0.01] shadow-sm"
                       }`}
                       onClick={handleListen}
                       type="button"
                     >
-                      {listening && (
+                      {voiceState === "listening" && (
                         <div className="absolute inset-[-20px] flex items-center justify-center gap-[3px] opacity-80 pointer-events-none">
                           {Array.from({ length: 12 }).map((_, index) => {
                              const h = 8 + Math.random() * 24;
@@ -526,29 +558,56 @@ export default function OnboardingPage() {
                           })}
                         </div>
                       )}
-                      <Mic className={`relative z-10 ${listening ? "size-10" : "size-8 opacity-60"}`} />
+                      {voiceState === "captured" ? (
+                        <CheckCircle2 className="size-10" />
+                      ) : (
+                        <Mic className={`relative z-10 ${voiceState === "listening" ? "size-10" : "size-8 opacity-60"}`} />
+                      )}
                     </button>
                     <div className="mt-4 text-[15px] font-semibold text-black">
-                      {listening ? "Listening..." : "Tap to speak"}
+                      {voiceState === "listening" ? "Listening..." : voiceState === "processing" ? "Processing audio..." : voiceState === "captured" ? "Captured!" : "Tap to speak"}
                     </div>
                     <div className="text-[12px] text-black/40 mt-1">
-                      {listening ? "Tap again to stop" : "Voice transcription mode"}
+                      {voiceState === "listening" ? "Tap again to stop" : voiceState === "processing" ? "Finalizing notes" : "Voice transcription mode"}
                     </div>
-                    {doneFlash && (
-                      <div className="mt-3 text-[13px] font-bold text-[#22c55e] flex items-center justify-center gap-1.5 bg-[#f0fdf4] px-3 py-1 rounded-full border border-[#22c55e]/10">
-                        <CheckCircle2 className="size-3.5" /> Captured
-                      </div>
-                    )}
                   </div>
 
                   {/* Text Mode */}
-                  <div className="flex-1 w-full text-left">
+                  <div className="flex-1 w-full text-left flex flex-col">
                     <Textarea
-                      className="min-h-[240px] text-[16px] rounded-[24px] bg-black/[0.02] border-black/5 focus:bg-white p-6 leading-relaxed resize-y"
+                      className={`min-h-[240px] text-[16px] rounded-[24px] bg-black/[0.02] border focus:bg-white p-6 leading-relaxed resize-y transition-all ${
+                        notes.trim().length > 0 && (notes.trim().length < 80 || notes.trim().length > 1200)
+                          ? "border-[#ff6b3d]/40 focus:border-[#ff6b3d]"
+                          : "border-black/5 focus:border-black/20"
+                      }`}
                       placeholder={`Describe your idea naturally.\nWhat problem are you solving?\nWho is it for?\nWhy you?\nWhy now?`}
                       onChange={(event) => setNotes(event.target.value)}
                       value={notes}
                     />
+                    <div className="flex items-center justify-between mt-3 px-2 text-[12px]">
+                      <span className={`font-medium transition-colors ${
+                        notes.trim().length === 0
+                          ? "text-black/40"
+                          : notes.trim().length < 80
+                          ? "text-[#ff6b3d]"
+                          : notes.trim().length <= 1200
+                          ? "text-[#22c55e]"
+                          : "text-[#ff6b3d]"
+                      }`}>
+                        {notes.trim().length === 0
+                          ? "Please enter at least 80 characters."
+                          : notes.trim().length < 80
+                          ? `Add ${80 - notes.trim().length} more characters to submit.`
+                          : notes.trim().length <= 1200
+                          ? "Excellent depth. Ready to proceed."
+                          : `Exceeded by ${notes.trim().length - 1200} characters.`}
+                      </span>
+                      <span className={`font-semibold tracking-tight transition-colors ${
+                        notes.trim().length < 80 || notes.trim().length > 1200 ? "text-[#ff6b3d]" : "text-black/40"
+                      }`}>
+                        {notes.trim().length} / 1200
+                      </span>
+                    </div>
                   </div>
                 </div>
                 
@@ -556,7 +615,7 @@ export default function OnboardingPage() {
                    <button
                      className="text-[15px] font-bold text-black/30 hover:text-black transition-colors"
                      onClick={() => {
-                       if (listening) handleListen();
+                       if (voiceState === "listening") handleListen();
                        setStep(1);
                      }}
                      type="button"
@@ -565,12 +624,12 @@ export default function OnboardingPage() {
                    </button>
                    <Button 
                      onClick={() => {
-                       if (listening) handleListen();
+                       if (voiceState === "listening") handleListen();
                        setStep(3);
                      }} 
                      size="lg" 
                      className="h-12 px-10 rounded-full" 
-                     disabled={!notes.trim() && !listening}
+                     disabled={notes.trim().length < 80 || notes.trim().length > 1200}
                    >
                      Continue <ArrowRight className="size-4 ml-2" />
                    </Button>
@@ -704,7 +763,7 @@ export default function OnboardingPage() {
                      ← Go Back
                    </button>
                    <Button onClick={finishOnboarding} disabled={isSubmitting} size="lg" className="h-14 px-10 rounded-full text-[16px] font-bold bg-[#ff6b3d] hover:bg-[#ff6b3d]/90 shadow-xl shadow-[#ff6b3d]/20">
-                     {isSubmitting ? "Submitting..." : "Submit for early access"}
+                     {isSubmitting ? "Submitting..." : "Submit for assessment"}
                    </Button>
                 </div>
               </motion.div>
@@ -730,16 +789,16 @@ export default function OnboardingPage() {
                       animate={{ opacity: 1, y: 0 }} 
                       className="text-[48px] font-semibold tracking-[-0.04em] leading-tight text-black max-w-[500px] mx-auto"
                     >
-                      Finding where you belong...
+                      Preparing your Funding Assessment...
                     </motion.h1>
                 </div>
 
                 <div className="w-full max-w-[440px] flex flex-col gap-3">
                    {[
-                     "Analyzing your startup", 
-                     "Understanding your materials", 
-                     "Preparing your founder profile", 
-                     "Finding the right startup programs"
+                     companyName ? `Analyzing framework for ${companyName}` : "Analyzing startup vision", 
+                     files.length > 0 ? `Processing ${files.length} submitted document${files.length > 1 ? "s" : ""}` : "Structuring target application materials", 
+                     name ? `Formatting founder briefing for ${name}` : "Formatting applicant background", 
+                     "Assessing capital deployment viability"
                    ].map((text, i) => {
                       const activeIndex = Math.min(3, Math.floor(elapsed / 1250));
                       const done = i < activeIndex || elapsed >= 5000;
