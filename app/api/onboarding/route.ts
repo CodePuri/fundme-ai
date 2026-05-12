@@ -3,9 +3,13 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 function getSupabase() {
-  const supabaseUrl = process.env.SUPABASE_URL || "https://nertfhxxkhstrihoszud.supabase.co";
-  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lcnRmaHh4a2hzdHJpaG9zenVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTczNDg5OCwiZXhwIjoyMDkxMzEwODk4fQ.g8C0Br1PZ0eUfN3UsvWhE92zf1Z9I5X5XTazH6Y-p_k";
-  return createClient(supabaseUrl, supabaseKey);
+  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Missing Supabase backend environment variables");
+  }
+  return createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  );
 }
 
 // GET /api/onboarding — check if the signed-in user has already submitted
