@@ -14,7 +14,7 @@ This protocol outlines the exact surgical steps required to safely transition th
 ## 2. Onboarding Flow Refinements Implemented
 1. **Neutral Founder Placeholders:** Replaced mock entries (e.g., "Aakash Puri", "Totem Interactive") with industry-neutral placeholders (`Priya Sharma`, `Orbit Labs`).
 2. **Mandatory Primary Contact Validation:** Implemented explicit validation requiring an Email Address OR a valid LinkedIn Profile URL to progress past Step 1.
-3. **Pitch Length Enforcement & Voice Integration:** Integrated live character boundaries (**80 to 1200 characters**) with a reactive dynamic counter on Step 2. Built dual voice-transcription streaming (`webkitSpeechRecognition`) complete with seamless cumulative state tracking (`listening`, `processing`, `captured`) and full manual editing fallbacks.
+3. **Pitch Length Enforcement & Voice Integration:** Integrated live word count boundaries (**35 to 250 words**) with a reactive dynamic counter on Step 2. Built dual voice-transcription streaming (`webkitSpeechRecognition`) complete with seamless cumulative state tracking (`listening`, `processing`, `captured`) and full manual editing fallbacks.
 4. **File Metadata Capture:** Equipped Step 3 (`FileUploadArea`) with an `onFilesAdded` callback interface to accurately record upload array metadata (file sizes, mime-types) alongside full voice transcript payloads.
 5. **Tailored Submission & Loading Loops:** Standardized all intake confirmation buttons to **"Submit for assessment"**. Engineered a dynamic 5-second simulated verification screen utilizing custom input values (e.g., parsing specific uploaded counts and company branding).
 6. **Unauthenticated Serialization & Local Cache Recovery:** Upgraded `/api/onboarding` endpoints to dynamically serialize guest payload details directly into the `notes` column. Intakes reroute to a premium confirmation screen at `/thank-you` equipped with local browser storage cache retrieval for bulletproof email feedback persistence.
@@ -27,7 +27,7 @@ Before executing domain mapping, review and test the following functionality aga
 - [ ] **Email-only submission:** Enter an Email address without LinkedIn in Step 1 to verify successful forward progression.
 - [ ] **LinkedIn-only submission:** Enter a LinkedIn URL without an Email address in Step 1 to verify successful forward progression.
 - [ ] **Missing both blocking:** Leave both Email and LinkedIn blank in Step 1 and attempt to proceed; confirm a client-side warning blocks the step.
-- [ ] **Text idea boundary checks:** Enter text under 80 characters or over 1200 characters in Step 2; confirm live dynamic instruction indicators update and block forward progress.
+- [ ] **Text idea boundary checks:** Enter text under 35 words or over 250 words in Step 2; confirm live dynamic instruction indicators update and block forward progress.
 - [ ] **Voice permission/fallback:** Click the microphone button in Step 2; grant browser permissions to test real-time speech transcription, or deny to test the graceful alert fallback.
 - [ ] **Deck metadata capture:** Drop a file into Step 3 and confirm extracted metadata (`name`, `size`, `type`) updates the component state.
 - [ ] **Review page validation:** Verify all finalized profile, pitch, and metadata fields are displayed beautifully on Step 4 alongside the **"Submit for assessment"** trigger.
