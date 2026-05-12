@@ -59,34 +59,7 @@ export default function ThankYouPage() {
           and get you onboarded soon.
         </motion.p>
 
-        {/* <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.55, duration: 0.4 }}
-          className="mt-12 flex flex-col gap-3 w-full max-w-[360px]"
-        >
-          {[
-            "Profile received",
-            "Under review by the team",
-            "Onboarding coming soon",
-          ].map((label, i) => (
-            <div
-              key={label}
-              className={`flex items-center gap-3 rounded-[16px] border px-5 py-3.5 text-[14px] font-semibold transition-all ${
-                i === 0
-                  ? "bg-white border-black/8 text-black shadow-sm"
-                  : "bg-transparent border-black/5 text-black/30"
-              }`}
-            >
-              <div
-                className={`size-2 rounded-full ${
-                  i === 0 ? "bg-[#22c55e]" : "bg-black/10"
-                }`}
-              />
-              {label}
-            </div>
-          ))}
-        </motion.div> */}
+
 
         <motion.p
           initial={{ opacity: 0 }}

@@ -13,7 +13,8 @@ function getSupabase() {
 export async function GET() {
   const { userId } = await auth();
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // Make auth optional for checking submission status so guests can view the form freely
+    return NextResponse.json({ submitted: false });
   }
 
   const supabase = getSupabase();
@@ -33,37 +34,74 @@ export async function GET() {
 // POST /api/onboarding — save onboarding data
 export async function POST(req: Request) {
   const { userId } = await auth();
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  let userEmail: string | null = null;
 
-  const user = await currentUser();
-  const email = user?.emailAddresses?.[0]?.emailAddress ?? null;
+  if (userId) {
+    try {
+      const user = await currentUser();
+      userEmail = user?.emailAddresses?.[0]?.emailAddress ?? null;
+    } catch {
+      // Ignore if user fetching fails
+    }
+  }
 
   const body = await req.json() as {
     name?: string;
     role?: string;
     companyName?: string;
+    email?: string;
     linkedIn?: string;
     websiteUrl?: string;
     xUrl?: string;
     notes?: string;
+    voiceTranscript?: string | null;
+    filesMetadata?: { name: string; size: number; type: string }[];
+    sourceRoute?: string;
   };
+
+  const resolvedEmail = body.email || userEmail || null;
+
+  // Server-side validation: email OR LinkedIn is mandatory
+  if (!resolvedEmail && !body.linkedIn) {
+    return NextResponse.json(
+      { error: "Email or LinkedIn URL is required" },
+      { status: 400 }
+    );
+  }
+
+  // Ensure stable fallback ID for guests to satisfy 'unique not null' constraints cleanly
+  const actualUserId = userId || ("guest_" + Date.now() + "_" + Math.random().toString(36).substring(2, 9));
+
+  // Serialize the complete set of extended metadata into the existing 'notes' field
+  // to ensure robust compatibility with base table schemas while capturing all data
+  const extraMetadata = {
+    website_url: body.websiteUrl ?? null,
+    x_url: body.xUrl ?? null,
+    voice_transcript: body.voiceTranscript ?? null,
+    deck_file_name: body.filesMetadata?.[0]?.name ?? null,
+    deck_file_size: body.filesMetadata?.[0]?.size ?? null,
+    deck_file_type: body.filesMetadata?.[0]?.type ?? null,
+    source_route: body.sourceRoute ?? "/onboarding",
+    status: "early_access_waitlist",
+  };
+
+  const baseNotes = body.notes ? body.notes.trim() : "";
+  const combinedNotes = `${baseNotes}\n\n--- Early Access Metadata ---\n${JSON.stringify(extraMetadata, null, 2)}`.trim();
 
   const supabase = getSupabase();
   const { error } = await supabase
     .from("onboarding_submissions")
     .upsert(
       {
-        clerk_user_id: userId,
-        email,
+        clerk_user_id: actualUserId,
+        email: resolvedEmail,
         name: body.name ?? null,
         role: body.role ?? null,
         company_name: body.companyName ?? null,
         linkedin_url: body.linkedIn ?? null,
         website_url: body.websiteUrl ?? null,
         x_url: body.xUrl ?? null,
-        notes: body.notes ?? null,
+        notes: combinedNotes,
       },
       { onConflict: "clerk_user_id" },
     );

@@ -57,6 +57,7 @@ export default function OnboardingPage() {
   const [notes, setNotes] = useState("");
   const [files, setFiles] = useState<string[]>([]);
   const [fileMeta, setFileMeta] = useState<{name: string; size: number; type: string}[]>([]);
+  const [voiceTranscript, setVoiceTranscript] = useState<string | null>(null);
   
   const [listening, setListening] = useState(false);
   const [typedOpen, setTypedOpen] = useState(false);
@@ -241,7 +242,9 @@ export default function OnboardingPage() {
             interimTranscript += transcript;
           }
         }
-        setNotes(baseNotes + finalTranscript + interimTranscript);
+        const fullSpoken = finalTranscript + interimTranscript;
+        setNotes(baseNotes + fullSpoken);
+        setVoiceTranscript((prev) => (prev ? prev + " " + fullSpoken : fullSpoken));
       };
 
       recognition.onerror = (event: any) => {
@@ -309,6 +312,8 @@ export default function OnboardingPage() {
           xUrl,
           files,
           filesMetadata: fileMeta,
+          voiceTranscript,
+          sourceRoute: "/onboarding",
         }),
       });
     } catch {
