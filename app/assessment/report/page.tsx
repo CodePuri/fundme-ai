@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ArrowRight,
@@ -251,6 +253,8 @@ function PaywallModal({ isOpen, onClose, onAuth }: { isOpen: boolean; onClose: (
 export default function AssessmentReportPage() {
   const { state } = useAssessment();
   const shouldReduceMotion = useReducedMotion();
+  const router = useRouter();
+  const { isSignedIn } = useUser();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [hasTimedModal, setHasTimedModal] = useState(false);
@@ -417,6 +421,27 @@ export default function AssessmentReportPage() {
             </p>
           </div>
         </motion.section>
+
+        {/* ─── Dashboard CTA ── */}
+        <div className="mb-16 flex items-center justify-between rounded-[28px] border border-black/[0.05] bg-white p-6 shadow-sm">
+          <div>
+            <h3 className="text-[16px] font-bold text-[#171513]">Save report to dashboard</h3>
+            <p className="mt-1 text-[13px] text-[#6f685f]">Keep your diagnosis in your personal workspace.</p>
+          </div>
+          <button
+            onClick={() => {
+              if (isSignedIn) {
+                router.push("/app/report");
+              } else {
+                router.push("/sign-up");
+              }
+            }}
+            className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-[#171513] px-5 text-[12px] font-bold text-white shadow-sm transition-all hover:bg-black"
+          >
+            Save to Dashboard
+            <ArrowRight className="size-3.5" />
+          </button>
+        </div>
 
         {/* ─── 3. Top 3 Issues ── */}
         <section className="mb-16">

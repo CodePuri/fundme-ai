@@ -9,7 +9,7 @@
 | Paywall | **MOCK** | Unlock modal shows "Early Access Coming Soon" placeholder. No real payment integration. |
 | Data persistence | **LIVE** | `localStorage` via `fundme-assessment-v1` key. No backend database. |
 | Assessment flow | **LIVE** | Full frontend funnel: homepage → intake → analyzing → report. Mock report data. |
-| Dashboard continuation | **PAUSED** | `app/app/report/` and `components/app/assessment-report-view.tsx` exist but are WIP. |
+| Dashboard continuation | **LIVE (client-side)** | `/app/report` renders within dashboard shell using client-side diagnosis state. No server persistence. |
 
 ## Must Turn On Before Live
 
@@ -75,9 +75,12 @@
 - Locked fix cards show mock blurred previews, not real fix content
 - Opportunity radar shows static match previews
 - No server-side persistence — reloading clears assessment state
-- Dashboard continuation (`/app/report`) is still WIP (checkpointed but not wired)
+- Dashboard continuation is client-side only — `/app/report` reads from `fundme-assessment-v1` localStorage key
+- No server-side persistence — report is lost on localStorage clear
+- Clerk webhook persistence still future work (no backend database for user reports)
 - Questions are duplicated between `/assessment/questions` and `/assessment/analyzing`
 - No real file upload to server — uploaded file names stored in localStorage only
+- Genkit AI pipeline still future work (mock report generation only)
 
 ## Vercel / Domain Mismatch Note
 

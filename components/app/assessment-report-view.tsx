@@ -33,6 +33,15 @@ import { Button } from "@/components/ui/button";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { EASE_OUT } from "@/lib/animations";
 
+/* ─── Score Label Helper ── */
+
+function getScoreLabel(score: number): { label: string; color: string } {
+  if (score >= 80) return { label: "Strong signal", color: "#22c55e" };
+  if (score >= 60) return { label: "Promising, needs sharpening", color: "#f59e0b" };
+  if (score >= 40) return { label: "Weak application signal", color: "#f97316" };
+  return { label: "Not ready yet", color: "#9ca3af" };
+}
+
 /* ─── Shared Components ───────────────────────────────────────── */
 
 function ScoreRing({ score, label, color = "#ff6b3d" }: { score: number; label: string; color?: string }) {
@@ -68,7 +77,7 @@ function ScoreRing({ score, label, color = "#ff6b3d" }: { score: number; label: 
   );
 }
 
-function LockedFixCard({ title, whyItHurts, onUnlock }: { title: string; whyItHurts: string; onUnlock: () => void }) {
+function LockedFixCard({ title, whyItHurts, previewText, onUnlock }: { title: string; whyItHurts: string; previewText: string; onUnlock: () => void }) {
   return (
     <div className="group relative overflow-hidden rounded-[24px] border border-black/[0.06] bg-white p-6 shadow-sm transition-all hover:shadow-md">
       <div className="relative z-10">
@@ -79,16 +88,13 @@ function LockedFixCard({ title, whyItHurts, onUnlock }: { title: string; whyItHu
           <span className="rounded-full bg-[#f6f1ea] px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-[#8b8276]">Locked Fix</span>
         </div>
         <h4 className="text-[16px] font-bold text-[#171513] mb-2">{title}</h4>
-        <p className="text-[13px] leading-[1.6] text-[#6f685f] mb-6">{whyItHurts}</p>
-        <div className="relative mt-4 h-24 overflow-hidden rounded-xl bg-[#f6f1ea]/30 p-4 border border-black/[0.03]">
-          <div className="space-y-2 blur-[6px] select-none opacity-50">
-            <div className="h-3 w-3/4 rounded-full bg-[#8b8276]/30" />
-            <div className="h-3 w-1/2 rounded-full bg-[#8b8276]/20" />
-            <div className="h-3 w-2/3 rounded-full bg-[#8b8276]/30" />
-          </div>
+        <p className="text-[13px] leading-[1.6] text-[#6f685f] mb-4">{whyItHurts}</p>
+        <p className="mb-3 text-[11px] font-bold text-[#ff6b3d] uppercase tracking-wider">Preview</p>
+        <div className="relative overflow-hidden rounded-xl bg-[#f6f1ea]/40 p-4 border border-black/[0.03]">
+          <p className="blur-[5px] select-none text-[13px] text-[#171513] leading-relaxed opacity-40">{previewText}</p>
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/40 backdrop-blur-[1px]">
              <Button onClick={onUnlock} variant="outline" className="h-9 px-4 rounded-full border-[#ff6b3d] text-[#ff6b3d] text-[11px] font-bold uppercase tracking-wider bg-white shadow-sm hover:bg-[#ff6b3d] hover:text-white transition-all">
-               View Fix
+               Unlock fix
              </Button>
           </div>
         </div>
@@ -193,6 +199,7 @@ export function AssessmentReportView() {
   }
 
   const readinessScore = Number.isFinite(report.readinessScore) ? report.readinessScore : 0;
+  const scoreInfo = getScoreLabel(readinessScore);
 
   return (
     <PageShell className="space-y-12 pb-20">
@@ -231,18 +238,19 @@ export function AssessmentReportView() {
           </div>
           
           <div className="mt-8 space-y-4">
-             <div className="flex items-center justify-between text-[13px]">
-               <span className="text-[#6f685f] font-medium">Status</span>
-               <span className="text-[#ff6b3d] font-bold">Strong Signal</span>
-             </div>
-             <div className="h-1.5 w-full bg-[#f6f1ea] rounded-full overflow-hidden">
-               <motion.div 
-                 initial={{ width: 0 }}
-                 animate={{ width: `${readinessScore}%` }}
-                 transition={{ duration: 1, ease: EASE_OUT }}
-                 className="h-full bg-[#ff6b3d]"
-               />
-             </div>
+              <div className="flex items-center justify-between text-[13px]">
+                <span className="text-[#6f685f] font-medium">Status</span>
+                <span className="font-bold" style={{ color: scoreInfo.color }}>{scoreInfo.label}</span>
+              </div>
+              <div className="h-1.5 w-full bg-[#f6f1ea] rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  animate={{ width: `${readinessScore}%` }}
+                  transition={{ duration: 1, ease: EASE_OUT }}
+                  className="h-full rounded-full"
+                  style={{ backgroundColor: scoreInfo.color }}
+                />
+              </div>
           </div>
         </div>
 
@@ -267,9 +275,9 @@ export function AssessmentReportView() {
           <div className="h-px flex-1 bg-black/[0.05]" />
         </div>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <LockedFixCard title="Founder Narrative Fix" whyItHurts="Your current profile lacks a 'Why You' hook. We'll rewrite it to highlight domain unfair advantages." onUnlock={() => setPaywallOpen(true)} />
-          <LockedFixCard title="Website Positioning" whyItHurts="Your landing page copy is too technical. We'll generate 3 editorial headlines for 2x clarity." onUnlock={() => setPaywallOpen(true)} />
-          <LockedFixCard title="Traction Proof Points" whyItHurts="Missing specific growth metrics. We'll draft the exact missing proof points needed for top tier apps." onUnlock={() => setPaywallOpen(true)} />
+          <LockedFixCard title="Founder Narrative Fix" whyItHurts="Your current profile lacks a 'Why You' hook." previewText="Rewrite your founder narrative around your domain edge. Highlight your unfair advantage and past wins to build a compelling founder story that selection committees remember." onUnlock={() => setPaywallOpen(true)} />
+          <LockedFixCard title="Website Positioning" whyItHurts="Your landing page copy is too technical." previewText="Sharpen homepage positioning for accelerators and grants. Replace jargon with clear value propositions that communicate your startup's purpose in under 8 seconds." onUnlock={() => setPaywallOpen(true)} />
+          <LockedFixCard title="Traction Proof Points" whyItHurts="Missing specific growth metrics." previewText="Reframe traction proof using your strongest metric. Surface growth signals that demonstrate momentum, even at early stage, to make your application stand out." onUnlock={() => setPaywallOpen(true)} />
         </div>
       </section>
 
@@ -314,7 +322,8 @@ export function AssessmentReportView() {
                 The intelligence engine has identified exactly where your application will fail. View the specific rewrites now.
               </p>
               <Button onClick={() => setPaywallOpen(true)} className="w-full h-14 rounded-full bg-[#ff6b3d] text-white hover:bg-[#f45d2e] gap-2 font-bold shadow-lg transition-all transform hover:scale-[1.02]">
-                Unlock Fixes
+                <span className="hidden sm:inline">Unlock Improvement Plan</span>
+                <span className="sm:hidden">Unlock Plan</span>
                 <ArrowRight className="size-4" />
               </Button>
             </div>
