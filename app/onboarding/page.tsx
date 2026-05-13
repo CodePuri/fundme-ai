@@ -67,6 +67,11 @@ export default function OnboardingPage() {
   const recognitionTimeoutRef = useRef<number | null>(null);
   const baseNotesRef = useRef<string>("");
   const isManualStopRef = useRef<boolean>(false); // Track absolute termination intent
+  const notesRef = useRef<string>(notes);
+
+  useEffect(() => {
+    notesRef.current = notes;
+  }, [notes]);
 
   const [hasImported, setHasImported] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -206,7 +211,7 @@ export default function OnboardingPage() {
       `Understanding ${entity}’s${ideaStr}...`,
       "Checking missing funding signals",
       "Looking for early opportunity paths",
-      "Preparing your funding assessment"
+      "Preparing your early funding assessment"
     ];
   }, [companyName, derivedFirstName, notes]);
 
@@ -259,7 +264,8 @@ export default function OnboardingPage() {
   };
 
   const stopRecognition = () => {
-    terminateSession("captured");
+    const hasContent = notesRef.current.trim().split(/\s+/).filter(Boolean).length > 0;
+    terminateSession(hasContent ? "captured" : "idle");
   };
 
   const handleListen = () => {
@@ -295,7 +301,8 @@ export default function OnboardingPage() {
         // Ensure hard ceiling of exactly 2 minutes
         if (!recognitionTimeoutRef.current) {
           recognitionTimeoutRef.current = window.setTimeout(() => {
-            terminateSession("captured");
+            const hasContent = notesRef.current.trim().split(/\s+/).filter(Boolean).length > 0;
+            terminateSession(hasContent ? "captured" : "idle");
           }, 120000);
         }
       };
@@ -337,13 +344,14 @@ export default function OnboardingPage() {
         // If not manually halted and timeout hasn't elapsed, auto-restart the listener loop seamlessly
         if (recognitionTimeoutRef.current) {
           try {
-            baseNotesRef.current = notes ? notes.trim() : "";
+            baseNotesRef.current = notesRef.current ? notesRef.current.trim() : "";
             recognition.start();
           } catch {
             terminateSession("idle");
           }
         } else {
-          terminateSession("captured");
+          const hasContent = notesRef.current.trim().split(/\s+/).filter(Boolean).length > 0;
+          terminateSession(hasContent ? "captured" : "idle");
         }
       };
 
@@ -721,7 +729,7 @@ export default function OnboardingPage() {
                   <h1 className="text-[26px] sm:text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black">
                     Upload your materials
                   </h1>
-                  <p className="text-[13px] sm:text-[18px] text-black/50 mt-1 sm:mt-4 max-w প্রচারিত max-w-[480px] leading-snug">
+                  <p className="text-[13px] sm:text-[18px] text-black/50 mt-1 sm:mt-4 max-w-[480px] leading-snug">
                     Add your pitch deck, memo, or previous application answers to help the AI understand your roadmap.
                   </p>
                 </div>

@@ -4,12 +4,10 @@ import { NextResponse } from "next/server";
 
 function getSupabase() {
   const url = process.env.SUPABASE_URL || "https://nertfhxxkhstrihoszud.supabase.co";
-  // Dynamically assemble fallback staging token segments to satisfy static repository secret scanners
-  // while ensuring seamless runtime database functionality across ephemeral preview deployments
-  const partA = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-  const partB = "eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5lcnRmaHh4a2hzdHJpaG9zenVkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NTczNDg5OCwiZXhwIjoyMDkxMzEwODk4fQ";
-  const partC = "g8C0Br1PZ0eUfN3UsvWhE92zf1Z9I5X5XTazH6Y-p_k";
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || `${partA}.${partB}.${partC}`;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) {
+    throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY in environment.");
+  }
   return createClient(url, key);
 }
 
@@ -113,17 +111,24 @@ export async function POST(req: Request) {
           notes: combinedNotes,
         },
         { onConflict: "clerk_user_id" },
-      );
+      )
+      .select("id")
+      .maybeSingle();
 
     if (error) {
-      console.warn("Supabase persistence warning in preview environment:", error.message);
-      // Return success gracefully to protect frontend walkthrough completion and illusion-of-labor loading sequences
-      return NextResponse.json({ success: true, warning: error.message });
+      console.warn("Supabase persistence error:", error.message);
+      return NextResponse.json(
+        { error: "We couldn't save your profile right now. Please try again." },
+        { status: 502 }
+      );
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, submissionId: data?.id, saved: true });
   } catch (e: any) {
     console.warn("Server route exception during POST persistence:", e?.message);
-    return NextResponse.json({ success: true, warning: e?.message });
+    return NextResponse.json(
+      { error: "We couldn't save your profile right now. Please try again." },
+      { status: 500 }
+    );
   }
 }
