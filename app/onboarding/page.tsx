@@ -417,7 +417,7 @@ export default function OnboardingPage() {
       setStep(5);
     } catch (e: any) {
       setIsSubmitting(false);
-      setSubmitError(e?.message || "Unable to save your assessment profile. Please check your connection and try again.");
+      setSubmitError(e?.message || "We couldn't save your profile right now. Please try again.");
     }
   }
 

@@ -62,6 +62,7 @@ export async function POST(req: Request) {
       companyName?: string;
       email?: string;
       linkedIn?: string;
+      linkedinUrl?: string;
       websiteUrl?: string;
       xUrl?: string;
       notes?: string;
@@ -71,9 +72,10 @@ export async function POST(req: Request) {
     };
 
     const resolvedEmail = body.email || userEmail || null;
+    const resolvedLinkedIn = body.linkedIn || body.linkedinUrl || null;
 
     // Server-side validation: email OR LinkedIn is mandatory
-    if (!resolvedEmail && !body.linkedIn) {
+    if (!resolvedEmail && !resolvedLinkedIn) {
       return NextResponse.json(
         { error: "Email or LinkedIn URL is required" },
         { status: 400 }
@@ -108,7 +110,7 @@ export async function POST(req: Request) {
           name: body.name ?? null,
           role: body.role ?? null,
           company_name: body.companyName ?? null,
-          linkedin_url: body.linkedIn ?? null,
+          linkedin_url: resolvedLinkedIn,
           website_url: body.websiteUrl ?? null,
           x_url: body.xUrl ?? null,
           notes: combinedNotes,
