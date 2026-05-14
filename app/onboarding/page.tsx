@@ -209,8 +209,7 @@ export default function OnboardingPage() {
       "Securing your founder profile",
       "Reading your startup context",
       `Understanding ${entity}’s${ideaStr}...`,
-      "Checking missing funding signals",
-      "Looking for early opportunity paths",
+      "Analyzing missing funding signals",
       "Preparing your early funding assessment"
     ];
   }, [companyName, derivedFirstName, notes]);
@@ -674,19 +673,22 @@ export default function OnboardingPage() {
                       <span className={`font-medium transition-colors ${
                         wordCount === 0 ? "text-black/40" : wordCount < 35 || wordCount > 250 ? "text-[#ff6b3d]" : "text-[#22c55e]"
                       }`}>
-                        {wordCount === 0
-                          ? "Aim for at least 35 words describing your core value proposition."
-                          : wordCount < 35 
-                          ? `Please add at least ${35 - wordCount} more word${35 - wordCount > 1 ? "s" : ""} to provide enough funding signal.` 
+                        {wordCount < 35 
+                          ? `Please add ${35 - wordCount} more words so we can understand what you’re building.` 
                           : wordCount > 250 
                           ? `You are ${wordCount - 250} words over the limit. Keep it under 250 words for now.`
-                          : "Excellent pitch context. Ready to proceed."}
+                          : "Good context. Ready to continue."}
                       </span>
-                      <span className={`font-semibold tracking-tight self-end sm:self-auto transition-colors ${
-                        wordCount > 0 && (wordCount < 35 || wordCount > 250) ? "text-[#ff6b3d]" : "text-black/40"
-                      }`}>
-                        {wordCount} / 250 words (Min: 35)
-                      </span>
+                      <div className="text-right shrink-0">
+                        <div className={`font-semibold tracking-tight transition-colors ${
+                          wordCount > 0 && (wordCount < 35 || wordCount > 250) ? "text-[#ff6b3d]" : "text-black/40"
+                        }`}>
+                          {wordCount} / 250 words
+                        </div>
+                        <div className="text-[10px] text-black/30 font-medium leading-none mt-0.5">
+                          Minimum 35 words
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -881,7 +883,7 @@ export default function OnboardingPage() {
 
                 <div className="w-full max-w-[440px] flex flex-col gap-2.5 sm:gap-3">
                    {loadingStepsArray.map((text, i) => {
-                      const activeIndex = Math.min(5, Math.floor(elapsed / 833));
+                      const activeIndex = Math.min(4, Math.floor(elapsed / 1000));
                       const done = i < activeIndex || elapsed >= 5000;
                       const active = i === activeIndex && elapsed < 5000;
                       return (
