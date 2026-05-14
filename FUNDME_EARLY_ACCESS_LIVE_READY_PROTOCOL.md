@@ -4,10 +4,10 @@
 `feature/early-access-intake-preview`
 
 ## 2. Current Commit
-(To be updated upon final deployment)
+db15a59
 
 ## 3. Current Preview URL
-(To be updated upon final deployment)
+https://fundme-ggixjw4c4-aakash-s-projects-bf7b5a5e.vercel.app
 
 ## 4. Product Intent
 Make the existing Fundme Early Access onboarding flow genuinely live-ready for preview review before any domain connection. Focus is strictly on gathering founder profile and startup idea for an early access waitlist, not performing real-time diagnosis or deck roasts.
@@ -88,8 +88,8 @@ The active onboarding and thank-you paths MUST NOT contain:
 ## 15. Preview Deployment Checklist
 - [x] Clean worktree.
 - [x] Successful build (`pnpm build`).
-- [ ] Pushed to `feature/early-access-intake-preview`.
-- [ ] Deployed to Vercel via `npx vercel --confirm`.
+- [x] Pushed to `feature/early-access-intake-preview`.
+- [x] Deployed to Vercel via `npx vercel --confirm`.
 
 ## 16. Domain Cutover Gate
 Domain cutover (`tryfundme.in`, production deployment) is blocked until:
