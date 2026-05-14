@@ -3,8 +3,11 @@ import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 function getSupabase() {
-  const url = process.env.SUPABASE_URL || "https://nertfhxxkhstrihoszud.supabase.co";
+  const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url) {
+    throw new Error("Missing SUPABASE_URL in environment.");
+  }
   if (!key) {
     throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY in environment.");
   }
@@ -96,7 +99,7 @@ export async function POST(req: Request) {
     const combinedNotes = `${baseNotes}\n\n--- Early Access Metadata ---\n${JSON.stringify(extraMetadata, null, 2)}`.trim();
 
     const supabase = getSupabase();
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("onboarding_submissions")
       .upsert(
         {
