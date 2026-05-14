@@ -336,7 +336,7 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
       <div className="absolute left-1/2 top-[100px] h-[520px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.85),rgba(255,255,255,0))] blur-3xl" />
       <div className="absolute inset-x-0 top-0 h-full bg-[linear-gradient(180deg,rgba(255,255,255,0.45),transparent_18%,transparent_100%)]" />
 
-      <div className="relative mx-auto max-w-[1340px] px-4 pb-20 sm:px-6 xl:px-10">
+      <div className="relative mx-auto max-w-[1340px] px-4 pb-12 sm:px-6 xl:px-10">
         {/* ── Floating accelerator cards — desktop ── */}
         {floatingCards.map((card) => (
           <FloatingCard key={card.id} card={card} shouldReduceMotion={shouldReduceMotion} />
@@ -417,14 +417,17 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
                 <ArrowRight className="size-3.5" />
               </motion.a>
             </motion.div>
+            <motion.div className="mt-3 text-[13px] font-medium text-[#8b8276]" variants={fadeRise}>
+              Free assessment. No credit card required.
+            </motion.div>
 
             {/* Trust row */}
             <motion.div
-              className="mt-12 flex flex-col items-center gap-3 sm:mt-14"
+              className="mt-8 flex flex-col items-center gap-3 sm:mt-10"
               variants={fadeRiseWithDelay(0.35)}
             >
               <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
-                Programs already in the room
+                Now matching with
               </span>
               <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
                 {trustLogos.map((logo) => (
@@ -476,9 +479,9 @@ function LogoRailSection() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-6">
+    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-4">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Programs already in the room</div>
+        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
       </SectionReveal>
 
       <motion.div

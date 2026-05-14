@@ -87,12 +87,44 @@ export default function OnboardingPage() {
     return first;
   }, [name]);
 
-  // Word count validator (35 to 250 words)
-  const wordCount = useMemo(() => {
-    const trimmed = notes.trim();
-    if (!trimmed) return 0;
-    return trimmed.split(/\s+/).filter(Boolean).length;
+  // Letter count validator (35 to 500 letters)
+  const letterCount = useMemo(() => {
+    return notes ? notes.length : 0;
   }, [notes]);
+
+  // Step 1 Validation checks
+  const isEmailValid = useMemo(() => {
+    if (!email.trim()) return false;
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  }, [email]);
+
+  const isWebsiteValid = useMemo(() => {
+    if (!websiteUrl.trim()) return true;
+    return /^([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}/.test(websiteUrl.trim().replace(/^https?:\/\//, ''));
+  }, [websiteUrl]);
+
+  const isLinkedInValid = useMemo(() => {
+    if (!linkedIn.trim()) return true;
+    return linkedIn.toLowerCase().includes("linkedin.com");
+  }, [linkedIn]);
+
+  const isXValid = useMemo(() => {
+    if (!xUrl.trim()) return true;
+    const lower = xUrl.toLowerCase();
+    return lower.includes("x.com") || lower.includes("twitter.com");
+  }, [xUrl]);
+
+  const isStep1Valid = useMemo(() => {
+    return (
+      name.trim().length > 0 &&
+      role.trim().length > 0 &&
+      companyName.trim().length > 0 &&
+      isEmailValid &&
+      isWebsiteValid &&
+      isLinkedInValid &&
+      isXValid
+    );
+  }, [name, role, companyName, isEmailValid, isWebsiteValid, isLinkedInValid, isXValid]);
 
   const placeholderText = "Describe your idea naturally.\nWhat problem are you solving?\nWho is it for?\nWhy you?\nWhy now?";
 
@@ -464,7 +496,7 @@ export default function OnboardingPage() {
 
         <div className="max-w-[280px]">
           <h2 className="text-[26px] font-medium leading-[1.2] tracking-[-0.03em] text-black">
-            Get access to your personal hub for clarity and productivity.
+            Stop pitching blindly. Get your founder profile assessed before you apply.
           </h2>
           <p className="mt-4 text-[14px] leading-relaxed text-black/40">
             Fundme helps founders secure capital by automating the boring parts of the application process.
@@ -511,7 +543,7 @@ export default function OnboardingPage() {
                     />
                   </Field>
                   <Field className="gap-1 sm:gap-2.5">
-                    <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">Role</FieldLabel>
+                    <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">Role <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input 
                       className="h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[14px] sm:text-[16px] px-3 sm:px-4"
                       placeholder="e.g. Founder"
@@ -532,44 +564,55 @@ export default function OnboardingPage() {
                     <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">Email <span className="text-[#ff6b3d]">*</span></FieldLabel>
                     <Input
                       type="email"
-                      className="h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[14px] sm:text-[16px] px-3 sm:px-4"
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${email && !isEmailValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
                       placeholder="founder@startup.com"
                       onChange={(e) => setEmail(e.target.value)}
                       value={email}
                     />
-                    <div className="text-[11px] sm:text-[12px] text-black/40 mt-1">Email OR LinkedIn URL is required to proceed.</div>
+                    {email && !isEmailValid && (
+                      <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">Please enter a valid email address with @ and domain.</div>
+                    )}
                   </Field>
                   <Field className="gap-1 sm:gap-2.5 md:col-span-2">
                     <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">Website URL</FieldLabel>
                     <Input
-                      className="h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[14px] sm:text-[16px] px-3 sm:px-4"
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${websiteUrl && !isWebsiteValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
                       placeholder="https://yourstartup.com"
                       onChange={(e) => setWebsiteUrl(e.target.value)}
                       value={websiteUrl}
                     />
+                    {websiteUrl && !isWebsiteValid && (
+                      <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">Please enter a reasonable URL format (e.g. example.com).</div>
+                    )}
                   </Field>
                   <Field className="gap-1 sm:gap-2.5">
                     <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">LinkedIn URL</FieldLabel>
                     <Input
-                      className="h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[14px] sm:text-[16px] px-3 sm:px-4"
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${linkedIn && !isLinkedInValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
                       placeholder="https://linkedin.com/in/yourname"
                       onChange={(e) => setLinkedIn(e.target.value)}
                       value={linkedIn}
                     />
+                    {linkedIn && !isLinkedInValid && (
+                      <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">URL must contain linkedin.com.</div>
+                    )}
                   </Field>
                   <Field className="gap-1 sm:gap-2.5">
                     <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">X (Twitter) URL</FieldLabel>
                     <Input
-                      className="h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border-black/5 focus:bg-white transition-all text-[14px] sm:text-[16px] px-3 sm:px-4"
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${xUrl && !isXValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
                       placeholder="https://x.com/yourhandle"
                       onChange={(e) => setXUrl(e.target.value)}
                       value={xUrl}
                     />
+                    {xUrl && !isXValid && (
+                      <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">URL must contain x.com or twitter.com.</div>
+                    )}
                   </Field>
                 </div>
 
                 <div className="flex justify-end pt-4 sm:pt-8 border-t border-black/5 mt-3 sm:mt-6">
-                  <Button onClick={() => setStep(2)} size="lg" className="h-10 sm:h-12 px-8 sm:px-10 rounded-full text-[14px] sm:text-[16px]" disabled={!name || !companyName || (!email && !linkedIn)}>
+                  <Button onClick={() => setStep(2)} size="lg" className="h-10 sm:h-12 px-8 sm:px-10 rounded-full text-[14px] sm:text-[16px]" disabled={!isStep1Valid}>
                     Continue <ArrowRight className="size-4 ml-2" />
                   </Button>
                 </div>
@@ -659,7 +702,7 @@ export default function OnboardingPage() {
                   <div className="flex-1 w-full text-left flex flex-col">
                     <Textarea
                       className={`min-h-[160px] sm:min-h-[240px] text-[14px] sm:text-[16px] rounded-[16px] sm:rounded-[24px] bg-black/[0.02] border focus:bg-white p-4 sm:p-6 leading-relaxed resize-y transition-all ${
-                        notes.trim().length > 0 && (wordCount < 35 || wordCount > 250)
+                        notes.length > 0 && (letterCount < 35 || letterCount > 500)
                           ? "border-[#ff6b3d]/40 focus:border-[#ff6b3d]"
                           : "border-black/5 focus:border-black/20"
                       }`}
@@ -668,25 +711,25 @@ export default function OnboardingPage() {
                       value={notes}
                     />
                     
-                    {/* Word Counter Rules Display */}
+                    {/* Letter Counter Rules Display */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mt-2 px-1 text-[11px] sm:text-[12px]">
                       <span className={`font-medium transition-colors ${
-                        wordCount === 0 ? "text-black/40" : wordCount < 35 || wordCount > 250 ? "text-[#ff6b3d]" : "text-[#22c55e]"
+                        letterCount === 0 ? "text-black/40" : letterCount < 35 || letterCount > 500 ? "text-[#ff6b3d]" : "text-[#22c55e]"
                       }`}>
-                        {wordCount < 35 
-                          ? `Please add ${35 - wordCount} more words so we can understand what you’re building.` 
-                          : wordCount > 250 
-                          ? `You are ${wordCount - 250} words over the limit. Keep it under 250 words for now.`
+                        {letterCount < 35 
+                          ? `Please add ${35 - letterCount} more letters so we can understand what you’re building.` 
+                          : letterCount > 500 
+                          ? `You are ${letterCount - 500} letters over the limit. Keep it under 500 letters for now.`
                           : "Good context. Ready to continue."}
                       </span>
                       <div className="text-right shrink-0">
                         <div className={`font-semibold tracking-tight transition-colors ${
-                          wordCount > 0 && (wordCount < 35 || wordCount > 250) ? "text-[#ff6b3d]" : "text-black/40"
+                          letterCount > 0 && (letterCount < 35 || letterCount > 500) ? "text-[#ff6b3d]" : "text-black/40"
                         }`}>
-                          {wordCount} / 250 words
+                          {letterCount} / 500 letters
                         </div>
                         <div className="text-[10px] text-black/30 font-medium leading-none mt-0.5">
-                          Minimum 35 words
+                          Minimum 35 letters
                         </div>
                       </div>
                     </div>
@@ -711,7 +754,7 @@ export default function OnboardingPage() {
                      }} 
                      size="lg" 
                      className="h-10 sm:h-12 px-6 sm:px-10 rounded-full text-[14px] sm:text-[16px]" 
-                     disabled={wordCount < 35 || wordCount > 250}
+                     disabled={letterCount < 35 || letterCount > 500}
                    >
                      Continue <ArrowRight className="size-4 ml-2" />
                    </Button>
