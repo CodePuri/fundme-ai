@@ -1,14 +1,17 @@
 "use client";
 
-import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
+import { Suspense, type ReactNode, useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
   FilePenLine,
   Menu,
+  Minus,
+  Plus,
   Target,
   Upload,
   X,
@@ -53,8 +56,6 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
-  { label: "For Founders", href: "#product-proof" },
-  { label: "Explore", href: "/search" },
 ] as const;
 
 const stepIcons = {
@@ -137,7 +138,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
             whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
             whileTap={shouldReduceMotion ? undefined : tapCompress}
           >
-            Request Invite →
+            Get Started →
           </motion.button>
         </div>
 
@@ -177,7 +178,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               }}
               type="button"
             >
-              Request Invite
+              Get Started
             </button>
           </div>
         </motion.div>
@@ -396,54 +397,24 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
               fit. Draft the right angle for each one. Track every deadline in one place.
             </motion.p>
 
-            {/* CTA row — lighter, refined */}
-            <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10 sm:flex-row sm:gap-4" variants={fadeRise}>
+            {/* CTA row — single primary action */}
+            <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
               <motion.button
-                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
                 onClick={onOpenAuth}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
               >
-                Get started free
+                Get Started Free
                 <ArrowRight className="size-3.5" />
               </motion.button>
-              <motion.a
-                className="inline-flex items-center gap-1.5 rounded-full px-5 py-3 text-[14px] font-medium text-[#645d54] transition-colors hover:text-[#171513]"
-                href="#how-it-works"
-                whileHover={shouldReduceMotion ? undefined : { x: 2 }}
-              >
-                See how it works
-                <ArrowRight className="size-3.5" />
-              </motion.a>
             </motion.div>
             <motion.div className="mt-3 text-[13px] font-medium text-[#8b8276]" variants={fadeRise}>
               Free assessment. No credit card required.
             </motion.div>
 
-            {/* Trust row */}
-            <motion.div
-              className="mt-8 flex flex-col items-center gap-3 sm:mt-10"
-              variants={fadeRiseWithDelay(0.35)}
-            >
-              <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
-                Now matching with
-              </span>
-              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
-                {trustLogos.map((logo) => (
-                  <div key={logo.name} className="group flex items-center gap-2">
-                    <ProgramMark
-                      program={{ name: logo.name, slug: logo.slug, mark: logo.mark }}
-                      size={20}
-                      className="opacity-60 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
-                    <span className="text-[12px] font-semibold tracking-[-0.01em] text-[#b5ad9f] transition-colors duration-300 group-hover:text-[#8b8276] sm:text-[13px]">
-                      {logo.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Trust row removed — single trust rail section below handles this */}
           </div>
         </motion.div>
       </div>
@@ -904,15 +875,100 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── 8. Cinematic Footer ──────────────────────────────────────────── */
+/* ─── 8. FAQ Section ────────────────────────────────────────────────── */
+
+const faqItems = [
+  {
+    question: "What does Fundme do?",
+    answer: "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and startup programs.",
+  },
+  {
+    question: "Is this free?",
+    answer: "Yes. The early-access assessment is free and does not require a credit card.",
+  },
+  {
+    question: "What happens after I submit?",
+    answer: "Team Fundme reviews your profile and startup context. If you are a fit for early access, we will contact you with next steps.",
+  },
+  {
+    question: "Do I need a pitch deck?",
+    answer: "No. A pitch deck helps, but you can start with your website, LinkedIn, or a short startup description.",
+  },
+  {
+    question: "Is this only for accelerators?",
+    answer: "No. Fundme is being built for accelerators, grants, fellowships, cloud credits, incubators, and other founder programs.",
+  },
+  {
+    question: "Who is building Fundme?",
+    answer: "Fundme is a Totem Interactive product.",
+  },
+];
+
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  return (
+    <section className="mx-auto max-w-[840px] px-4 py-20 sm:px-6 lg:py-28" id="faq">
+      <SectionReveal className="text-center">
+        <h2 className="text-[clamp(2rem,4vw,2.5rem)] font-bold tracking-[-0.03em] text-[#171513]">
+          Frequently Asked Questions
+        </h2>
+        <p className="mt-3 text-[16px] text-[#645d54]">
+          Everything you need to know about the early-access assessment.
+        </p>
+      </SectionReveal>
+
+      <div className="mt-12 flex flex-col gap-4">
+        {faqItems.map((item, index) => {
+          const isOpen = openIndex === index;
+          return (
+            <div
+              key={index}
+              className={cn(
+                "rounded-2xl border transition-all duration-200 overflow-hidden",
+                isOpen
+                  ? "border-[#ff6b3d] bg-white shadow-[0_8px_24px_rgba(255,107,61,0.08)]"
+                  : "border-[#e7ddd0] bg-[#f6f1ea]/50 hover:bg-white/60"
+              )}
+            >
+              <button
+                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[16px] font-semibold text-[#171513] focus:outline-none"
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+                type="button"
+              >
+                <span>{item.question}</span>
+                <span className={cn(
+                  "flex size-6 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
+                  isOpen ? "bg-[#ff6b3d] text-white" : "bg-[#e7ddd0] text-[#645d54]"
+                )}>
+                  {isOpen ? <Minus className="size-3.5" /> : <Plus className="size-3.5" />}
+                </span>
+              </button>
+
+              <motion.div
+                animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+                initial={{ height: 0, opacity: 0 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: EASE_OUT }}
+              >
+                <div className="px-6 pb-5 pt-0 text-[15px] leading-relaxed text-[#645d54] border-t border-black/4 mt-1 pt-3">
+                  {item.answer}
+                </div>
+              </motion.div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+/* ─── 9. Cinematic Footer ──────────────────────────────────────────── */
 
 const footerLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Programs", href: "/search" },
-  { label: "Pricing", href: "#product-proof" },
-  { label: "Privacy", href: "#" },
-  { label: "Terms", href: "#" },
-  { label: "Contact", href: "#" },
+  { label: "Instagram", href: "https://instagram.com" /* TODO: Replace with final Fundme / Totem Instagram URL */ },
 ];
 
 function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
@@ -956,9 +1012,12 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
               <br />
               <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
             </h2>
-            <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#645d54]">
-              Upload once. Match faster. Draft smarter.
+            <p className="mt-6 max-w-[520px] text-[17px] leading-8 text-[#645d54]">
+              Fundme helps founders stop applying blindly and prepare stronger funding applications.
             </p>
+            <div className="mt-2 text-[13px] font-medium text-[#8b8276]">
+              A Totem Interactive product.
+            </div>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <motion.button
@@ -985,23 +1044,26 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         {/* Bottom Strip */}
         <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#e5d8c8]">
-          <div className="flex items-center gap-2">
-             <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
-                <Target className="size-5" />
-             </div>
-             <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
-          </div>
+          <Link href="/">
+            <BrandLockup size="sm" />
+          </Link>
 
           <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#645d54]">
             {footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="transition-colors hover:text-[#ff6b3d] font-medium">
+              <a
+                key={link.label}
+                href={link.href}
+                className="transition-colors hover:text-[#ff6b3d] font-medium"
+                target={link.label === "Instagram" ? "_blank" : undefined}
+                rel={link.label === "Instagram" ? "noopener noreferrer" : undefined}
+              >
                 {link.label}
               </a>
             ))}
           </div>
 
           <div className="text-[12px] text-[#8b8276] sm:text-right">
-            © {new Date().getFullYear()} Fundme.ai. <br className="sm:hidden" /> Built for founders.
+            © {new Date().getFullYear()} Fundme. <br className="sm:hidden" /> Built for founders.
           </div>
         </div>
       </div>
@@ -1017,7 +1079,7 @@ export function PublicHomepage() {
 
   function openAuth(_destination = "/onboarding") {
     if (isSignedIn) {
-      router.push("/thank-you");
+      router.push("/onboarding");
     } else {
       router.push("/sign-up");
     }
@@ -1033,18 +1095,10 @@ export function PublicHomepage() {
         <HowItWorksSection />
         <ProductProofSection />
         <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+        <FAQSection />
       </div>
 
       <CinematicFooter onOpenAuth={() => openAuth()} />
-
-      {/* <Suspense fallback={null}>
-        <PublicAuthController
-          fallbackIntent={{
-            action: "default",
-            destination: "/onboarding",
-          }}
-        />
-      </Suspense> */}
     </main>
   );
 }

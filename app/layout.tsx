@@ -7,8 +7,15 @@ import "./globals.css";
 import { DemoProvider } from "@/components/app/demo-provider";
 
 export const metadata: Metadata = {
-  title: "Fundme.ai",
-  description: "Founder workflow demo for startup applications.",
+  title: "Fundme — Get assessed before you apply",
+  description:
+    "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
+  openGraph: {
+    title: "Fundme — Get assessed before you apply",
+    description:
+      "Fundme helps founders stop applying blindly and prepare stronger funding applications.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
