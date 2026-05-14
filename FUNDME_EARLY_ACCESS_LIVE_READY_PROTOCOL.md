@@ -4,10 +4,10 @@
 `feature/early-access-intake-preview`
 
 ## 2. Current Commit
-db15a59
+4a975f7
 
 ## 3. Current Preview URL
-https://fundme-ggixjw4c4-aakash-s-projects-bf7b5a5e.vercel.app
+https://fundme-2w7kbg1ol-aakash-s-projects-bf7b5a5e.vercel.app
 
 ## 4. Product Intent
 Make the existing Fundme Early Access onboarding flow genuinely live-ready for preview review before any domain connection. Focus is strictly on gathering founder profile and startup idea for an early access waitlist, not performing real-time diagnosis or deck roasts.
