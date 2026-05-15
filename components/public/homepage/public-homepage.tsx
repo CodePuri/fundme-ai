@@ -7,11 +7,8 @@ import { useUser } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
-  ChevronDown,
   FilePenLine,
   Menu,
-  Minus,
-  Plus,
   Target,
   Upload,
   X,
@@ -56,6 +53,8 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
+  { label: "For Founders", href: "#product-proof" },
+  { label: "Explore", href: "/search" },
 ] as const;
 
 const stepIcons = {
@@ -66,8 +65,19 @@ const stepIcons = {
 
 /* ─── Utility ────────────────────────────────────────────────── */
 
+function useStableReducedMotion() {
+  const prefersReducedMotion = useReducedMotion();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  return isMounted ? prefersReducedMotion : false;
+}
+
 function SectionReveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
     <motion.div
@@ -85,7 +95,7 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 /* ─── CountUp display ────────────────────────────────────────── */
 
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
 
   return <>{shouldReduceMotion ? value : count}{suffix}</>;
@@ -95,7 +105,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
 
@@ -328,7 +338,7 @@ function FloatingCardMid({
 }
 
 function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -432,11 +442,11 @@ function LogoRailCard({
   id,
 }: (typeof ecosystemPrograms)[number]) {
   return (
-    <div className="flex min-w-[220px] items-center gap-4 rounded-[26px] border border-black/8 bg-white/90 px-5 py-4 shadow-[0_10px_28px_rgba(18,15,11,0.05)] backdrop-blur-sm">
+    <div className="flex min-w-[190px] items-center gap-3 rounded-[22px] border border-black/8 bg-white/92 px-4 py-3.5 shadow-[0_10px_28px_rgba(18,15,11,0.05)] backdrop-blur-sm sm:min-w-[230px] sm:gap-4 sm:px-5 sm:py-4">
       <ProgramMark
         className="shadow-[0_10px_24px_rgba(18,15,11,0.06)]"
         program={{ id, mark, name, slug }}
-        size={40}
+        size={38}
       />
       <div className="min-w-0">
         <div className="text-[14px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#171513]">{name}</div>
@@ -447,10 +457,10 @@ function LogoRailCard({
 }
 
 function LogoRailSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
-    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-4">
+    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-5 sm:py-6">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
         <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
       </SectionReveal>
@@ -496,7 +506,7 @@ function parseStatValue(raw: string): { num: number; suffix: string } {
 }
 
 function StatsStrip() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
@@ -538,7 +548,7 @@ function StatsStrip() {
 /* ─── 5. How it works ────────────────────────────────────────── */
 
 function HowItWorksSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#e7ddd0] bg-[#f8f3ec] px-4 py-20 sm:px-6 xl:px-8" id="how-it-works">
@@ -614,7 +624,7 @@ function HowItWorksSection() {
 /* ─── 6. Product proof — one dominant visual ─────────────────── */
 
 function ProductProofSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#d4c4b3] bg-[#eae0d2] px-4 py-20 sm:px-6 xl:px-8" id="product-proof">
@@ -761,7 +771,7 @@ function ProductProofSection() {
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
 function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
   return (
@@ -879,86 +889,72 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
 
 const faqItems = [
   {
-    question: "What does Fundme do?",
-    answer: "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and startup programs.",
+    question: "What is Fundme?",
+    answer: "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
   },
   {
-    question: "Is this free?",
+    question: "Is it free?",
     answer: "Yes. The early-access assessment is free and does not require a credit card.",
   },
   {
-    question: "What happens after I submit?",
-    answer: "Team Fundme reviews your profile and startup context. If you are a fit for early access, we will contact you with next steps.",
+    question: "How does Fundme use my submission?",
+    answer: "We use your submitted startup context to prepare an early funding assessment and identify gaps in positioning, deck readiness, and application fit.",
   },
   {
-    question: "Do I need a pitch deck?",
-    answer: "No. A pitch deck helps, but you can start with your website, LinkedIn, or a short startup description.",
+    question: "Who is this for?",
+    answer: "Early-stage founders, student founders, indie builders, and startup teams preparing to apply for funding programs.",
+  },
+  {
+    question: "What happens after I submit?",
+    answer: "Team Fundme reviews your profile and will contact you if you are selected for early access.",
   },
   {
     question: "Is this only for accelerators?",
     answer: "No. Fundme is being built for accelerators, grants, fellowships, cloud credits, incubators, and other founder programs.",
   },
-  {
-    question: "Who is building Fundme?",
-    answer: "Fundme is a Totem Interactive product.",
-  },
 ];
 
 function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
-    <section className="mx-auto max-w-[840px] px-4 py-20 sm:px-6 lg:py-28" id="faq">
-      <SectionReveal className="text-center">
-        <h2 className="text-[clamp(2rem,4vw,2.5rem)] font-bold tracking-[-0.03em] text-[#171513]">
-          Frequently Asked Questions
-        </h2>
-        <p className="mt-3 text-[16px] text-[#645d54]">
-          Everything you need to know about the early-access assessment.
-        </p>
-      </SectionReveal>
+    <section className="border-t border-[#e7ddd0] bg-[#f6f1ea] px-4 py-20 sm:px-6 sm:py-24 lg:py-28" id="faq">
+      <SectionReveal className="mx-auto max-w-[1120px]">
+        <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:gap-12">
+          <div>
+            <div className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]">Clarity first</div>
+            <h2 className="mt-4 max-w-[420px] text-[clamp(2rem,4vw,3rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513]">
+              Questions founders ask before they submit.
+            </h2>
+            <p className="mt-5 max-w-[380px] text-[15px] leading-7 text-[#645d54]">
+              Early access is intentionally focused: submit your context, get reviewed, and avoid applying blindly.
+            </p>
+          </div>
 
-      <div className="mt-12 flex flex-col gap-4">
-        {faqItems.map((item, index) => {
-          const isOpen = openIndex === index;
-          return (
-            <div
-              key={index}
-              className={cn(
-                "rounded-2xl border transition-all duration-200 overflow-hidden",
-                isOpen
-                  ? "border-[#ff6b3d] bg-white shadow-[0_8px_24px_rgba(255,107,61,0.08)]"
-                  : "border-[#e7ddd0] bg-[#f6f1ea]/50 hover:bg-white/60"
-              )}
-            >
-              <button
-                className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left text-[16px] font-semibold text-[#171513] focus:outline-none"
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                type="button"
+          <div className="grid gap-3 sm:grid-cols-2">
+            {faqItems.map((item, index) => (
+              <motion.article
+                className={cn(
+                  "rounded-[18px] border border-[#e4d8c8] bg-white/80 p-5 shadow-[0_12px_34px_rgba(18,15,11,0.035)]",
+                  index === 2 && "sm:col-span-2",
+                )}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                key={item.question}
+                transition={{ duration: 0.45, ease: EASE_OUT, delay: index * 0.04 }}
+                viewport={{ once: true, amount: 0.2 }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               >
-                <span>{item.question}</span>
-                <span className={cn(
-                  "flex size-6 shrink-0 items-center justify-center rounded-full transition-colors duration-200",
-                  isOpen ? "bg-[#ff6b3d] text-white" : "bg-[#e7ddd0] text-[#645d54]"
-                )}>
-                  {isOpen ? <Minus className="size-3.5" /> : <Plus className="size-3.5" />}
-                </span>
-              </button>
-
-              <motion.div
-                animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-                initial={{ height: 0, opacity: 0 }}
-                transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: EASE_OUT }}
-              >
-                <div className="px-6 pb-5 pt-0 text-[15px] leading-relaxed text-[#645d54] border-t border-black/4 mt-1 pt-3">
+                <h3 className="text-[15px] font-semibold leading-snug tracking-[-0.02em] text-[#171513] sm:text-[16px]">
+                  {item.question}
+                </h3>
+                <p className="mt-3 text-[14px] leading-6 text-[#645d54]">
                   {item.answer}
-                </div>
-              </motion.div>
-            </div>
-          );
-        })}
-      </div>
+                </p>
+              </motion.article>
+            ))}
+          </div>
+        </div>
+      </SectionReveal>
     </section>
   );
 }
@@ -968,102 +964,61 @@ function FAQSection() {
 const footerLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Programs", href: "/search" },
-  { label: "Instagram", href: "https://instagram.com" /* TODO: Replace with final Fundme / Totem Instagram URL */ },
-];
+] as const;
+
+// TODO: Render Instagram once the final Fundme or Totem Instagram URL is approved.
 
 function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useStableReducedMotion();
 
   return (
-    <footer
-      className="relative h-[650px] sm:h-[600px] lg:h-[700px]"
-      style={{ clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%)" }}
-    >
-      <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
-        
-        {/* Subtle Background Word */}
-        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-white/50 select-none mix-blend-soft-light filter blur-[2px]">
-          FUNDME
-        </div>
-
-        {/* Top Marquee Band */}
-        <div className="relative z-10 overflow-hidden py-3">
-          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="flex items-center gap-10">
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
-                <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
-                <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
-                <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
-                <span className="text-[#d2c5b3]">•</span>
-              </div>
-            ))}
+    <footer className="border-t border-[#d9cbbd] bg-[#eee3d6] text-[#171513]">
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-4 py-12 sm:px-6 sm:py-14 xl:px-8">
+        <div className="grid gap-9 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+          <div>
+            <Link className="inline-flex" href="/">
+              <BrandLockup size="sm" />
+            </Link>
+            <div className="mt-4 text-[13px] font-medium text-[#8b8276]">
+              A Totem Interactive product.
+            </div>
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 sm:px-6 xl:px-8">
-          <div className="flex flex-col items-center text-center">
-            <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#171513]">
+          <div className="lg:text-right">
+            <h2 className="text-[clamp(2.3rem,5vw,4.5rem)] font-semibold leading-[0.96] tracking-[-0.05em]">
               One startup.
               <br />
               <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
             </h2>
-            <p className="mt-6 max-w-[520px] text-[17px] leading-8 text-[#645d54]">
+            <p className="mt-5 max-w-[560px] text-[16px] leading-7 text-[#645d54] lg:ml-auto">
               Fundme helps founders stop applying blindly and prepare stronger funding applications.
             </p>
-            <div className="mt-2 text-[13px] font-medium text-[#8b8276]">
-              A Totem Interactive product.
-            </div>
-
-            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-              <motion.button
-                className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
-                onClick={onOpenAuth}
-                type="button"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                Get Started
-                <ArrowRight className="size-4" />
-              </motion.button>
-              <motion.a
-                className="inline-flex items-center gap-2 rounded-full border border-[#d2c5b3] bg-white/70 backdrop-blur-sm px-6 py-4 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
-                href="#how-it-works"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                See how it works
-              </motion.a>
-            </div>
           </div>
         </div>
 
-        {/* Bottom Strip */}
-        <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#e5d8c8]">
-          <Link href="/">
-            <BrandLockup size="sm" />
-          </Link>
-
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#645d54]">
+        <div className="flex flex-col gap-6 border-t border-[#d9cbbd] pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] font-medium text-[#645d54]">
             {footerLinks.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="transition-colors hover:text-[#ff6b3d] font-medium"
-                target={link.label === "Instagram" ? "_blank" : undefined}
-                rel={link.label === "Instagram" ? "noopener noreferrer" : undefined}
-              >
+              <Link className="transition-colors hover:text-[#ff6b3d]" href={link.href} key={link.label}>
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
 
-          <div className="text-[12px] text-[#8b8276] sm:text-right">
-            © {new Date().getFullYear()} Fundme. <br className="sm:hidden" /> Built for founders.
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+            <motion.button
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff6b3d] px-6 py-3 text-[14px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.20)] transition-colors hover:bg-[#f45d2e]"
+              onClick={onOpenAuth}
+              type="button"
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+              whileTap={shouldReduceMotion ? undefined : tapCompress}
+            >
+              Get Started
+              <ArrowRight className="size-4" />
+            </motion.button>
+            <div className="text-[12px] text-[#8b8276]">
+              © 2026 Fundme. All rights reserved.
+            </div>
           </div>
         </div>
       </div>

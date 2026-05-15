@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Fundme — Get assessed before you apply",
     description:
-      "Fundme helps founders stop applying blindly and prepare stronger funding applications.",
+      "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
     type: "website",
   },
 };

@@ -227,24 +227,14 @@ export default function OnboardingPage() {
 
   // Loading assessment dynamic messages array
   const loadingStepsArray = useMemo(() => {
-    const entity = companyName.trim() || derivedFirstName || "your startup";
-    const meaningfulWords = notes
-      .trim()
-      .split(/\s+/)
-      .filter((w) => w.length > 3)
-      .slice(0, 3)
-      .join(" ");
-    
-    const ideaStr = meaningfulWords ? ` ${meaningfulWords} idea` : " idea";
-
     return [
       "Securing your founder profile",
       "Reading your startup context",
-      `Understanding ${entity}’s${ideaStr}...`,
-      "Analyzing missing funding signals",
-      "Preparing your early funding assessment"
+      "Understanding your startup context",
+      "Checking missing funding signals",
+      "Preparing your early funding assessment",
     ];
-  }, [companyName, derivedFirstName, notes]);
+  }, []);
 
   // Step 5 inline processing timers
   useEffect(() => {
