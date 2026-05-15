@@ -1,0 +1,9 @@
+.env
+.env.*
+!.env.example
+.env.local
+.env.production
+.env.preview
+.clerk/
+.agents/
+skills-lock.json
