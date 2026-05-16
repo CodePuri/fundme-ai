@@ -18,3 +18,8 @@
 **Security Standards Enforced:**
 - Failing Securely: Ensuring the middleware is properly registered so that unprotected routes fail closed (require authentication) by default.
 - Defense in Depth: Multiple layers of protection (middleware routing + component-level state checks) are now properly aligned.
+
+## 2026-05-16 - Open Redirect in Authentication Flow
+**Vulnerability:** The `/login` page was accepting an arbitrary `redirect` query parameter and appending it to the Clerk `/sign-in` URL (`redirect_url`) without validation. This allowed an attacker to craft a malicious URL (e.g., `/login?redirect=https://evil.com`) which would redirect the user to a malicious site after authenticating.
+**Learning:** Next.js redirect parameters, especially those tied to authentication flows (like `redirect_url` in Clerk), must be treated as untrusted input. Relying on default fallbacks (`|| "/onboarding"`) does not sanitize the input if the attacker provides a truthy, absolute URL.
+**Prevention:** Always validate user-provided redirect URLs to ensure they are relative paths. Created and applied a `getSafeRedirect` utility that explicitly checks that the path starts with `/` and not `//` to prevent protocol-relative and absolute URL redirects.
