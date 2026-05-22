@@ -53,7 +53,6 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
-  { label: "For Founders", href: "#product-proof" },
   { label: "Explore", href: "/search" },
 ] as const;
 
@@ -117,8 +116,10 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
     <motion.header
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b bg-[#f6f1ea]/92 backdrop-blur-xl transition-[border-color,padding] duration-300",
-        scrolled ? "border-[#d9cbbd] py-2.5 sm:py-2.5" : "border-[#e7ddd0] py-4",
+        "fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl transition-[border-color,padding,background-color,box-shadow] duration-300",
+        scrolled
+          ? "border-[#d4c8ba] bg-[#f6f1ea] py-2.5 shadow-[0_1px_8px_rgba(18,15,11,0.08)] sm:py-2.5"
+          : "border-[#e7ddd0] bg-[#f6f1ea]/95 py-4",
       )}
       initial={shouldReduceMotion ? false : { opacity: 0, y: -16 }}
       transition={{ duration: 0.6, ease: EASE_OUT }}
@@ -131,7 +132,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
-              className="text-[14px] text-[#5f584f] transition-colors duration-200 hover:text-[#171513]"
+              className="text-[14px] font-medium text-[#4a4540] transition-colors duration-200 hover:text-[#171513]"
               href={item.href}
               key={item.label}
             >
@@ -141,15 +142,12 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <motion.button
+          <Link
             className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_10px_28px_rgba(255,107,61,0.22)] transition-colors hover:bg-[#f45d2e]"
-            onClick={onOpenAuth}
-            type="button"
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-            whileTap={shouldReduceMotion ? undefined : tapCompress}
+            href="/onboarding"
           >
             Get Started →
-          </motion.button>
+          </Link>
         </div>
 
         <button
@@ -180,16 +178,13 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
                 {item.label}
               </Link>
             ))}
-            <button
-              className="mt-2 rounded-2xl bg-[#ff6b3d] px-4 py-3 text-left text-[14px] font-medium text-white"
-              onClick={() => {
-                setMenuOpen(false);
-                onOpenAuth();
-              }}
-              type="button"
+            <Link
+              className="mt-2 block rounded-2xl bg-[#ff6b3d] px-4 py-3 text-left text-[14px] font-medium text-white"
+              href="/onboarding"
+              onClick={() => setMenuOpen(false)}
             >
               Get Started
-            </button>
+            </Link>
           </div>
         </motion.div>
       ) : null}
@@ -918,9 +913,13 @@ function FAQSection() {
   const shouldReduceMotion = useStableReducedMotion();
 
   return (
-    <section className="border-t border-[#e7ddd0] bg-[#f6f1ea] px-4 py-20 sm:px-6 sm:py-24 lg:py-28" id="faq">
-      <SectionReveal className="mx-auto max-w-[1120px]">
-        <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:gap-12">
+    <section
+      className="scroll-mt-20 border-t border-[#d9cbbd] bg-[#f0e9df] px-4 py-20 sm:px-6 sm:py-24 lg:py-28"
+      id="faq"
+    >
+      <div className="mx-auto max-w-[1120px]">
+        <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-14">
+          {/* Left intro column */}
           <div>
             <div className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]">Clarity first</div>
             <h2 className="mt-4 max-w-[420px] text-[clamp(2rem,4vw,3rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513]">
@@ -931,30 +930,31 @@ function FAQSection() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
+          {/* FAQ cards grid */}
+          <div className="grid gap-4 sm:grid-cols-2">
             {faqItems.map((item, index) => (
               <motion.article
                 className={cn(
-                  "rounded-[18px] border border-[#e4d8c8] bg-white/80 p-5 shadow-[0_12px_34px_rgba(18,15,11,0.035)]",
+                  "rounded-[18px] border border-[#ddd1c2] bg-white/90 p-5 shadow-[0_4px_18px_rgba(18,15,11,0.04)] backdrop-blur-sm",
                   index === 2 && "sm:col-span-2",
                 )}
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
                 key={item.question}
-                transition={{ duration: 0.45, ease: EASE_OUT, delay: index * 0.04 }}
-                viewport={{ once: true, amount: 0.2 }}
+                transition={{ duration: 0.4, ease: EASE_OUT, delay: index * 0.04 }}
+                viewport={{ once: true, amount: 0.15 }}
                 whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
               >
                 <h3 className="text-[15px] font-semibold leading-snug tracking-[-0.02em] text-[#171513] sm:text-[16px]">
                   {item.question}
                 </h3>
-                <p className="mt-3 text-[14px] leading-6 text-[#645d54]">
+                <p className="mt-3 text-[14px] leading-[1.65] text-[#645d54]">
                   {item.answer}
                 </p>
               </motion.article>
             ))}
           </div>
         </div>
-      </SectionReveal>
+      </div>
     </section>
   );
 }
@@ -964,6 +964,7 @@ function FAQSection() {
 const footerLinks = [
   { label: "How It Works", href: "#how-it-works" },
   { label: "Programs", href: "/search" },
+  { label: "FAQ", href: "#faq" },
 ] as const;
 
 // TODO: Render Instagram once the final Fundme or Totem Instagram URL is approved.
@@ -972,8 +973,8 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useStableReducedMotion();
 
   return (
-    <footer className="border-t border-[#d9cbbd] bg-[#eee3d6] text-[#171513]">
-      <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-4 py-12 sm:px-6 sm:py-14 xl:px-8">
+    <footer className="border-t border-[#d4c4b3] bg-[#e8ddd0] text-[#171513]">
+      <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-4 py-14 sm:px-6 sm:py-16 xl:px-8">
         <div className="grid gap-9 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <Link className="inline-flex" href="/">
@@ -1041,18 +1042,15 @@ export function PublicHomepage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
-      <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] pb-8">
-        <Header onOpenAuth={() => openAuth()} />
-        <HomepageHero onOpenAuth={() => openAuth()} />
-        <LogoRailSection />
-        <StatsStrip />
-        <HowItWorksSection />
-        <ProductProofSection />
-        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
-        <FAQSection />
-      </div>
-
+    <main className="min-h-screen bg-[#e8ddd0] text-[#171513]" data-theme="public">
+      <Header onOpenAuth={() => openAuth()} />
+      <HomepageHero onOpenAuth={() => openAuth()} />
+      <LogoRailSection />
+      <StatsStrip />
+      <HowItWorksSection />
+      <ProductProofSection />
+      <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+      <FAQSection />
       <CinematicFooter onOpenAuth={() => openAuth()} />
     </main>
   );
