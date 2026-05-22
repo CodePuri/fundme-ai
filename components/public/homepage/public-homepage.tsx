@@ -1,12 +1,13 @@
 "use client";
 
-import { Suspense, type ReactNode, useState, useEffect, useRef, useCallback } from "react";
+import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
   FilePenLine,
   Menu,
   Target,
@@ -53,6 +54,7 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
+  { label: "For Founders", href: "#product-proof" },
   { label: "Explore", href: "/search" },
 ] as const;
 
@@ -64,19 +66,8 @@ const stepIcons = {
 
 /* ─── Utility ────────────────────────────────────────────────── */
 
-function useStableReducedMotion() {
-  const prefersReducedMotion = useReducedMotion();
-  const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  return isMounted ? prefersReducedMotion : false;
-}
-
 function SectionReveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <motion.div
@@ -94,7 +85,7 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 /* ─── CountUp display ────────────────────────────────────────── */
 
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
 
   return <>{shouldReduceMotion ? value : count}{suffix}</>;
@@ -104,7 +95,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
 
@@ -116,8 +107,8 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
     <motion.header
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b border-black/5 bg-[#f8f3ec]/95 shadow-[0_8px_30px_rgba(23,21,19,0.04)] backdrop-blur-md transition-[padding] duration-300",
-        scrolled ? "py-2.5" : "py-4",
+        "fixed inset-x-0 top-0 z-50 border-b bg-[#f6f1ea]/95 backdrop-blur-md transition-[border-color,padding] duration-300",
+        scrolled ? "border-[#d9cbbd] py-3 shadow-sm" : "border-[#e7ddd0] py-4",
       )}
       initial={shouldReduceMotion ? false : { opacity: 0, y: -16 }}
       transition={{ duration: 0.6, ease: EASE_OUT }}
@@ -130,7 +121,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
-              className="text-[14px] font-semibold text-[#171513] opacity-100 transition-colors duration-200 hover:text-black"
+              className="text-[14px] font-semibold text-[#171513] transition-colors duration-200 hover:text-black"
               href={item.href}
               key={item.label}
             >
@@ -141,10 +132,11 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(23,21,19,0.12)] opacity-100 transition-colors hover:bg-[#2a2622]"
+            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
             href="/onboarding"
+            style={{ color: "#ffffff" }}
           >
-            Get Started →
+            Get Started
           </Link>
         </div>
 
@@ -161,14 +153,14 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
       {menuOpen ? (
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="border-t border-black/8 px-4 py-4 md:hidden"
+          className="border-t border-black/8 bg-[#f6f1ea] px-4 py-4 md:hidden"
           initial={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25, ease: EASE_OUT }}
         >
           <div className="flex flex-col gap-2">
             {navItems.map((item) => (
               <Link
-                className="rounded-2xl px-3 py-2 text-[14px] text-[#171513] transition-colors hover:bg-white"
+                className="rounded-2xl px-3 py-2 text-[14px] font-semibold text-[#171513] transition-colors hover:bg-white/50"
                 href={item.href}
                 key={item.label}
                 onClick={() => setMenuOpen(false)}
@@ -177,9 +169,10 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               </Link>
             ))}
             <Link
-              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-left text-[14px] font-medium text-white opacity-100"
+              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
               href="/onboarding"
               onClick={() => setMenuOpen(false)}
+              style={{ color: "#ffffff" }}
             >
               Get Started
             </Link>
@@ -214,12 +207,20 @@ const floatingCards: {
   { id: "500", label: "500 Global", slug: "500-global", x: "5%", y: "76%", rotate: 3, delay: 0.36, side: "right" },
 ];
 
-const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" }[] = [
+const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" | "default" }[] = [
   { name: "Y Combinator", slug: "y-combinator" },
-  { name: "Antler", mark: "antler" },
-  { name: "Google for Startups", slug: "google-for-startups" },
   { name: "Techstars", slug: "techstars" },
+  { name: "Antler", mark: "antler" },
   { name: "500 Global", slug: "500-global" },
+  { name: "Startup India", mark: "default" },
+  { name: "Startup India Seed Fund", mark: "default" },
+  { name: "MeitY TIDE 2.0", mark: "default" },
+  { name: "BIRAC BIG", mark: "default" },
+  { name: "SIDBI Fund of Funds", mark: "default" },
+  { name: "AWS Activate", mark: "aws" },
+  { name: "Google for Startups", slug: "google-for-startups" },
+  { name: "Microsoft for Startups", mark: "default" },
+  { name: "NVIDIA Inception", mark: "default" },
 ];
 
 function FloatingCard({
@@ -331,7 +332,7 @@ function FloatingCardMid({
 }
 
 function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -435,11 +436,11 @@ function LogoRailCard({
   id,
 }: (typeof ecosystemPrograms)[number]) {
   return (
-    <div className="flex min-w-[190px] items-center gap-3 rounded-[22px] border border-black/8 bg-white/92 px-4 py-3.5 shadow-[0_10px_28px_rgba(18,15,11,0.05)] backdrop-blur-sm sm:min-w-[230px] sm:gap-4 sm:px-5 sm:py-4">
+    <div className="flex min-w-[220px] items-center gap-4 rounded-[26px] border border-black/8 bg-white/90 px-5 py-4 shadow-[0_10px_28px_rgba(18,15,11,0.05)] backdrop-blur-sm">
       <ProgramMark
         className="shadow-[0_10px_24px_rgba(18,15,11,0.06)]"
         program={{ id, mark, name, slug }}
-        size={38}
+        size={40}
       />
       <div className="min-w-0">
         <div className="text-[14px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#171513]">{name}</div>
@@ -450,16 +451,30 @@ function LogoRailCard({
 }
 
 function LogoRailSection() {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
+
+  // Combine data to render exactly the required mix
+  const programsToRender = trustLogos.map((tl, i) => ({
+    id: tl.slug || `prog-${i}`,
+    name: tl.name,
+    slug: tl.slug,
+    mark: tl.mark as any,
+    label: "Program",
+    type: "Accelerator",
+    checkSize: "Various",
+    deadline: "Rolling",
+    why: "Ecosystem partner.",
+    fitScore: 90
+  }));
 
   return (
-    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-5 sm:py-6">
+    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-4">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
+        <div className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
       </SectionReveal>
 
       <motion.div
-        className="logo-rail-viewport relative mt-5"
+        className="logo-rail-viewport relative mt-5 overflow-hidden"
         initial={shouldReduceMotion ? false : { opacity: 0 }}
         transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
         viewport={{ once: true }}
@@ -469,7 +484,7 @@ function LogoRailSection() {
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
 
         <div className={cn("logo-rail-strip px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}>
-          {ecosystemPrograms.map((program) => (
+          {programsToRender.map((program) => (
             <LogoRailCard key={program.id} {...program} />
           ))}
         </div>
@@ -478,7 +493,7 @@ function LogoRailSection() {
           aria-hidden="true"
           className={cn("logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}
         >
-          {ecosystemPrograms.map((program) => (
+          {programsToRender.map((program) => (
             <LogoRailCard key={`${program.id}-duplicate`} {...program} />
           ))}
         </div>
@@ -499,7 +514,7 @@ function parseStatValue(raw: string): { num: number; suffix: string } {
 }
 
 function StatsStrip() {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
@@ -541,7 +556,7 @@ function StatsStrip() {
 /* ─── 5. How it works ────────────────────────────────────────── */
 
 function HowItWorksSection() {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#e7ddd0] bg-[#f8f3ec] px-4 py-20 sm:px-6 xl:px-8" id="how-it-works">
@@ -617,7 +632,7 @@ function HowItWorksSection() {
 /* ─── 6. Product proof — one dominant visual ─────────────────── */
 
 function ProductProofSection() {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#d4c4b3] bg-[#eae0d2] px-4 py-20 sm:px-6 xl:px-8" id="product-proof">
@@ -764,7 +779,7 @@ function ProductProofSection() {
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
 function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useStableReducedMotion();
+  const shouldReduceMotion = useReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
   return (
@@ -878,9 +893,9 @@ function MatchedProgramsSection({ onOpenAuth }: { onOpenAuth: () => void }) {
   );
 }
 
-/* ─── 8. FAQ Section ────────────────────────────────────────────────── */
+/* ─── 8. Premium FAQ ────────────────────────────────────────────── */
 
-const faqItems = [
+const faqs = [
   {
     question: "What is Fundme?",
     answer: "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
@@ -908,117 +923,83 @@ const faqItems = [
 ];
 
 function FAQSection() {
-  const shouldReduceMotion = useStableReducedMotion();
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section
-      className="scroll-mt-20 border-t border-[#d9cbbd] bg-[#f0e9df] px-4 py-20 sm:px-6 sm:py-24 lg:py-28"
-      id="faq"
-    >
-      <div className="mx-auto max-w-[1120px]">
-        <div className="grid gap-10 lg:grid-cols-[0.75fr_1.25fr] lg:gap-14">
-          {/* Left intro column */}
-          <div>
-            <div className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]">Clarity first</div>
-            <h2 className="mt-4 max-w-[420px] text-[clamp(2rem,4vw,3rem)] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513]">
-              Questions founders ask before they submit.
-            </h2>
-            <p className="mt-5 max-w-[380px] text-[15px] leading-7 text-[#645d54]">
-              Early access is intentionally focused: submit your context, get reviewed, and avoid applying blindly.
-            </p>
-          </div>
-
-          {/* FAQ cards grid */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            {faqItems.map((item, index) => (
-              <motion.article
-                className={cn(
-                  "rounded-[18px] border border-[#ddd1c2] bg-white/90 p-5 shadow-[0_4px_18px_rgba(18,15,11,0.04)] backdrop-blur-sm",
-                  index === 2 && "sm:col-span-2",
-                )}
-                initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
-                key={item.question}
-                transition={{ duration: 0.4, ease: EASE_OUT, delay: index * 0.04 }}
-                viewport={{ once: true, amount: 0.15 }}
-                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+    <section className="bg-[#f6f1ea] px-4 py-24 sm:px-6 xl:px-8 border-t border-[#e5d8c8]/50">
+      <div className="mx-auto max-w-[800px]">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-[32px] sm:text-[42px] font-semibold tracking-[-0.03em] text-[#171513]">
+            Frequently asked questions
+          </h2>
+        </div>
+        <div className="flex flex-col gap-4">
+          {faqs.map((faq, index) => {
+            const isOpen = openIndex === index;
+            return (
+              <div 
+                key={index}
+                className="group cursor-pointer overflow-hidden rounded-2xl border border-black/8 bg-white transition-all duration-300 hover:border-black/15 shadow-sm"
+                onClick={() => setOpenIndex(isOpen ? null : index)}
               >
-                <h3 className="text-[15px] font-semibold leading-snug tracking-[-0.02em] text-[#171513] sm:text-[16px]">
-                  {item.question}
-                </h3>
-                <p className="mt-3 text-[14px] leading-[1.65] text-[#645d54]">
-                  {item.answer}
-                </p>
-              </motion.article>
-            ))}
-          </div>
+                <div className="flex items-center justify-between p-6 sm:p-8">
+                  <h3 className="text-[16px] sm:text-[18px] font-medium text-[#171513] pr-4">
+                    {faq.question}
+                  </h3>
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f6f1ea] text-[#171513] group-hover:bg-[#eee3d6] transition-colors">
+                    <ChevronDown className={cn("size-4 transition-transform duration-300", isOpen && "rotate-180")} />
+                  </div>
+                </div>
+                <div 
+                  className={cn("px-6 sm:px-8 transition-all duration-300 ease-in-out", isOpen ? "max-h-[200px] pb-6 sm:pb-8 opacity-100" : "max-h-0 opacity-0")}
+                >
+                  <p className="text-[15px] sm:text-[16px] leading-relaxed text-[#645d54]">
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-/* ─── 9. Cinematic Footer ──────────────────────────────────────────── */
+/* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
 const footerLinks = [
-  { label: "How It Works", href: "#how-it-works" },
+  { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "/search" },
-  { label: "FAQ", href: "#faq" },
-] as const;
+  { label: "Explore", href: "/search" },
+];
 
-// TODO: Render Instagram once the final Fundme or Totem Instagram URL is approved.
-
-function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
-  const shouldReduceMotion = useStableReducedMotion();
-
+function Footer() {
   return (
-    <footer className="border-t border-[#d4c4b3] bg-[#e8ddd0] text-[#171513]">
-      <div className="mx-auto flex max-w-[1180px] flex-col gap-10 px-4 py-14 sm:px-6 sm:py-16 xl:px-8">
-        <div className="grid gap-9 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
-          <div>
-            <Link className="inline-flex" href="/">
-              <BrandLockup size="sm" />
-            </Link>
-            <div className="mt-4 text-[13px] font-medium text-[#8b8276]">
-              A Totem Interactive product.
-            </div>
-          </div>
-
-          <div className="lg:text-right">
-            <h2 className="text-[clamp(2.3rem,5vw,4.5rem)] font-semibold leading-[0.96] tracking-[-0.05em]">
-              One startup.
-              <br />
-              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
-            </h2>
-            <p className="mt-5 max-w-[560px] text-[16px] leading-7 text-[#645d54] lg:ml-auto">
-              Fundme helps founders stop applying blindly and prepare stronger funding applications.
-            </p>
-          </div>
+    <footer className="bg-[#eee3d6] px-4 py-12 sm:px-6 sm:py-16 xl:px-8 z-10 relative">
+      <div className="mx-auto max-w-[1240px] flex flex-col items-center justify-center gap-6 sm:gap-8 text-center">
+        <BrandLockup />
+        
+        <div className="max-w-[400px]">
+          <p className="text-[15px] leading-relaxed text-[#171513] font-medium">
+            A Totem Interactive product.
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-[#645d54]">
+            Fundme helps founders stop applying blindly and prepare stronger funding applications.
+          </p>
         </div>
 
-        <div className="flex flex-col gap-6 border-t border-[#d9cbbd] pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 text-[13px] font-medium text-[#645d54]">
-            {footerLinks.map((link) => (
-              <Link className="transition-colors hover:text-[#ff6b3d]" href={link.href} key={link.label}>
-                {link.label}
-              </Link>
-            ))}
-          </div>
+        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[14px] text-[#645d54]">
+          {footerLinks.map((link) => (
+            <Link key={link.label} href={link.href} className="font-medium transition-colors hover:text-[#171513]">
+              {link.label}
+            </Link>
+          ))}
+          {/* TODO: Add Contact when real mailto exists */}
+        </div>
 
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
-            <motion.button
-              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#ff6b3d] px-6 py-3 text-[14px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.20)] transition-colors hover:bg-[#f45d2e]"
-              onClick={onOpenAuth}
-              type="button"
-              whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
-              whileTap={shouldReduceMotion ? undefined : tapCompress}
-            >
-              Get Started
-              <ArrowRight className="size-4" />
-            </motion.button>
-            <div className="text-[12px] text-[#8b8276]">
-              © 2026 Fundme. All rights reserved.
-            </div>
-          </div>
+        <div className="mt-4 text-[13px] text-[#8b8276]">
+          © 2026 Fundme. All rights reserved.
         </div>
       </div>
     </footer>
@@ -1033,23 +1014,26 @@ export function PublicHomepage() {
 
   function openAuth(_destination = "/onboarding") {
     if (isSignedIn) {
-      router.push("/onboarding");
+      router.push("/thank-you");
     } else {
-      router.push("/sign-up");
+      router.push("/onboarding");
     }
   }
 
   return (
-    <main className="min-h-screen bg-[#e8ddd0] text-[#171513]" data-theme="public">
+    <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
       <Header onOpenAuth={() => openAuth()} />
-      <HomepageHero onOpenAuth={() => openAuth()} />
-      <LogoRailSection />
-      <StatsStrip />
-      <HowItWorksSection />
-      <ProductProofSection />
-      <MatchedProgramsSection onOpenAuth={() => openAuth()} />
-      <FAQSection />
-      <CinematicFooter onOpenAuth={() => openAuth()} />
+      <div className="relative z-10 bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] rounded-b-[40px] pb-8">
+        <HomepageHero onOpenAuth={() => openAuth()} />
+        <LogoRailSection />
+        <StatsStrip />
+        <HowItWorksSection />
+        {/* <ProductProofSection /> temporarily disabled per UX conversion hierarchy pass */}
+        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+        <FAQSection />
+      </div>
+
+      <Footer />
     </main>
   );
 }

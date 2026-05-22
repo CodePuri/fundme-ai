@@ -41,7 +41,7 @@ export default function OnboardingPage() {
   const { isLoaded: isClerkLoaded, isSignedIn } = useUser();
   const { completeOnboarding } = useDemo();
   const [hasHydrated, setHasHydrated] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
@@ -153,10 +153,10 @@ export default function OnboardingPage() {
     let nextXUrl = "";
     let nextNotes = "";
     let nextFiles: string[] = [];
-    let nextStep = 1;
+    let nextStep = 0;
     let nextImported = false;
 
-    if (savedStep && parseInt(savedStep) > 1 && parseInt(savedStep) <= 4) {
+    if (savedStep && parseInt(savedStep) >= 1 && parseInt(savedStep) <= 4) {
       nextStep = Number(savedStep);
     }
 
@@ -173,6 +173,10 @@ export default function OnboardingPage() {
         if (parsed.notes) nextNotes = parsed.notes;
         if (parsed.files) nextFiles = parsed.files;
         if (parsed.imported) nextImported = parsed.imported;
+
+        if (parsed.email && nextStep === 0) {
+          nextStep = 1;
+        }
       } catch {
         window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
       }
@@ -232,7 +236,7 @@ export default function OnboardingPage() {
       "Reading your startup context",
       "Understanding your startup context",
       "Checking missing funding signals",
-      "Preparing your early funding assessment",
+      "Preparing your early funding assessment"
     ];
   }, []);
 
@@ -455,7 +459,7 @@ export default function OnboardingPage() {
           <BrandLockup />
           
           <div className="flex flex-col gap-8">
-            <div className="text-[12px] font-bold text-black/30 uppercase tracking-[0.2em] mb-2">Step {step} of 4</div>
+            <div className="text-[12px] font-bold text-black/30 uppercase tracking-[0.2em] mb-2">{step === 0 ? "Welcome" : `Step ${step} of 4`}</div>
             <div className="flex flex-col gap-0 relative">
               {[
                 { id: 1, title: "Founder Profile", desc: "Your background" },
@@ -499,12 +503,70 @@ export default function OnboardingPage() {
         {/* Mobile Header (Compact & Sticky) */}
         <div className="flex lg:hidden items-center justify-between px-4 py-2.5 border-b border-black/[0.03] bg-white/95 backdrop-blur-md sticky top-0 z-50 shrink-0">
           <BrandLockup size="sm" />
-          <div className="text-[11px] font-bold text-[#ff6b3d] tracking-wider">STEP {step}/4</div>
+          <div className="text-[11px] font-bold text-[#ff6b3d] tracking-wider">{step === 0 ? "WELCOME" : `STEP ${step}/4`}</div>
         </div>
 
         <div className="flex-1 overflow-y-auto pt-3 pb-[calc(3rem+env(safe-area-inset-bottom))] lg:pt-16 lg:pb-32 px-4 sm:px-12 xl:px-24">
           <div className="w-full max-w-[680px] mx-auto">
             <AnimatePresence mode="wait">
+            {step === 0 && (
+              <motion.div
+                key="step0"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex flex-col gap-4 sm:gap-8 w-full max-w-[480px] mx-auto pt-4 sm:pt-8"
+              >
+                <div className="mb-1 sm:mb-2 text-center">
+                  <h1 className="text-[26px] sm:text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black">
+                    Get early access
+                  </h1>
+                  <p className="text-[13px] sm:text-[16px] text-black/50 mt-2 sm:mt-4 leading-snug">
+                    Enter your email to start your free startup assessment. No credit card required.
+                  </p>
+                </div>
+                
+                <div className="grid grid-cols-1 gap-3 sm:gap-6 mt-1 sm:mt-4">
+                  <Field className="gap-1 sm:gap-2.5">
+                    <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5">Email <span className="text-[#ff6b3d]">*</span></FieldLabel>
+                    <Input
+                      type="email"
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${email && !isEmailValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
+                      placeholder="founder@startup.com"
+                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}
+                    />
+                    {email && !isEmailValid && (
+                      <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">Please enter a valid email address.</div>
+                    )}
+                  </Field>
+                  <Field className="gap-1 sm:gap-2.5">
+                    <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5 flex items-center justify-between">
+                      LinkedIn URL 
+                      <span className="text-black/30 font-normal lowercase tracking-normal">(Optional)</span>
+                    </FieldLabel>
+                    <Input
+                      className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${linkedIn && !isLinkedInValid ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
+                      placeholder="https://linkedin.com/in/yourname"
+                      onChange={(e) => setLinkedIn(e.target.value)}
+                      value={linkedIn}
+                    />
+                  </Field>
+                </div>
+
+                <div className="flex justify-end pt-4 sm:pt-8 border-t border-black/5 mt-3 sm:mt-6">
+                  <Button 
+                    onClick={() => setStep(1)} 
+                    size="lg" 
+                    className="h-10 sm:h-12 w-full sm:w-auto px-8 sm:px-10 rounded-[10px] sm:rounded-full text-[14px] sm:text-[16px]" 
+                    disabled={!isEmailValid || (linkedIn.length > 0 && !isLinkedInValid)}
+                  >
+                    Start Assessment <ArrowRight className="size-4 ml-2" />
+                  </Button>
+                </div>
+              </motion.div>
+            )}
+
             {step === 1 && (
               <motion.div
                 key="step1"
@@ -518,7 +580,7 @@ export default function OnboardingPage() {
                     Tell us about yourself
                   </h1>
                   <p className="text-[13px] sm:text-[18px] text-black/50 mt-1 sm:mt-4 max-w-[480px] leading-snug">
-                    Let&apos;s start with your identity and background. We&apos;ll use this to personalize your experience.
+                    Stop pitching blindly. Get your founder profile assessed before you apply.
                   </p>
                 </div>
                 
