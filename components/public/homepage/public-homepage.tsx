@@ -116,10 +116,8 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
     <motion.header
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b backdrop-blur-xl transition-[border-color,padding,background-color,box-shadow] duration-300",
-        scrolled
-          ? "border-[#d4c8ba] bg-[#f6f1ea] py-2.5 shadow-[0_1px_8px_rgba(18,15,11,0.08)] sm:py-2.5"
-          : "border-[#e7ddd0] bg-[#f6f1ea]/95 py-4",
+        "fixed inset-x-0 top-0 z-50 border-b border-black/5 bg-[#f8f3ec]/95 shadow-[0_8px_30px_rgba(23,21,19,0.04)] backdrop-blur-md transition-[padding] duration-300",
+        scrolled ? "py-2.5" : "py-4",
       )}
       initial={shouldReduceMotion ? false : { opacity: 0, y: -16 }}
       transition={{ duration: 0.6, ease: EASE_OUT }}
@@ -132,7 +130,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
-              className="text-[14px] font-medium text-[#4a4540] transition-colors duration-200 hover:text-[#171513]"
+              className="text-[14px] font-semibold text-[#171513] opacity-100 transition-colors duration-200 hover:text-black"
               href={item.href}
               key={item.label}
             >
@@ -143,7 +141,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_10px_28px_rgba(255,107,61,0.22)] transition-colors hover:bg-[#f45d2e]"
+            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(23,21,19,0.12)] opacity-100 transition-colors hover:bg-[#2a2622]"
             href="/onboarding"
           >
             Get Started →
@@ -179,7 +177,7 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               </Link>
             ))}
             <Link
-              className="mt-2 block rounded-2xl bg-[#ff6b3d] px-4 py-3 text-left text-[14px] font-medium text-white"
+              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-left text-[14px] font-medium text-white opacity-100"
               href="/onboarding"
               onClick={() => setMenuOpen(false)}
             >
