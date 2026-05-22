@@ -135,9 +135,8 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
+            className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
             href="/onboarding"
-            style={{ color: "#ffffff" }}
           >
             Get Started
           </Link>
@@ -172,10 +171,9 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               </Link>
             ))}
             <Link
-              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
+              className="mt-2 block rounded-2xl bg-[#ff6b3d] px-4 py-3 text-center text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(255,107,61,0.24)]"
               href="/onboarding"
               onClick={() => setMenuOpen(false)}
-              style={{ color: "#ffffff" }}
             >
               Get Started
             </Link>
@@ -974,53 +972,97 @@ function FAQSection() {
   );
 }
 
-/* ─── 9. Simplified Footer ──────────────────────────────────────── */
+/* ─── 9. Cinematic Footer ──────────────────────────────────────────── */
 
-function Footer() {
+function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
-    <footer className="bg-[#171513] text-[#f6f1ea] px-4 py-16 sm:px-6 sm:py-24 xl:px-8 relative z-10" id="footer">
-      <div className="mx-auto max-w-[1240px]">
-        {/* Top area */}
-        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-8 pb-12 border-b border-white/10">
-          <div className="max-w-[400px]">
-            <BrandLockup theme="dark" />
-            <p className="mt-6 text-[15px] leading-relaxed text-white/60">
+    <footer
+      className="relative h-[850px] sm:h-[650px] lg:h-[700px]"
+      style={{ clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%)" }}
+    >
+      <div className="fixed bottom-0 left-0 w-full h-[850px] sm:h-[650px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
+        
+        {/* Subtle Background Word */}
+        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-white/50 select-none mix-blend-soft-light filter blur-[2px]">
+          FUNDME
+        </div>
+
+        {/* Top Marquee Band */}
+        <div className="relative z-10 overflow-hidden py-3">
+          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center gap-10">
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[#d2c5b3]">•</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 sm:px-6 xl:px-8">
+          <div className="flex flex-col items-center text-center">
+            <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#171513]">
+              One startup.
+              <br />
+              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
+            </h2>
+            <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#645d54]">
               Fundme helps founders stop applying blindly and prepare stronger funding applications.
             </p>
-          </div>
-          <div className="flex flex-col items-start md:items-end gap-6 shrink-0">
-            <Link
-              href="/onboarding"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-[15px] font-bold text-[#171513] transition-colors hover:bg-white/90"
-            >
-              Get Started
-            </Link>
+
+            <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+              <motion.button
+                className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
+                onClick={onOpenAuth}
+                type="button"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                Get Started
+                <ArrowRight className="size-4" />
+              </motion.button>
+            </div>
           </div>
         </div>
 
-        {/* Middle area */}
-        <div className="py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[13px] font-bold uppercase tracking-wider text-white/40">Product</h4>
-            <Link href="#how-it-works" className="text-[14px] text-white/70 hover:text-white transition-colors">How it works</Link>
-            <Link href="#matched-programs" className="text-[14px] text-white/70 hover:text-white transition-colors">Programs</Link>
-            <Link href="#faq" className="text-[14px] text-white/70 hover:text-white transition-colors">FAQ</Link>
+        {/* Bottom Strip */}
+        <div className="relative z-10 flex flex-col items-center justify-between gap-8 px-6 py-8 md:flex-row xl:px-12 border-t border-[#e5d8c8] bg-[#eee3d6]">
+          <div className="flex flex-col items-center md:items-start gap-2">
+            <BrandLockup theme="light" />
+            <p className="text-[13px] text-[#8b8276]">A Totem Interactive product.</p>
           </div>
-          <div className="flex flex-col gap-4">
-            <h4 className="text-[13px] font-bold uppercase tracking-wider text-white/40">Explore</h4>
-            <Link href="/search" className="text-[14px] text-white/70 hover:text-white transition-colors">Program search</Link>
-            <Link href="#for-founders" className="text-[14px] text-white/70 hover:text-white transition-colors">For founders</Link>
-          </div>
-        </div>
 
-        {/* Bottom area */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-white/10">
-          <p className="text-[13px] text-white/40 text-center md:text-left">
-            A Totem Interactive product.
-          </p>
-          <p className="text-[13px] text-white/40 text-center md:text-right">
-            © 2026 Fundme. All rights reserved.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-12 text-[14px] text-[#645d54]">
+            <div className="flex flex-col items-center sm:items-start gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8b8276]">Product</span>
+              <div className="flex items-center gap-6">
+                <Link href="#how-it-works" className="transition-colors hover:text-[#ff6b3d] font-medium">How it works</Link>
+                <Link href="#matched-programs" className="transition-colors hover:text-[#ff6b3d] font-medium">Programs</Link>
+                <Link href="#faq" className="transition-colors hover:text-[#ff6b3d] font-medium">FAQ</Link>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center sm:items-start gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8b8276]">Explore</span>
+              <div className="flex items-center gap-6">
+                <Link href="/search" className="transition-colors hover:text-[#ff6b3d] font-medium">Program search</Link>
+                <Link href="#for-founders" className="transition-colors hover:text-[#ff6b3d] font-medium">For founders</Link>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-[13px] text-[#8b8276] text-center md:text-right font-medium">
+            © 2026 Fundme.<br className="hidden md:block" /> All rights reserved.
+          </div>
         </div>
       </div>
     </footer>
@@ -1054,7 +1096,7 @@ export function PublicHomepage() {
         <FAQSection />
       </div>
 
-      <Footer />
+      <CinematicFooter onOpenAuth={() => openAuth()} />
     </main>
   );
 }
