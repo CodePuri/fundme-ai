@@ -74,10 +74,10 @@ export default function ThankYouPage() {
             We’ve received your founder profile and startup context.
           </p>
           <p>
-            Our team will review what you shared and use it to prepare your early funding assessment.
+            Team Fundme will review what you shared and use it to prepare your early funding assessment.
           </p>
           <p>
-            Fundme is being built to help founders sharpen their deck, positioning, and funding path before they apply.
+            Fundme is being built by Totem Interactive to help founders sharpen their deck, positioning, and funding path before they apply.
           </p>
         </motion.div>
 
@@ -85,16 +85,19 @@ export default function ThankYouPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.4 }}
-          className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-black/5 w-full flex flex-col items-center gap-2"
+          className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-black/5 w-full flex flex-col items-center gap-1.5"
         >
           <p className="text-[13px] sm:text-[14px] font-medium text-black/80">
-            Look out for an email from us soon.
+            Look out for an email from Team Fundme soon.
           </p>
-          <p className="text-[13px] sm:text-[14px] font-semibold text-black">
-            Team Totem
+          <p className="text-[13px] sm:text-[14px] font-semibold text-black mt-1">
+            Team Fundme
+          </p>
+          <p className="text-[12px] font-medium text-black/40">
+            A Totem Interactive product
           </p>
           {resolvedEmail && resolvedEmail !== "your submitted email" && (
-            <p className="text-[12px] text-black/40 mt-1 break-all max-w-[300px]">
+            <p className="text-[12px] text-black/40 mt-2 break-all max-w-[300px]">
               Updates routed to: <span className="font-medium text-black/60">{resolvedEmail}</span>
             </p>
           )}

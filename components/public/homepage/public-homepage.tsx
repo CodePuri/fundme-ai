@@ -135,8 +135,9 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         <div className="hidden items-center gap-3 md:flex">
           <Link
-            className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
+            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
             href="/onboarding"
+            style={{ color: "#ffffff" }}
           >
             Get Started
           </Link>
@@ -171,9 +172,10 @@ function Header({ onOpenAuth }: { onOpenAuth: () => void }) {
               </Link>
             ))}
             <Link
-              className="mt-2 block rounded-2xl bg-[#ff6b3d] px-4 py-3 text-center text-[14px] font-medium text-white shadow-[0_4px_14px_rgba(255,107,61,0.24)]"
+              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
               href="/onboarding"
               onClick={() => setMenuOpen(false)}
+              style={{ color: "#ffffff" }}
             >
               Get Started
             </Link>
@@ -972,20 +974,20 @@ function FAQSection() {
   );
 }
 
-/* ─── 9. Cinematic Footer ──────────────────────────────────────────── */
+/* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
 function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
     <footer
-      className="relative h-[850px] sm:h-[650px] lg:h-[700px]"
+      className="relative h-[650px] sm:h-[600px] lg:h-[700px]"
       style={{ clipPath: "polygon(0px 0px, 100% 0px, 100% 100%, 0px 100%)" }}
     >
-      <div className="fixed bottom-0 left-0 w-full h-[850px] sm:h-[650px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
+      <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
         
         {/* Subtle Background Word */}
-        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-white/50 select-none mix-blend-soft-light filter blur-[2px]">
+        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-[#171513]/5 select-none mix-blend-multiply filter blur-[2px]">
           FUNDME
         </div>
 
@@ -1016,13 +1018,17 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
               <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
             </h2>
             <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#645d54]">
-              Fundme helps founders stop applying blindly and prepare stronger funding applications.
+              Upload once. Match faster. Draft smarter.
             </p>
 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <motion.button
                 className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
-                onClick={onOpenAuth}
+                onClick={() => {
+                  const el = document.createElement("a");
+                  el.href = "/onboarding";
+                  el.click();
+                }}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
@@ -1030,38 +1036,51 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
                 Get Started
                 <ArrowRight className="size-4" />
               </motion.button>
+              <motion.a
+                className="inline-flex items-center gap-2 rounded-full border border-[#d2c5b3] bg-white/70 backdrop-blur-sm px-6 py-4 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
+                href="#how-it-works"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                See how it works
+              </motion.a>
             </div>
           </div>
         </div>
 
         {/* Bottom Strip */}
-        <div className="relative z-10 flex flex-col items-center justify-between gap-8 px-6 py-8 md:flex-row xl:px-12 border-t border-[#e5d8c8] bg-[#eee3d6]">
-          <div className="flex flex-col items-center md:items-start gap-2">
-            <BrandLockup theme="light" />
-            <p className="text-[13px] text-[#8b8276]">A Totem Interactive product.</p>
+        <div className="relative z-10 grid gap-10 px-6 py-8 sm:grid-cols-[1fr_auto_1fr] sm:items-start xl:px-12 border-t border-[#e5d8c8]">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+               <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
+                  <Target className="size-5" />
+               </div>
+               <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
+            </div>
+            <p className="max-w-[300px] text-[13px] leading-relaxed text-[#645d54]">
+              Fundme helps founders stop applying blindly and prepare stronger funding applications.
+            </p>
+            <p className="text-[13px] text-[#8b8276]">
+              A Totem Interactive product.
+            </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-12 text-[14px] text-[#645d54]">
-            <div className="flex flex-col items-center sm:items-start gap-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8b8276]">Product</span>
-              <div className="flex items-center gap-6">
-                <Link href="#how-it-works" className="transition-colors hover:text-[#ff6b3d] font-medium">How it works</Link>
-                <Link href="#matched-programs" className="transition-colors hover:text-[#ff6b3d] font-medium">Programs</Link>
-                <Link href="#faq" className="transition-colors hover:text-[#ff6b3d] font-medium">FAQ</Link>
-              </div>
+          <div className="flex flex-wrap gap-x-12 gap-y-8 sm:justify-center">
+            <div className="flex flex-col gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#b15d37]">Product</span>
+              <Link href="#how-it-works" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">How it works</Link>
+              <Link href="#matched-programs" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">Programs</Link>
+              <Link href="#faq" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">FAQ</Link>
             </div>
-            
-            <div className="flex flex-col items-center sm:items-start gap-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#8b8276]">Explore</span>
-              <div className="flex items-center gap-6">
-                <Link href="/search" className="transition-colors hover:text-[#ff6b3d] font-medium">Program search</Link>
-                <Link href="#for-founders" className="transition-colors hover:text-[#ff6b3d] font-medium">For founders</Link>
-              </div>
+            <div className="flex flex-col gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#b15d37]">Explore</span>
+              <Link href="/search" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">Program search</Link>
+              <Link href="#for-founders" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">For founders</Link>
             </div>
           </div>
 
-          <div className="text-[13px] text-[#8b8276] text-center md:text-right font-medium">
-            © 2026 Fundme.<br className="hidden md:block" /> All rights reserved.
+          <div className="flex h-full flex-col justify-end text-[12px] text-[#8b8276] sm:text-right">
+            © 2026 Fundme. All rights reserved.
           </div>
         </div>
       </div>
