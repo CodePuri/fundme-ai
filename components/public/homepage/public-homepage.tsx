@@ -8,8 +8,11 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronDown,
+  ChevronRight,
   FilePenLine,
+  FileText,
   Menu,
+  Sparkles,
   Target,
   Upload,
   X,
@@ -54,7 +57,7 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
-  { label: "For Founders", href: "#product-proof" },
+  { label: "For Founders", href: "#for-founders" },
   { label: "Explore", href: "/search" },
 ] as const;
 
@@ -518,7 +521,7 @@ function StatsStrip() {
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
-    <section className="border-b border-[#d9cebf] bg-[#f1e8dc] px-4 py-14 sm:px-6 xl:px-8">
+    <section className="scroll-mt-28 border-b border-[#d9cebf] bg-[#f1e8dc] px-4 py-14 sm:px-6 xl:px-8" id="for-founders">
       <motion.div
         className="mx-auto max-w-[1180px]"
         initial={shouldReduceMotion ? false : "hidden"}
@@ -558,68 +561,70 @@ function StatsStrip() {
 function HowItWorksSection() {
   const shouldReduceMotion = useReducedMotion();
 
+  const steps = [
+    {
+      id: "1",
+      title: "Share your startup context",
+      description: "Add your company, deck, traction, and founder details once.",
+      icon: FileText
+    },
+    {
+      id: "2",
+      title: "Get assessed before applying",
+      description: "Fundme reviews your readiness signals and identifies gaps before you submit anywhere.",
+      icon: Sparkles
+    },
+    {
+      id: "3",
+      title: "Apply with a sharper angle",
+      description: "Use the assessment to improve positioning, deck clarity, and program fit.",
+      icon: ArrowRight
+    }
+  ];
+
   return (
     <section className="scroll-mt-28 border-b border-[#e7ddd0] bg-[#f8f3ec] px-4 py-20 sm:px-6 xl:px-8" id="how-it-works">
       <SectionReveal className="mx-auto max-w-[1180px]">
         <div className="mx-auto max-w-[700px] text-center">
           <motion.div
-            className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]"
+            className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#b15d37]"
             initial={shouldReduceMotion ? false : { opacity: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
           >
-            How it works
+            How Fundme works
           </motion.div>
-          <h2 className="mt-4 text-[40px] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513] sm:text-[48px]">
-            From scattered pitch decks to matched applications.
+          <h2 className="mt-4 text-[36px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#171513] sm:text-[44px]">
+            Stop applying blindly.
           </h2>
-          <p className="mx-auto mt-5 max-w-[580px] text-[16px] leading-8 text-[#645d54]">
-            Upload once. See where you fit. Draft in your value. This is the system founders wish existed before they started rebuilding the same company story in every new form.
-          </p>
         </div>
 
         <motion.div
-          className="mt-16 grid gap-10 lg:grid-cols-3 lg:gap-0"
+          className="mt-16 grid gap-8 lg:grid-cols-3 lg:gap-10"
           initial={shouldReduceMotion ? false : "hidden"}
           variants={staggerContainer(0.15, 0.2)}
           viewport={{ once: true, amount: 0.2 }}
           whileInView={shouldReduceMotion ? undefined : "visible"}
         >
-          {storySteps.map((step, index) => {
-            const Icon = stepIcons[step.id as keyof typeof stepIcons];
+          {steps.map((step, index) => {
+            const Icon = step.icon;
 
             return (
               <motion.div
                 className={cn(
-                  "relative pt-8 lg:px-10",
-                  index < storySteps.length - 1 && "lg:border-r lg:border-black/8",
+                  "relative rounded-2xl border border-black/8 bg-white p-6 shadow-sm transition-all sm:p-8",
                 )}
                 key={step.id}
                 variants={fadeRise}
-                whileHover={shouldReduceMotion ? undefined : hoverLiftSmall}
               >
-                {/* Decorative top line — reveals via scaleX */}
-                <motion.div
-                  className="absolute left-0 top-0 h-px w-16 origin-left bg-[#d9cbbd]"
-                  initial={shouldReduceMotion ? false : { scaleX: 0, opacity: 0 }}
-                  transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.3 + index * 0.12 }}
-                  viewport={{ once: true }}
-                  whileInView={shouldReduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
-                />
-                <motion.div
-                  className="text-[12px] font-medium tracking-[0.18em] text-[#b15d37]"
-                  variants={fadeRiseSmall}
-                >
-                  {step.eyebrow}
-                </motion.div>
-                <div className="mt-7 flex size-11 items-center justify-center rounded-2xl border border-black/8 bg-white/84 shadow-[0_10px_24px_rgba(18,15,11,0.04)]">
-                  <Icon className="size-5 text-[#171513]" />
+                <div className="flex size-10 items-center justify-center rounded-xl bg-[#f6f1ea] text-[#171513]">
+                  <Icon className="size-5" />
                 </div>
-                <h3 className="mt-6 max-w-[250px] text-[30px] font-semibold leading-[1.02] tracking-[-0.05em] text-[#171513]">
+                <h3 className="mt-5 text-[18px] font-semibold tracking-[-0.03em] text-[#171513]">
                   {step.title}
                 </h3>
-                <p className="mt-4 max-w-[300px] text-[15px] leading-7 text-[#645d54]">{step.description}</p>
+                <p className="mt-3 text-[14px] leading-6 text-[#645d54]">{step.description}</p>
               </motion.div>
             );
           })}
@@ -926,12 +931,15 @@ function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="bg-[#f6f1ea] px-4 py-24 sm:px-6 xl:px-8 border-t border-[#e5d8c8]/50">
+    <section className="scroll-mt-28 bg-[#f6f1ea] px-4 py-24 sm:px-6 xl:px-8 border-t border-[#e5d8c8]/50" id="faq">
       <div className="mx-auto max-w-[800px]">
         <div className="text-center mb-12 sm:mb-16">
           <h2 className="text-[32px] sm:text-[42px] font-semibold tracking-[-0.03em] text-[#171513]">
-            Frequently asked questions
+            Questions founders ask before applying
           </h2>
+          <p className="mt-4 text-[15px] sm:text-[18px] text-[#645d54]">
+            Quick answers before you start your free assessment.
+          </p>
         </div>
         <div className="flex flex-col gap-4">
           {faqs.map((faq, index) => {
@@ -968,38 +976,51 @@ function FAQSection() {
 
 /* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
-const footerLinks = [
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Programs", href: "/search" },
-  { label: "Explore", href: "/search" },
-];
-
 function Footer() {
   return (
-    <footer className="bg-[#eee3d6] px-4 py-12 sm:px-6 sm:py-16 xl:px-8 z-10 relative">
-      <div className="mx-auto max-w-[1240px] flex flex-col items-center justify-center gap-6 sm:gap-8 text-center">
-        <BrandLockup />
-        
-        <div className="max-w-[400px]">
-          <p className="text-[15px] leading-relaxed text-[#171513] font-medium">
+    <footer className="bg-[#171513] text-[#f6f1ea] px-4 py-16 sm:px-6 sm:py-24 xl:px-8 relative z-10" id="footer">
+      <div className="mx-auto max-w-[1240px]">
+        {/* Top area */}
+        <div className="flex flex-col md:flex-row justify-between gap-10 md:gap-8 pb-12 border-b border-white/10">
+          <div className="max-w-[400px]">
+            <BrandLockup theme="dark" />
+            <p className="mt-6 text-[15px] leading-relaxed text-white/60">
+              Fundme helps founders stop applying blindly and prepare stronger funding applications.
+            </p>
+          </div>
+          <div className="flex flex-col items-start md:items-end gap-6 shrink-0">
+            <Link
+              href="/onboarding"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3.5 text-[15px] font-bold text-[#171513] transition-colors hover:bg-white/90"
+            >
+              Get Started
+            </Link>
+          </div>
+        </div>
+
+        {/* Middle area */}
+        <div className="py-12 grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[13px] font-bold uppercase tracking-wider text-white/40">Product</h4>
+            <Link href="#how-it-works" className="text-[14px] text-white/70 hover:text-white transition-colors">How it works</Link>
+            <Link href="#matched-programs" className="text-[14px] text-white/70 hover:text-white transition-colors">Programs</Link>
+            <Link href="#faq" className="text-[14px] text-white/70 hover:text-white transition-colors">FAQ</Link>
+          </div>
+          <div className="flex flex-col gap-4">
+            <h4 className="text-[13px] font-bold uppercase tracking-wider text-white/40">Explore</h4>
+            <Link href="/search" className="text-[14px] text-white/70 hover:text-white transition-colors">Program search</Link>
+            <Link href="#for-founders" className="text-[14px] text-white/70 hover:text-white transition-colors">For founders</Link>
+          </div>
+        </div>
+
+        {/* Bottom area */}
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-white/10">
+          <p className="text-[13px] text-white/40 text-center md:text-left">
             A Totem Interactive product.
           </p>
-          <p className="mt-2 text-[14px] leading-relaxed text-[#645d54]">
-            Fundme helps founders stop applying blindly and prepare stronger funding applications.
+          <p className="text-[13px] text-white/40 text-center md:text-right">
+            © 2026 Fundme. All rights reserved.
           </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[14px] text-[#645d54]">
-          {footerLinks.map((link) => (
-            <Link key={link.label} href={link.href} className="font-medium transition-colors hover:text-[#171513]">
-              {link.label}
-            </Link>
-          ))}
-          {/* TODO: Add Contact when real mailto exists */}
-        </div>
-
-        <div className="mt-4 text-[13px] text-[#8b8276]">
-          © 2026 Fundme. All rights reserved.
         </div>
       </div>
     </footer>

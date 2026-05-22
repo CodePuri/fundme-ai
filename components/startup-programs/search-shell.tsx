@@ -25,7 +25,7 @@ export function SearchShell({
               className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
               href="/onboarding"
             >
-              Get Started
+              Get assessed first
             </Link>
           </div>
         </div>

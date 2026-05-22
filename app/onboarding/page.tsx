@@ -519,10 +519,10 @@ export default function OnboardingPage() {
               >
                 <div className="mb-1 sm:mb-2 text-center">
                   <h1 className="text-[26px] sm:text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black">
-                    Get early access
+                    Start your free funding assessment
                   </h1>
                   <p className="text-[13px] sm:text-[16px] text-black/50 mt-2 sm:mt-4 leading-snug">
-                    Enter your email to start your free startup assessment. No credit card required.
+                    Enter your email so Team Fundme can send your assessment update.
                   </p>
                 </div>
                 
@@ -561,7 +561,7 @@ export default function OnboardingPage() {
                     className="h-10 sm:h-12 w-full sm:w-auto px-8 sm:px-10 rounded-[10px] sm:rounded-full text-[14px] sm:text-[16px]" 
                     disabled={!isEmailValid || (linkedIn.length > 0 && !isLinkedInValid)}
                   >
-                    Start Assessment <ArrowRight className="size-4 ml-2" />
+                    Continue to assessment <ArrowRight className="size-4 ml-2" />
                   </Button>
                 </div>
               </motion.div>
