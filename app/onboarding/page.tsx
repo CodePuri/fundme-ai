@@ -572,7 +572,14 @@ export default function OnboardingPage() {
                         <div className="text-[17px] font-semibold text-black">{name || "Aakash Puri"}</div>
                       </div>
                     </div>
-                    <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(1)} />
+                    <button
+                      type="button"
+                      aria-label="Edit Founder Profile"
+                      onClick={() => setStep(1)}
+                      className="rounded-full p-2 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b3d]/30 transition-colors"
+                    >
+                      <PenIcon className="size-4 text-black/20 group-hover:text-black" />
+                    </button>
                   </div>
 
                   <div className="p-6 rounded-[24px] bg-black/[0.02] border border-black/5 flex items-center justify-between group hover:bg-white hover:shadow-sm transition-all">
@@ -585,7 +592,14 @@ export default function OnboardingPage() {
                         <div className="text-[17px] font-semibold text-black line-clamp-1 max-w-[300px]">{notes || "Captured pitch description..."}</div>
                       </div>
                     </div>
-                    <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(2)} />
+                    <button
+                      type="button"
+                      aria-label="Edit Startup Pitch"
+                      onClick={() => setStep(2)}
+                      className="rounded-full p-2 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b3d]/30 transition-colors"
+                    >
+                      <PenIcon className="size-4 text-black/20 group-hover:text-black" />
+                    </button>
                   </div>
 
                   <div className="p-6 rounded-[24px] bg-black/[0.02] border border-black/5 flex items-center justify-between group hover:bg-white hover:shadow-sm transition-all">
@@ -598,7 +612,14 @@ export default function OnboardingPage() {
                         <div className="text-[17px] font-semibold text-black">{files.length} material{files.length !== 1 ? "s" : ""} uploaded</div>
                       </div>
                     </div>
-                    <PenIcon className="size-4 text-black/20 group-hover:text-black cursor-pointer" onClick={() => setStep(3)} />
+                    <button
+                      type="button"
+                      aria-label="Edit Documents"
+                      onClick={() => setStep(3)}
+                      className="rounded-full p-2 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff6b3d]/30 transition-colors"
+                    >
+                      <PenIcon className="size-4 text-black/20 group-hover:text-black" />
+                    </button>
                   </div>
                 </div>
 
