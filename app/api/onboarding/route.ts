@@ -69,6 +69,13 @@ export async function POST(req: Request) {
       voiceTranscript?: string | null;
       filesMetadata?: { name: string; size: number; type: string }[];
       sourceRoute?: string;
+      phoneData?: {
+        phone_country_name: string | null;
+        phone_country_code: string | null;
+        phone_country_iso2: string | null;
+        phone_number_raw: string | null;
+        phone_number_e164: string | null;
+      } | null;
     };
 
     const resolvedEmail = body.email || userEmail || null;
@@ -95,6 +102,7 @@ export async function POST(req: Request) {
       deck_file_type: body.filesMetadata?.[0]?.type ?? null,
       source_route: body.sourceRoute ?? "/onboarding",
       status: "early_access_waitlist",
+      phone_data: body.phoneData ?? null, // Storing in metadata until schema columns are added
     };
 
     const baseNotes = body.notes ? body.notes.trim() : "";
@@ -114,6 +122,11 @@ export async function POST(req: Request) {
           website_url: body.websiteUrl ?? null,
           x_url: body.xUrl ?? null,
           notes: combinedNotes,
+          // phone_country_name: body.phoneData?.phone_country_name ?? null,
+          // phone_country_code: body.phoneData?.phone_country_code ?? null,
+          // phone_country_iso2: body.phoneData?.phone_country_iso2 ?? null,
+          // phone_number_raw: body.phoneData?.phone_number_raw ?? null,
+          // phone_number_e164: body.phoneData?.phone_number_e164 ?? null,
         },
         { onConflict: "clerk_user_id" },
       )
@@ -137,3 +150,4 @@ export async function POST(req: Request) {
     );
   }
 }
+

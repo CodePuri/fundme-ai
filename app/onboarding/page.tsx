@@ -19,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploadArea } from "@/components/ui/file-upload";
 import { mapOnboardingToAssessment } from "@/components/assessment/onboarding-bridge";
+import { PhoneInputField, PhoneData } from "@/components/ui/phone-input";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 const defaultPitchText =
   "Building an automated platform that helps founders prepare institutional-grade application materials and securely manage funding intake rounds efficiently.";
@@ -35,6 +37,8 @@ type OnboardingDraft = {
   notes?: string;
   files?: string[];
   imported?: boolean;
+  phone?: string;
+  phoneData?: PhoneData | null;
 };
 
 export default function OnboardingPage() {
@@ -58,6 +62,8 @@ export default function OnboardingPage() {
   const [files, setFiles] = useState<string[]>([]);
   const [fileMeta, setFileMeta] = useState<{name: string; size: number; type: string}[]>([]);
   const [voiceTranscript, setVoiceTranscript] = useState<string | null>(null);
+  const [phone, setPhone] = useState("");
+  const [phoneData, setPhoneData] = useState<PhoneData | null>(null);
   
   // Voice feature state
   const [listening, setListening] = useState(false);
@@ -115,6 +121,11 @@ export default function OnboardingPage() {
     return lower.includes("x.com") || lower.includes("twitter.com");
   }, [xUrl]);
 
+  const isPhoneValid = useMemo(() => {
+    if (!phone) return false;
+    return isValidPhoneNumber(phone);
+  }, [phone]);
+
   const isStep1Valid = useMemo(() => {
     return (
       name.trim().length > 0 &&
@@ -123,9 +134,10 @@ export default function OnboardingPage() {
       isEmailValid &&
       isWebsiteValid &&
       isLinkedInValid &&
-      isXValid
+      isXValid &&
+      isPhoneValid
     );
-  }, [name, role, companyName, isEmailValid, isWebsiteValid, isLinkedInValid, isXValid]);
+  }, [name, role, companyName, isEmailValid, isWebsiteValid, isLinkedInValid, isXValid, isPhoneValid]);
 
   const placeholderText = "Describe your idea naturally.\nWhat problem are you solving?\nWho is it for?\nWhy you?\nWhy now?";
 
@@ -161,6 +173,8 @@ export default function OnboardingPage() {
     let nextFiles: string[] = [];
     let nextStep = 0;
     let nextImported = false;
+    let nextPhone = "";
+    let nextPhoneData: PhoneData | null = null;
 
     if (savedStep && parseInt(savedStep) >= 1 && parseInt(savedStep) <= 4) {
       nextStep = Number(savedStep);
@@ -179,6 +193,8 @@ export default function OnboardingPage() {
         if (parsed.notes) nextNotes = parsed.notes;
         if (parsed.files) nextFiles = parsed.files;
         if (parsed.imported) nextImported = parsed.imported;
+        if (parsed.phone) nextPhone = parsed.phone;
+        if (parsed.phoneData) nextPhoneData = parsed.phoneData;
 
         if (parsed.email && nextStep === 0) {
           nextStep = 1;
@@ -202,6 +218,8 @@ export default function OnboardingPage() {
       setNotes(nextNotes);
       setFiles(nextFiles);
       setHasImported(nextImported);
+      setPhone(nextPhone);
+      setPhoneData(nextPhoneData);
       setHasHydrated(true);
     });
   }, []);
@@ -230,10 +248,12 @@ export default function OnboardingPage() {
         xUrl,
         notes,
         files,
-        imported: hasImported
+        imported: hasImported,
+        phone,
+        phoneData
       })
     );
-  }, [hasHydrated, name, role, companyName, email, linkedIn, websiteUrl, xUrl, notes, files, hasImported]);
+  }, [hasHydrated, name, role, companyName, email, linkedIn, websiteUrl, xUrl, notes, files, hasImported, phone, phoneData]);
 
   // Loading assessment dynamic messages array
   const loadingStepsArray = useMemo(() => {
@@ -441,6 +461,7 @@ export default function OnboardingPage() {
           filesMetadata: fileMeta,
           voiceTranscript,
           sourceRoute: "/onboarding",
+          phoneData,
         }),
       });
 
@@ -555,6 +576,11 @@ export default function OnboardingPage() {
                       <div className="text-[11px] text-[#ff6b3d] mt-0.5 font-medium">Please enter a valid email address.</div>
                     )}
                   </Field>
+                  <PhoneInputField 
+                    value={phone} 
+                    onChange={(val, data) => { setPhone(val); setPhoneData(data); }}
+                    error={phone && !isPhoneValid ? "Please enter a valid phone number." : null} 
+                  />
                   <Field className="gap-1 sm:gap-2.5">
                     <FieldLabel className="text-[11px] sm:text-[13px] font-bold text-black uppercase tracking-wider mb-0.5 sm:mb-2.5 flex items-center justify-between">
                       LinkedIn URL 
@@ -569,15 +595,18 @@ export default function OnboardingPage() {
                   </Field>
                 </div>
 
-                <div className="flex justify-end pt-4 sm:pt-8 border-t border-black/5 mt-3 sm:mt-6">
+                <div className="flex flex-col items-center sm:items-end pt-4 sm:pt-8 border-t border-black/5 mt-3 sm:mt-6 gap-2">
                   <Button 
                     onClick={() => setStep(1)} 
                     size="lg" 
                     className="h-10 sm:h-12 w-full sm:w-auto px-8 sm:px-10 rounded-[10px] sm:rounded-full text-[14px] sm:text-[16px]" 
-                    disabled={!isEmailValid || (linkedIn.length > 0 && !isLinkedInValid)}
+                    disabled={!isEmailValid || (linkedIn.length > 0 && !isLinkedInValid) || !isPhoneValid}
                   >
                     Continue to assessment <ArrowRight className="size-4 ml-2" />
                   </Button>
+                  <div className="text-[12px] text-black/40 text-center sm:text-right w-full sm:w-auto">
+                    We&rsquo;ll never sell your data.
+                  </div>
                 </div>
               </motion.div>
             )}
