@@ -46,22 +46,13 @@ export default function ThankYouPage() {
           <CheckCircle2 className="size-8 sm:size-9 text-[#ff6b3d]" />
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25, duration: 0.4 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#fff5f0] border border-[#ff6b3d]/10 text-[#ff6b3d] text-[11px] sm:text-[12px] font-bold uppercase tracking-wider mb-4 sm:mb-6"
-        >
-          <Sparkles className="size-3" /> You&apos;re on the list
-        </motion.div>
-
         <motion.h1
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
           className="text-[28px] sm:text-[42px] font-semibold tracking-[-0.04em] leading-[1.1] text-black"
         >
-          {firstName ? `Thanks, ${firstName}. You’re on the list.` : "Thanks, you’re on the list."}
+          {firstName ? `Thanks, ${firstName}. We've got it.` : "Thanks, we've got it."}
         </motion.h1>
 
         <motion.div
@@ -77,7 +68,7 @@ export default function ThankYouPage() {
             Team Fundme will review what you shared and use it to prepare your early funding assessment.
           </p>
           <p>
-            Fundme is being built by Totem Interactive to help founders sharpen their deck, positioning, and funding path before they apply.
+            Fundme AI helps founders sharpen their deck, positioning, and funding path before they apply.
           </p>
         </motion.div>
 
@@ -88,10 +79,10 @@ export default function ThankYouPage() {
           className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-black/5 w-full flex flex-col items-center gap-1.5"
         >
           <p className="text-[13px] sm:text-[14px] font-medium text-black/80">
-            Look out for an email from Team Fundme soon.
+            Look out for an email from Fundme soon.
           </p>
           <p className="text-[13px] sm:text-[14px] font-semibold text-black mt-1">
-            Team Fundme
+            Team Fundme AI
           </p>
           <p className="text-[12px] font-medium text-black/40">
             A Totem Interactive product
