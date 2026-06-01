@@ -81,10 +81,17 @@ export async function POST(req: Request) {
     const resolvedEmail = body.email || userEmail || null;
     const resolvedLinkedIn = body.linkedIn || body.linkedinUrl || null;
 
-    // Server-side validation: email OR LinkedIn is mandatory
-    if (!resolvedEmail && !resolvedLinkedIn) {
+    // Server-side validation: email and phone are mandatory
+    if (!resolvedEmail) {
       return NextResponse.json(
-        { error: "Email or LinkedIn URL is required" },
+        { error: "Email is required" },
+        { status: 400 }
+      );
+    }
+
+    if (!body.phoneData || !body.phoneData.phone_number_e164) {
+      return NextResponse.json(
+        { error: "Valid mobile number is required" },
         { status: 400 }
       );
     }
@@ -122,11 +129,11 @@ export async function POST(req: Request) {
           website_url: body.websiteUrl ?? null,
           x_url: body.xUrl ?? null,
           notes: combinedNotes,
-          // phone_country_name: body.phoneData?.phone_country_name ?? null,
-          // phone_country_code: body.phoneData?.phone_country_code ?? null,
-          // phone_country_iso2: body.phoneData?.phone_country_iso2 ?? null,
-          // phone_number_raw: body.phoneData?.phone_number_raw ?? null,
-          // phone_number_e164: body.phoneData?.phone_number_e164 ?? null,
+          phone_country_name: body.phoneData?.phone_country_name ?? null,
+          phone_country_code: body.phoneData?.phone_country_code ?? null,
+          phone_country_iso2: body.phoneData?.phone_country_iso2 ?? null,
+          phone_number_raw: body.phoneData?.phone_number_raw ?? null,
+          phone_number_e164: body.phoneData?.phone_number_e164 ?? null,
         },
         { onConflict: "clerk_user_id" },
       )
