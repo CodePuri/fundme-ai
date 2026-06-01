@@ -30,3 +30,19 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+
+# extra local environment files
+.env.development
+.env.preview
+
+# temporary artifacts
+*.png
+!public/*.png
+!public/**/*.png
+!assets/**/*.png
+*.mp4
+*.webm
+api_*_response.json
+*_api_test.json
+*_supabase_row.json
+payload*.json
