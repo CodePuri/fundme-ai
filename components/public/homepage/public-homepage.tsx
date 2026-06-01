@@ -221,7 +221,7 @@ const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" | "defa
   { name: "BIRAC BIG", mark: "default" },
   { name: "SIDBI Fund of Funds", mark: "default" },
   { name: "AWS Activate", mark: "aws" },
-  { name: "Google for Startups", slug: "google-for-startups" },
+  { name: "Google for Startups", slug: "google-for-startups-accelerator" },
   { name: "Microsoft for Startups", mark: "default" },
   { name: "NVIDIA Inception", mark: "default" },
 ];
@@ -486,7 +486,7 @@ function LogoRailSection() {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
 
-        <div className={cn("logo-rail-strip px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}>
+        <div className={cn("logo-rail-strip", shouldReduceMotion && "animation-play-state-paused")}>
           {programsToRender.map((program) => (
             <LogoRailCard key={program.id} {...program} />
           ))}
@@ -494,7 +494,7 @@ function LogoRailSection() {
 
         <div
           aria-hidden="true"
-          className={cn("logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}
+          className={cn("logo-rail-strip logo-rail-strip--duplicate", shouldReduceMotion && "animation-play-state-paused")}
         >
           {programsToRender.map((program) => (
             <LogoRailCard key={`${program.id}-duplicate`} {...program} />
@@ -993,9 +993,23 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         {/* Top Marquee Band */}
         <div className="relative z-10 overflow-hidden py-3">
-          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
+          <div className={cn("logo-rail-strip gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-10">
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[#d2c5b3]">•</span>
+              </div>
+            ))}
+          </div>
+          <div aria-hidden="true" className={cn("logo-rail-strip logo-rail-strip--duplicate gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={`${i}-dup`} className="flex items-center gap-10">
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
                 <span className="text-[#d2c5b3]">•</span>
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
