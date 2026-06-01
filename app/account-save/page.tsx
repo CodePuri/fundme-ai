@@ -39,7 +39,7 @@ function AccountSaveContent() {
         </p>
 
         <div className="w-full flex flex-col gap-3">
-          <SignUpButton mode="modal" fallbackRedirectUrl="/thank-you" forceRedirectUrl="/thank-you">
+          <SignUpButton mode="modal" fallbackRedirectUrl="/thank-you" forceRedirectUrl="/thank-you" signInFallbackRedirectUrl="/thank-you" signInForceRedirectUrl="/thank-you">
             <button className="w-full h-12 bg-black hover:bg-black/80 text-white rounded-[12px] sm:rounded-full font-medium text-[15px] transition-all flex items-center justify-center group">
               Save my information <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
             </button>
