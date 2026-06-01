@@ -5,10 +5,11 @@ import { motion } from "framer-motion";
 interface FileUploadProps {
   files: string[];
   onChange: (files: string[]) => void;
+  onFilesAdded?: (files: File[]) => void;
   className?: string;
 }
 
-export function FileUploadArea({ files, onChange, className = "" }: FileUploadProps) {
+export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }: FileUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -32,7 +33,7 @@ export function FileUploadArea({ files, onChange, className = "" }: FileUploadPr
         handleFiles(Array.from(e.dataTransfer.files));
       }
     },
-    [files, onChange],
+    [files, onChange, onFilesAdded],
   );
 
   const handleChange = useCallback(
@@ -41,14 +42,18 @@ export function FileUploadArea({ files, onChange, className = "" }: FileUploadPr
         handleFiles(Array.from(e.target.files));
       }
     },
-    [files, onChange],
+    [files, onChange, onFilesAdded],
   );
 
   const handleFiles = (newFiles: File[]) => {
     const fileNames = newFiles.map((f) => f.name);
     // filter out duplicates
-    const uniqueNew = fileNames.filter((name) => !files.includes(name));
-    onChange([...files, ...uniqueNew]);
+    const uniqueNewFiles = newFiles.filter((f) => !files.includes(f.name));
+    const uniqueNewNames = uniqueNewFiles.map((f) => f.name);
+    onChange([...files, ...uniqueNewNames]);
+    if (onFilesAdded && uniqueNewFiles.length > 0) {
+      onFilesAdded(uniqueNewFiles);
+    }
   };
 
   const removeFile = (fileName: string) => {

@@ -6,8 +6,12 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CheckCircle2,
+  ChevronDown,
+  ChevronRight,
   FilePenLine,
+  FileText,
   Menu,
+  Sparkles,
   Target,
   Upload,
   X,
@@ -52,7 +56,7 @@ const cardStagger = staggerContainer(0.1, 0);
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
-  { label: "For Founders", href: "#product-proof" },
+  { label: "For Founders", href: "#for-founders" },
   { label: "Explore", href: "/search" },
 ] as const;
 
@@ -105,8 +109,8 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
     <motion.header
       animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b bg-[#f6f1ea]/92 backdrop-blur-xl transition-[border-color,padding] duration-300",
-        scrolled ? "border-[#d9cbbd] py-2.5 sm:py-2.5" : "border-[#e7ddd0] py-4",
+        "fixed inset-x-0 top-0 z-50 border-b bg-[#f6f1ea]/95 backdrop-blur-md transition-[border-color,padding] duration-300",
+        scrolled ? "border-[#d9cbbd] py-3 shadow-sm" : "border-[#e7ddd0] py-4",
       )}
       initial={shouldReduceMotion ? false : { opacity: 0, y: -16 }}
       transition={{ duration: 0.6, ease: EASE_OUT }}
@@ -119,7 +123,7 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
         <nav className="hidden items-center gap-8 md:flex">
           {navItems.map((item) => (
             <Link
-              className="text-[14px] text-[#5f584f] transition-colors duration-200 hover:text-[#171513]"
+              className="text-[14px] font-semibold text-[#171513] transition-colors duration-200 hover:text-black"
               href={item.href}
               key={item.label}
             >
@@ -129,15 +133,13 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <motion.button
-            className="rounded-full bg-[#ff6b3d] px-5 py-2.5 text-[14px] font-medium text-white shadow-[0_10px_28px_rgba(255,107,61,0.22)] transition-colors hover:bg-[#f45d2e]"
-            onClick={onOpenAssessment}
-            type="button"
-            whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-            whileTap={shouldReduceMotion ? undefined : tapCompress}
+          <Link
+            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
+            href="/onboarding"
+            style={{ color: "#ffffff" }}
           >
-            Analyze my funding fit
-          </motion.button>
+            Get Started
+          </Link>
         </div>
 
         <button
@@ -154,14 +156,14 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
       {menuOpen ? (
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="border-t border-black/8 px-4 py-4 md:hidden"
+          className="border-t border-black/8 bg-[#f6f1ea] px-4 py-4 md:hidden"
           initial={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.25, ease: EASE_OUT }}
         >
           <div className="flex flex-col gap-2">
             {navItems.map((item) => (
               <Link
-                className="rounded-2xl px-3 py-2 text-[14px] text-[#171513] transition-colors hover:bg-white"
+                className="rounded-2xl px-3 py-2 text-[14px] font-semibold text-[#171513] transition-colors hover:bg-white/50"
                 href={item.href}
                 key={item.label}
                 onClick={() => setMenuOpen(false)}
@@ -169,16 +171,14 @@ function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
                 {item.label}
               </Link>
             ))}
-            <button
-              className="mt-2 rounded-2xl bg-[#ff6b3d] px-4 py-3 text-left text-[14px] font-medium text-white"
-              onClick={() => {
-                setMenuOpen(false);
-                onOpenAssessment();
-              }}
-              type="button"
+            <Link
+              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
+              href="/onboarding"
+              onClick={() => setMenuOpen(false)}
+              style={{ color: "#ffffff" }}
             >
-              Analyze my funding fit
-            </button>
+              Get Started
+            </Link>
           </div>
         </motion.div>
       ) : null}
@@ -210,12 +210,20 @@ const floatingCards: {
   { id: "500", label: "500 Global", slug: "500-global", x: "5%", y: "76%", rotate: 3, delay: 0.36, side: "right" },
 ];
 
-const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" }[] = [
+const trustLogos: { name: string; slug?: string; mark?: "antler" | "aws" | "default" }[] = [
   { name: "Y Combinator", slug: "y-combinator" },
-  { name: "Antler", mark: "antler" },
-  { name: "Google for Startups", slug: "google-for-startups" },
   { name: "Techstars", slug: "techstars" },
+  { name: "Antler", mark: "antler" },
   { name: "500 Global", slug: "500-global" },
+  { name: "Startup India", mark: "default" },
+  { name: "Startup India Seed Fund", mark: "default" },
+  { name: "MeitY TIDE 2.0", mark: "default" },
+  { name: "BIRAC BIG", mark: "default" },
+  { name: "SIDBI Fund of Funds", mark: "default" },
+  { name: "AWS Activate", mark: "aws" },
+  { name: "Google for Startups", slug: "google-for-startups-accelerator" },
+  { name: "Microsoft for Startups", mark: "default" },
+  { name: "NVIDIA Inception", mark: "default" },
 ];
 
 function FloatingCard({
@@ -347,7 +355,7 @@ function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) 
       <div className="absolute left-1/2 top-[100px] h-[520px] w-[1000px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,255,255,0.85),rgba(255,255,255,0))] blur-3xl" />
       <div className="absolute inset-x-0 top-0 h-full bg-[linear-gradient(180deg,rgba(255,255,255,0.45),transparent_18%,transparent_100%)]" />
 
-      <div className="relative mx-auto max-w-[1340px] px-4 pb-20 sm:px-6 xl:px-10">
+      <div className="relative mx-auto max-w-[1340px] px-4 pb-12 sm:px-6 xl:px-10">
         {/* ── Floating accelerator cards — desktop ── */}
         {floatingCards.map((card) => (
           <FloatingCard key={card.id} card={card} shouldReduceMotion={shouldReduceMotion} />
@@ -406,56 +414,24 @@ function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) 
               Drop your website. We scan your positioning, founder signals, and application readiness against real accelerator criteria.
             </motion.p>
 
-            {/* Website Input + CTA */}
-            <motion.div className="mt-9 flex flex-col items-center gap-4 sm:mt-10" variants={fadeRise}>
-              <div className="flex w-full max-w-md flex-col gap-3 sm:flex-row">
-                <input
-                  type="url"
-                  placeholder="https://yourstartup.com"
-                  value={websiteUrl}
-                  onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="h-12 flex-1 rounded-full border border-black/[0.08] bg-white/90 px-6 text-[15px] text-[#171513] placeholder:text-[#b5ad9f] focus:border-[#ff6b3d]/30 focus:outline-none focus:ring-2 focus:ring-[#ff6b3d]/10 transition-all"
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") handleStart();
-                  }}
-                />
-                <motion.button
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#171513] px-7 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                  onClick={handleStart}
-                  type="button"
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-                  whileTap={shouldReduceMotion ? undefined : tapCompress}
-                >
-                  Analyze my funding fit
-                  <ArrowRight className="size-3.5" />
-                </motion.button>
-              </div>
-              <p className="text-[12px] text-[#8b8276]">Takes about 2 minutes. No credit card required.</p>
+            {/* CTA row — single primary action */}
+            <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
+              <motion.button
+                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                onClick={onOpenAuth}
+                type="button"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                Get Started Free
+                <ArrowRight className="size-3.5" />
+              </motion.button>
+            </motion.div>
+            <motion.div className="mt-3 text-[13px] font-medium text-[#8b8276]" variants={fadeRise}>
+              Free assessment. No credit card required.
             </motion.div>
 
-            {/* Trust row */}
-            <motion.div
-              className="mt-10 flex flex-col items-center gap-3 sm:mt-12"
-              variants={fadeRiseWithDelay(0.35)}
-            >
-              <span className="text-[10.5px] uppercase tracking-[0.22em] text-[#a59d93]">
-                Programs already in the room
-              </span>
-              <div className="flex flex-wrap items-center justify-center gap-5 sm:gap-6">
-                {trustLogos.map((logo) => (
-                  <div key={logo.name} className="group flex items-center gap-2">
-                    <ProgramMark
-                      program={{ name: logo.name, slug: logo.slug, mark: logo.mark }}
-                      size={20}
-                      className="opacity-60 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
-                    />
-                    <span className="text-[12px] font-semibold tracking-[-0.01em] text-[#b5ad9f] transition-colors duration-300 group-hover:text-[#8b8276] sm:text-[13px]">
-                      {logo.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Trust row removed — single trust rail section below handles this */}
           </div>
         </motion.div>
       </div>
@@ -490,14 +466,28 @@ function LogoRailCard({
 function LogoRailSection() {
   const shouldReduceMotion = useReducedMotion();
 
+  // Combine data to render exactly the required mix
+  const programsToRender = trustLogos.map((tl, i) => ({
+    id: tl.slug || `prog-${i}`,
+    name: tl.name,
+    slug: tl.slug,
+    mark: tl.mark as any,
+    label: "Program",
+    type: "Accelerator",
+    checkSize: "Various",
+    deadline: "Rolling",
+    why: "Ecosystem partner.",
+    fitScore: 90
+  }));
+
   return (
-    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-6">
+    <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-4">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] uppercase tracking-[0.22em] text-[#8b8276]">Programs already in the room</div>
+        <div className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
       </SectionReveal>
 
       <motion.div
-        className="logo-rail-viewport relative mt-5"
+        className="logo-rail-viewport relative mt-5 overflow-hidden"
         initial={shouldReduceMotion ? false : { opacity: 0 }}
         transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
         viewport={{ once: true }}
@@ -506,17 +496,17 @@ function LogoRailSection() {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
 
-        <div className={cn("logo-rail-strip px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}>
-          {ecosystemPrograms.map((program) => (
+        <div className={cn("logo-rail-strip", shouldReduceMotion && "animation-play-state-paused")}>
+          {programsToRender.map((program) => (
             <LogoRailCard key={program.id} {...program} />
           ))}
         </div>
 
         <div
           aria-hidden="true"
-          className={cn("logo-rail-strip logo-rail-strip--duplicate px-4 sm:px-6 xl:px-8", shouldReduceMotion && "animation-play-state-paused")}
+          className={cn("logo-rail-strip logo-rail-strip--duplicate", shouldReduceMotion && "animation-play-state-paused")}
         >
-          {ecosystemPrograms.map((program) => (
+          {programsToRender.map((program) => (
             <LogoRailCard key={`${program.id}-duplicate`} {...program} />
           ))}
         </div>
@@ -541,7 +531,7 @@ function StatsStrip() {
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
-    <section className="border-b border-[#d9cebf] bg-[#f1e8dc] px-4 py-14 sm:px-6 xl:px-8">
+    <section className="scroll-mt-28 border-b border-[#d9cebf] bg-[#f1e8dc] px-4 py-14 sm:px-6 xl:px-8" id="for-founders">
       <motion.div
         className="mx-auto max-w-[1180px]"
         initial={shouldReduceMotion ? false : "hidden"}
@@ -581,68 +571,70 @@ function StatsStrip() {
 function HowItWorksSection() {
   const shouldReduceMotion = useReducedMotion();
 
+  const steps = [
+    {
+      id: "1",
+      title: "Share your startup context",
+      description: "Add your company, deck, traction, and founder details once.",
+      icon: FileText
+    },
+    {
+      id: "2",
+      title: "Get assessed before applying",
+      description: "Fundme reviews your readiness signals and identifies gaps before you submit anywhere.",
+      icon: Sparkles
+    },
+    {
+      id: "3",
+      title: "Apply with a sharper angle",
+      description: "Use the assessment to improve positioning, deck clarity, and program fit.",
+      icon: ArrowRight
+    }
+  ];
+
   return (
     <section className="scroll-mt-28 border-b border-[#e7ddd0] bg-[#f8f3ec] px-4 py-20 sm:px-6 xl:px-8" id="how-it-works">
       <SectionReveal className="mx-auto max-w-[1180px]">
         <div className="mx-auto max-w-[700px] text-center">
           <motion.div
-            className="text-[12px] uppercase tracking-[0.22em] text-[#b15d37]"
+            className="text-[12px] font-bold uppercase tracking-[0.22em] text-[#b15d37]"
             initial={shouldReduceMotion ? false : { opacity: 0 }}
             transition={{ duration: 0.5 }}
             viewport={{ once: true }}
             whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
           >
-            How it works
+            How Fundme works
           </motion.div>
-          <h2 className="mt-4 text-[40px] font-semibold leading-[0.98] tracking-[-0.05em] text-[#171513] sm:text-[48px]">
-            From scattered pitch decks to matched applications.
+          <h2 className="mt-4 text-[36px] font-semibold leading-[1.05] tracking-[-0.04em] text-[#171513] sm:text-[44px]">
+            Stop applying blindly.
           </h2>
-          <p className="mx-auto mt-5 max-w-[580px] text-[16px] leading-8 text-[#645d54]">
-            Upload once. See where you fit. Draft in your value. This is the system founders wish existed before they started rebuilding the same company story in every new form.
-          </p>
         </div>
 
         <motion.div
-          className="mt-16 grid gap-10 lg:grid-cols-3 lg:gap-0"
+          className="mt-16 grid gap-8 lg:grid-cols-3 lg:gap-10"
           initial={shouldReduceMotion ? false : "hidden"}
           variants={staggerContainer(0.15, 0.2)}
           viewport={{ once: true, amount: 0.2 }}
           whileInView={shouldReduceMotion ? undefined : "visible"}
         >
-          {storySteps.map((step, index) => {
-            const Icon = stepIcons[step.id as keyof typeof stepIcons];
+          {steps.map((step, index) => {
+            const Icon = step.icon;
 
             return (
               <motion.div
                 className={cn(
-                  "relative pt-8 lg:px-10",
-                  index < storySteps.length - 1 && "lg:border-r lg:border-black/8",
+                  "relative rounded-2xl border border-black/8 bg-white p-6 shadow-sm transition-all sm:p-8",
                 )}
                 key={step.id}
                 variants={fadeRise}
-                whileHover={shouldReduceMotion ? undefined : hoverLiftSmall}
               >
-                {/* Decorative top line — reveals via scaleX */}
-                <motion.div
-                  className="absolute left-0 top-0 h-px w-16 origin-left bg-[#d9cbbd]"
-                  initial={shouldReduceMotion ? false : { scaleX: 0, opacity: 0 }}
-                  transition={{ duration: 0.6, ease: EASE_OUT, delay: 0.3 + index * 0.12 }}
-                  viewport={{ once: true }}
-                  whileInView={shouldReduceMotion ? undefined : { scaleX: 1, opacity: 1 }}
-                />
-                <motion.div
-                  className="text-[12px] font-medium tracking-[0.18em] text-[#b15d37]"
-                  variants={fadeRiseSmall}
-                >
-                  {step.eyebrow}
-                </motion.div>
-                <div className="mt-7 flex size-11 items-center justify-center rounded-2xl border border-black/8 bg-white/84 shadow-[0_10px_24px_rgba(18,15,11,0.04)]">
-                  <Icon className="size-5 text-[#171513]" />
+                <div className="flex size-10 items-center justify-center rounded-xl bg-[#f6f1ea] text-[#171513]">
+                  <Icon className="size-5" />
                 </div>
-                <h3 className="mt-6 max-w-[250px] text-[30px] font-semibold leading-[1.02] tracking-[-0.05em] text-[#171513]">
+                <h3 className="mt-5 text-[18px] font-semibold tracking-[-0.03em] text-[#171513]">
                   {step.title}
                 </h3>
-                <p className="mt-4 max-w-[300px] text-[15px] leading-7 text-[#645d54]">{step.description}</p>
+                <p className="mt-3 text-[14px] leading-6 text-[#645d54]">{step.description}</p>
               </motion.div>
             );
           })}
@@ -916,18 +908,85 @@ function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () =
   );
 }
 
-/* ─── 8. Cinematic Footer ──────────────────────────────────────────── */
+/* ─── 8. Premium FAQ ────────────────────────────────────────────── */
 
-const footerLinks = [
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Programs", href: "/search" },
-  { label: "Pricing", href: "#product-proof" },
-  { label: "Privacy", href: "#" },
-  { label: "Terms", href: "#" },
-  { label: "Contact", href: "#" },
+const faqs = [
+  {
+    question: "What is Fundme?",
+    answer: "Fundme helps founders assess their startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
+  },
+  {
+    question: "Is it free?",
+    answer: "Yes. The early-access assessment is free and does not require a credit card.",
+  },
+  {
+    question: "How does Fundme use my submission?",
+    answer: "We use your submitted startup context to prepare an early funding assessment and identify gaps in positioning, deck readiness, and application fit.",
+  },
+  {
+    question: "Who is this for?",
+    answer: "Early-stage founders, student founders, indie builders, and startup teams preparing to apply for funding programs.",
+  },
+  {
+    question: "What happens after I submit?",
+    answer: "Team Fundme reviews your profile and will contact you if you are selected for early access.",
+  },
+  {
+    question: "Is this only for accelerators?",
+    answer: "No. Fundme is being built for accelerators, grants, fellowships, cloud credits, incubators, and other founder programs.",
+  },
 ];
 
-function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void }) {
+function FAQSection() {
+  const [openIndex, setOpenIndex] = useState<number | null>(0);
+
+  return (
+    <section className="scroll-mt-28 bg-[#f6f1ea] px-4 py-24 sm:px-6 xl:px-8 border-t border-[#e5d8c8]/50" id="faq">
+      <div className="mx-auto max-w-[800px]">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-[32px] sm:text-[42px] font-semibold tracking-[-0.03em] text-[#171513]">
+            Questions founders ask before applying
+          </h2>
+          <p className="mt-4 text-[15px] sm:text-[18px] text-[#645d54]">
+            Quick answers before you start your free assessment.
+          </p>
+        </div>
+        <div className="flex flex-col gap-4">
+          {faqs.map((faq, index) => {
+            const isOpen = openIndex === index;
+            return (
+              <div 
+                key={index}
+                className="group cursor-pointer overflow-hidden rounded-2xl border border-black/8 bg-white transition-all duration-300 hover:border-black/15 shadow-sm"
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+              >
+                <div className="flex items-center justify-between p-6 sm:p-8">
+                  <h3 className="text-[16px] sm:text-[18px] font-medium text-[#171513] pr-4">
+                    {faq.question}
+                  </h3>
+                  <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#f6f1ea] text-[#171513] group-hover:bg-[#eee3d6] transition-colors">
+                    <ChevronDown className={cn("size-4 transition-transform duration-300", isOpen && "rotate-180")} />
+                  </div>
+                </div>
+                <div 
+                  className={cn("px-6 sm:px-8 transition-all duration-300 ease-in-out", isOpen ? "max-h-[200px] pb-6 sm:pb-8 opacity-100" : "max-h-0 opacity-0")}
+                >
+                  <p className="text-[15px] sm:text-[16px] leading-relaxed text-[#645d54]">
+                    {faq.answer}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─── 9. Simplified Footer ──────────────────────────────────────── */
+
+function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -938,15 +997,29 @@ function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void 
       <div className="fixed bottom-0 left-0 w-full h-[650px] sm:h-[600px] lg:h-[700px] bg-[#eee3d6] text-[#171513] flex flex-col justify-between overflow-hidden pt-8">
         
         {/* Subtle Background Word */}
-        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-white/50 select-none mix-blend-soft-light filter blur-[2px]">
+        <div className="pointer-events-none absolute left-1/2 top-[65%] -translate-x-1/2 -translate-y-1/2 text-[22vw] font-bold leading-none tracking-[-0.04em] text-[#171513]/5 select-none mix-blend-multiply filter blur-[2px]">
           FUNDME
         </div>
 
         {/* Top Marquee Band */}
         <div className="relative z-10 overflow-hidden py-3">
-          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
+          <div className={cn("logo-rail-strip gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-10">
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[#d2c5b3]">•</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[#d2c5b3]">•</span>
+              </div>
+            ))}
+          </div>
+          <div aria-hidden="true" className={cn("logo-rail-strip logo-rail-strip--duplicate gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
+            {[...Array(4)].map((_, i) => (
+              <div key={`${i}-dup`} className="flex items-center gap-10">
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
                 <span className="text-[#d2c5b3]">•</span>
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
@@ -975,7 +1048,11 @@ function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void 
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <motion.button
                 className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
-                onClick={onStartAssessment}
+                onClick={() => {
+                  const el = document.createElement("a");
+                  el.href = "/onboarding";
+                  el.click();
+                }}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -2 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
@@ -983,37 +1060,43 @@ function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void 
                 Analyze my funding fit
                 <ArrowRight className="size-4" />
               </motion.button>
-              <motion.a
-                className="inline-flex items-center gap-2 rounded-full border border-[#d2c5b3] bg-white/70 backdrop-blur-sm px-6 py-4 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
-                href="#how-it-works"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                See how it works
-              </motion.a>
             </div>
           </div>
         </div>
 
         {/* Bottom Strip */}
-        <div className="relative z-10 flex flex-col items-center justify-between gap-6 px-6 py-8 sm:flex-row xl:px-12 border-t border-[#e5d8c8]">
-          <div className="flex items-center gap-2">
-             <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
-                <Target className="size-5" />
-             </div>
-             <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
+        <div className="relative z-10 grid gap-10 px-6 py-8 sm:grid-cols-[1fr_auto_1fr] sm:items-start xl:px-12 border-t border-[#e5d8c8]">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-2">
+               <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
+                  <Target className="size-5" />
+               </div>
+               <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
+            </div>
+            <p className="max-w-[300px] text-[13px] leading-relaxed text-[#645d54]">
+              Fundme helps founders stop applying blindly and prepare stronger funding applications.
+            </p>
+            <p className="text-[13px] text-[#8b8276]">
+              A Totem Interactive product.
+            </p>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[13px] text-[#645d54]">
-            {footerLinks.map((link) => (
-              <a key={link.label} href={link.href} className="transition-colors hover:text-[#ff6b3d] font-medium">
-                {link.label}
-              </a>
-            ))}
+          <div className="flex flex-wrap gap-x-12 gap-y-8 sm:justify-center">
+            <div className="flex flex-col gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#b15d37]">Product</span>
+              <Link href="#how-it-works" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">How it works</Link>
+              <Link href="#matched-programs" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">Programs</Link>
+              <Link href="#faq" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">FAQ</Link>
+            </div>
+            <div className="flex flex-col gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-[#b15d37]">Explore</span>
+              <Link href="/search" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">Program search</Link>
+              <Link href="#for-founders" className="text-[14px] text-[#171513] hover:text-[#ff6b3d] transition-colors">For founders</Link>
+            </div>
           </div>
 
-          <div className="text-[12px] text-[#8b8276] sm:text-right">
-            © {new Date().getFullYear()} Fundme.ai. <br className="sm:hidden" /> Built for founders.
+          <div className="flex h-full flex-col justify-end text-[12px] text-[#8b8276] sm:text-right">
+            © 2026 Fundme. All rights reserved.
           </div>
         </div>
       </div>
@@ -1026,23 +1109,28 @@ function CinematicFooter({ onStartAssessment }: { onStartAssessment: () => void 
 export function PublicHomepage() {
   const router = useRouter();
 
-  function startAssessment() {
-    router.push("/assessment");
+  function openAuth(_destination = "/onboarding") {
+    if (isSignedIn) {
+      router.push("/thank-you");
+    } else {
+      router.push("/onboarding");
+    }
   }
 
   return (
     <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
-      <div className="relative z-10 rounded-b-[40px] bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] pb-8">
-        <Header onOpenAssessment={() => startAssessment()} />
-        <HomepageHero onStartAssessment={() => startAssessment()} />
+      <Header onOpenAuth={() => openAuth()} />
+      <div className="relative z-10 bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] rounded-b-[40px] pb-8">
+        <HomepageHero onOpenAuth={() => openAuth()} />
         <LogoRailSection />
         <StatsStrip />
         <HowItWorksSection />
-        <ProductProofSection />
-        <MatchedProgramsSection onStartAssessment={() => startAssessment()} />
+        {/* <ProductProofSection /> temporarily disabled per UX conversion hierarchy pass */}
+        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+        <FAQSection />
       </div>
 
-      <CinematicFooter onStartAssessment={() => startAssessment()} />
+      <CinematicFooter onOpenAuth={() => openAuth()} />
     </main>
   );
 }

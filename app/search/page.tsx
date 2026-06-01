@@ -27,9 +27,9 @@ export default function SearchPage() {
           }
         >
           <StartupProgramsPage
-            description="Search accelerators, incubators, fellowships, and equity-free programs by thesis, geography, stage, and check size."
+            description="Explore accelerators, grants, fellowships, cloud credits, and founder programs."
             mode="public"
-            title="Startup Programs"
+            title="Find startup programs worth applying to"
           />
         </Suspense>
       </SearchShell>
