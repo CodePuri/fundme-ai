@@ -334,19 +334,8 @@ function FloatingCardMid({
   );
 }
 
-function HomepageHero({ onStartAssessment }: { onStartAssessment: () => void }) {
+function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
   const shouldReduceMotion = useReducedMotion();
-  const [websiteUrl, setWebsiteUrl] = useState("");
-
-  function handleStart() {
-    // Persist the website URL to localStorage so AssessmentProvider can pick it up
-    if (websiteUrl.trim()) {
-      try {
-        localStorage.setItem("fundme-homepage-website", websiteUrl.trim());
-      } catch {/* ignore */}
-    }
-    onStartAssessment();
-  }
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
