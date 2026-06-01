@@ -1036,14 +1036,6 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
                 Get Started
                 <ArrowRight className="size-4" />
               </motion.button>
-              <motion.a
-                className="inline-flex items-center gap-2 rounded-full border border-[#d2c5b3] bg-white/70 backdrop-blur-sm px-6 py-4 text-[15px] font-medium text-[#171513] transition-colors hover:bg-white"
-                href="#how-it-works"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.02 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                See how it works
-              </motion.a>
             </div>
           </div>
         </div>
