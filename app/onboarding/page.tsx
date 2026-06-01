@@ -74,6 +74,7 @@ export default function OnboardingPage() {
   }, [notes]);
 
   const [hasImported, setHasImported] = useState(false);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
 
   // Derived first name with robust regex sanitization
@@ -264,11 +265,15 @@ export default function OnboardingPage() {
     if (step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
-        router.push("/thank-you");
+        if (submissionId) {
+          router.push(`/account-save?submissionId=${submissionId}`);
+        } else {
+          router.push("/account-save");
+        }
       }, 400);
       return () => clearTimeout(t);
     }
-  }, [step, elapsed, router]);
+  }, [step, elapsed, router, submissionId]);
 
   // Forceful session teardown ensuring absolute termination intent
   const terminateSession = (status: "idle" | "captured" = "idle") => {
@@ -437,6 +442,11 @@ export default function OnboardingPage() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         throw new Error(errorData.error || "Failed to save profile");
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (data.submissionId) {
+        setSubmissionId(data.submissionId);
       }
 
       setIsSubmitting(false);
