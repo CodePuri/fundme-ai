@@ -18,3 +18,9 @@
 **Security Standards Enforced:**
 - Failing Securely: Ensuring the middleware is properly registered so that unprotected routes fail closed (require authentication) by default.
 - Defense in Depth: Multiple layers of protection (middleware routing + component-level state checks) are now properly aligned.
+
+## 2026-04-24 - Fix Open Redirect in login flow
+
+**Vulnerability:** Open Redirect
+**Learning:** Using untrusted user input directly in Next.js `redirect()` via URL query parameters like `redirect_url` allows attackers to construct URLs that redirect users to malicious domains after authentication, as standard relative URL checks don't block protocol-relative URLs (`//evil.com`).
+**Prevention:** Always sanitize redirect destinations with a robust check that enforces a valid local relative path. Ensure the URL starts with `/` and not `//`, and implement a safe fallback to a known good route.
