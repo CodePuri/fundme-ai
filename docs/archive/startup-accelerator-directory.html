@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup Accelerator Directory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300..700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root,[data-theme="light"]{
+  --color-bg:#f7f6f2;--color-surface:#f9f8f5;--color-surface-2:#fbfbf9;
+  --color-surface-offset:#f3f0ec;--color-surface-dynamic:#e6e4df;
+  --color-divider:#dcd9d5;--color-border:#d4d1ca;
+  --color-text:#28251d;--color-text-muted:#7a7974;--color-text-faint:#bab9b4;
+  --color-primary:#01696f;--color-primary-hover:#0c4e54;
+  --color-primary-highlight:#cedcd8;
+  --color-accent:#da7101;--color-accent-bg:#e7d7c4;
+  --color-success:#437a22;--color-success-bg:#d4dfcc;
+  --color-warning:#964219;--color-warning-bg:#ddcfc6;
+  --color-blue:#006494;--color-blue-bg:#c6d8e4;
+  --color-purple:#7a39bb;--color-purple-bg:#dacfde;
+  --shadow-sm:0 1px 2px oklch(0.2 0.01 80 / 0.06);
+  --shadow-md:0 4px 12px oklch(0.2 0.01 80 / 0.08);
+  --shadow-lg:0 12px 32px oklch(0.2 0.01 80 / 0.12);
+  --radius-sm:0.375rem;--radius-md:0.5rem;--radius-lg:0.75rem;--radius-xl:1rem;--radius-full:9999px;
+  --transition:180ms cubic-bezier(0.16,1,0.3,1);
+  --font-display:'Instrument Serif',Georgia,serif;
+  --font-body:'DM Sans','Helvetica Neue',sans-serif;
+}
+[data-theme="dark"]{
+  --color-bg:#171614;--color-surface:#1c1b19;--color-surface-2:#201f1d;
+  --color-surface-offset:#1d1c1a;--color-surface-dynamic:#2d2c2a;
+  --color-divider:#262523;--color-border:#393836;
+  --color-text:#cdccca;--color-text-muted:#797876;--color-text-faint:#5a5957;
+  --color-primary:#4f98a3;--color-primary-hover:#227f8b;
+  --color-primary-highlight:#313b3b;
+  --color-accent:#fdab43;--color-accent-bg:#564b3e;
+  --color-success:#6daa45;--color-success-bg:#3a4435;
+  --color-warning:#bb653b;--color-warning-bg:#564942;
+  --color-blue:#5591c7;--color-blue-bg:#3a4550;
+  --color-purple:#a86fdf;--color-purple-bg:#4e4652;
+  --shadow-sm:0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-md:0 4px 12px oklch(0 0 0 / 0.3);
+  --shadow-lg:0 12px 32px oklch(0 0 0 / 0.4);
+}
+html{-webkit-font-smoothing:antialiased;scroll-behavior:smooth}
+body{min-height:100dvh;font-family:var(--font-body);font-size:16px;color:var(--color-text);background:var(--color-bg);line-height:1.6}
+img{display:block;max-width:100%;height:auto}
+button{cursor:pointer;background:none;border:none;font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+.site-header{
+  position:sticky;top:0;z-index:100;
+  background:var(--color-bg);
+  border-bottom:1px solid var(--color-border);
+  padding:0.75rem 1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  backdrop-filter:blur(12px);
+}
+.logo-lockup{display:flex;align-items:center;gap:0.625rem;flex-shrink:0}
+.logo-mark{width:32px;height:32px}
+.logo-text{font-family:var(--font-display);font-size:1.25rem;font-style:italic;color:var(--color-text)}
+.logo-text span{color:var(--color-primary)}
+
+.search-wrap{flex:1;max-width:520px;position:relative}
+.search-wrap svg{position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--color-text-muted);pointer-events:none}
+#searchInput{
+  width:100%;padding:0.5rem 0.75rem 0.5rem 2.5rem;
+  background:var(--color-surface-2);border:1px solid var(--color-border);
+  border-radius:var(--radius-full);font-size:0.9rem;color:var(--color-text);
+  outline:none;transition:border-color var(--transition),box-shadow var(--transition);
+}
+#searchInput:focus{border-color:var(--color-primary);box-shadow:0 0 0 3px color-mix(in oklch,var(--color-primary) 20%,transparent)}
+#searchInput::placeholder{color:var(--color-text-faint)}
+
+.header-actions{display:flex;align-items:center;gap:0.5rem;margin-left:auto}
+.btn{
+  display:inline-flex;align-items:center;gap:0.375rem;
+  padding:0.5rem 0.875rem;border-radius:var(--radius-full);
+  font-size:0.8rem;font-weight:500;cursor:pointer;
+  transition:background var(--transition),color var(--transition);
+}
+.btn-primary{background:var(--color-primary);color:#fff}
+.btn-primary:hover{background:var(--color-primary-hover)}
+.btn-ghost{background:var(--color-surface-2);border:1px solid var(--color-border);color:var(--color-text-muted)}
+.btn-ghost:hover{color:var(--color-text);background:var(--color-surface-dynamic)}
+.theme-btn{padding:0.5rem;border-radius:var(--radius-full);background:var(--color-surface-2);border:1px solid var(--color-border);color:var(--color-text-muted);transition:all var(--transition)}
+.theme-btn:hover{color:var(--color-text)}
+
+/* HERO STRIP */
+.hero-strip{
+  padding:2.5rem 1.5rem 1.5rem;
+  max-width:1280px;margin:0 auto;
+}
+.hero-strip h1{font-family:var(--font-display);font-size:clamp(1.75rem,3vw,2.75rem);font-style:italic;line-height:1.15;margin-bottom:0.5rem}
+.hero-strip h1 em{color:var(--color-primary);font-style:normal}
+.hero-strip p{font-size:0.95rem;color:var(--color-text-muted);max-width:600px}
+.stats-row{display:flex;gap:2rem;margin-top:1.25rem;flex-wrap:wrap}
+.stat{display:flex;flex-direction:column}
+.stat-num{font-family:var(--font-display);font-size:1.5rem;color:var(--color-primary);line-height:1}
+.stat-label{font-size:0.75rem;color:var(--color-text-faint);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+
+/* FILTERS */
+.filters-bar{
+  padding:0 1.5rem 1rem;
+  max-width:1280px;margin:0 auto;
+  display:flex;gap:0.625rem;flex-wrap:wrap;align-items:center;
+}
+.filter-label{font-size:0.75rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-faint);margin-right:0.25rem}
+.filter-chip{
+  padding:0.3rem 0.75rem;border-radius:var(--radius-full);
+  font-size:0.8rem;font-weight:500;cursor:pointer;
+  border:1px solid var(--color-border);
+  background:var(--color-surface-2);color:var(--color-text-muted);
+  transition:all var(--transition);
+}
+.filter-chip:hover,.filter-chip.active{
+  background:var(--color-primary);border-color:var(--color-primary);color:#fff;
+}
+.filter-group{display:flex;gap:0.375rem;flex-wrap:wrap;align-items:center}
+.filter-sep{width:1px;height:20px;background:var(--color-border);margin:0 0.25rem}
+
+/* GRID */
+.main-content{max-width:1280px;margin:0 auto;padding:0 1.5rem 3rem}
+.results-bar{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:1rem;font-size:0.82rem;color:var(--color-text-muted);
+}
+.results-count strong{color:var(--color-text)}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));
+  gap:1.25rem;
+}
+
+/* CARD */
+.card{
+  background:var(--color-surface);
+  border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);
+  padding:1.25rem;
+  transition:box-shadow var(--transition),transform var(--transition);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;gap:0.875rem;
+}
+.card:hover{box-shadow:var(--shadow-lg);transform:translateY(-2px)}
+
+.card-top{display:flex;align-items:flex-start;gap:0.875rem}
+.card-logo{
+  width:48px;height:48px;border-radius:var(--radius-md);
+  background:var(--color-surface-2);border:1px solid var(--color-border);
+  overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+}
+.card-logo img{width:44px;height:44px;object-fit:contain}
+.card-logo-fallback{font-size:1.1rem;font-weight:700;color:var(--color-primary)}
+
+.card-identity{flex:1;min-width:0}
+.card-name{font-size:1rem;font-weight:600;color:var(--color-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card-location{font-size:0.78rem;color:var(--color-text-muted);margin-top:2px}
+
+.card-badges{display:flex;flex-wrap:wrap;gap:0.375rem}
+.badge{
+  padding:0.15rem 0.5rem;border-radius:var(--radius-full);
+  font-size:0.7rem;font-weight:500;letter-spacing:0.01em;
+}
+.badge-region{background:var(--color-blue-bg);color:var(--color-blue)}
+.badge-sector{background:var(--color-purple-bg);color:var(--color-purple)}
+.badge-equity{background:var(--color-accent-bg);color:var(--color-accent)}
+.badge-free{background:var(--color-success-bg);color:var(--color-success)}
+.badge-india{background:color-mix(in oklch,var(--color-accent) 15%,var(--color-surface));color:var(--color-accent)}
+
+.card-deal{
+  background:var(--color-surface-2);border-radius:var(--radius-md);
+  padding:0.625rem 0.75rem;
+  display:grid;grid-template-columns:1fr 1fr;gap:0.375rem;
+}
+.deal-item{display:flex;flex-direction:column;gap:1px}
+.deal-label{font-size:0.68rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-faint)}
+.deal-value{font-size:0.82rem;font-weight:600;color:var(--color-text)}
+
+.card-desc{font-size:0.83rem;color:var(--color-text-muted);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.card-footer{display:flex;gap:0.5rem;margin-top:auto;padding-top:0.25rem}
+.card-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:0.3rem;
+  padding:0.45rem;border-radius:var(--radius-md);font-size:0.78rem;font-weight:500;
+  border:1px solid var(--color-border);background:var(--color-surface-2);
+  color:var(--color-text-muted);cursor:pointer;
+  transition:all var(--transition);text-align:center;
+}
+.card-btn:hover{background:var(--color-surface-dynamic);color:var(--color-text)}
+.card-btn-apply{
+  background:var(--color-primary);border-color:var(--color-primary);color:#fff;
+}
+.card-btn-apply:hover{background:var(--color-primary-hover)}
+.card-btn-logo{font-size:0.72rem}
+
+/* EMPTY STATE */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;
+  padding:5rem 2rem;text-align:center;color:var(--color-text-muted);grid-column:1/-1;
+}
+.empty-state h3{font-size:1.1rem;color:var(--color-text);margin:0.75rem 0 0.5rem}
+.empty-state p{font-size:0.875rem;max-width:36ch}
+
+/* EXPORT MODAL */
+.modal-overlay{
+  position:fixed;inset:0;background:oklch(0.1 0 0 / 0.7);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity 0.2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal{
+  background:var(--color-surface);border:1px solid var(--color-border);
+  border-radius:var(--radius-xl);padding:1.75rem;max-width:560px;width:90%;
+  box-shadow:var(--shadow-lg);
+}
+.modal h2{font-family:var(--font-display);font-size:1.25rem;margin-bottom:0.5rem}
+.modal p{font-size:0.85rem;color:var(--color-text-muted);margin-bottom:1rem}
+.modal textarea{
+  width:100%;height:200px;padding:0.75rem;
+  background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-md);
+  font-family:monospace;font-size:0.75rem;color:var(--color-text);resize:none;outline:none;
+}
+.modal-actions{display:flex;gap:0.5rem;margin-top:1rem;justify-content:flex-end}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:300;
+  background:var(--color-text);color:var(--color-bg);
+  padding:0.625rem 1rem;border-radius:var(--radius-full);
+  font-size:0.82rem;font-weight:500;
+  transform:translateY(60px);opacity:0;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* MOBILE */
+@media(max-width:640px){
+  .site-header{padding:0.625rem 1rem;gap:0.625rem}
+  .logo-text{display:none}
+  .stats-row{gap:1.25rem}
+  .hero-strip{padding:1.5rem 1rem 1rem}
+  .filters-bar,.main-content{padding-left:1rem;padding-right:1rem}
+  .header-actions .btn span{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-lockup">
+    <svg class="logo-mark" viewBox="0 0 32 32" fill="none" aria-label="Launchpad Directory">
+      <rect width="32" height="32" rx="8" fill="var(--color-primary)"/>
+      <path d="M16 6 C16 6 22 10 22 17 C22 21.4 19.3 25 16 26 C12.7 25 10 21.4 10 17 C10 10 16 6 16 6Z" fill="white" opacity="0.9"/>
+      <circle cx="16" cy="17" r="3" fill="var(--color-primary)"/>
+      <path d="M9 22 L13 18 M23 22 L19 18" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-text">Launch<span>Pad</span></span>
+  </div>
+  
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="search" id="searchInput" placeholder="Search accelerators, sectors, countries…" autocomplete="off">
+  </div>
+  
+  <div class="header-actions">
+    <button class="btn btn-ghost" id="exportBtn" onclick="openExport()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <span>Export JSON</span>
+    </button>
+    <button class="theme-btn" data-theme-toggle aria-label="Toggle theme">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
+
+<section class="hero-strip">
+  <h1>The <em>Complete</em> Startup Accelerator<br>Directory for Founders</h1>
+  <p>40+ global accelerators with deal terms, logo URLs, and direct apply links — ready to feed into ChatGPT or any AI tool.</p>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num" id="totalCount">40</span><span class="stat-label">Accelerators</span></div>
+    <div class="stat"><span class="stat-num">$0–$1M</span><span class="stat-label">Deal Range</span></div>
+    <div class="stat"><span class="stat-num">15+</span><span class="stat-label">Countries</span></div>
+    <div class="stat"><span class="stat-num">8</span><span class="stat-label">Equity-Free</span></div>
+  </div>
+</section>
+
+<div class="filters-bar">
+  <span class="filter-label">Region</span>
+  <div class="filter-group" id="regionFilters">
+    <button class="filter-chip active" data-filter-type="region" data-filter-val="all">All</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="global">Global</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="usa">USA</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="europe">Europe</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="india">India</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="latam">LATAM</button>
+    <button class="filter-chip" data-filter-type="region" data-filter-val="asia">Asia</button>
+  </div>
+  <div class="filter-sep"></div>
+  <span class="filter-label">Equity</span>
+  <div class="filter-group">
+    <button class="filter-chip active" data-filter-type="equity" data-filter-val="all">All</button>
+    <button class="filter-chip" data-filter-type="equity" data-filter-val="free">Equity-Free</button>
+    <button class="filter-chip" data-filter-type="equity" data-filter-val="low">≤6%</button>
+    <button class="filter-chip" data-filter-type="equity" data-filter-val="high">&gt;6%</button>
+  </div>
+</div>
+
+<main class="main-content">
+  <div class="results-bar">
+    <div class="results-count"><strong id="shownCount">40</strong> accelerators shown</div>
+    <div style="font-size:0.78rem;color:var(--color-text-faint)">Click logo URL to copy • Apply links open in new tab</div>
+  </div>
+  <div class="grid" id="cardGrid"></div>
+</main>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="exportModal">
+  <div class="modal">
+    <h2>Export for ChatGPT</h2>
+    <p>Copy this JSON and paste it into ChatGPT with: <em>"Use these accelerators to build a directory. Download logos from the logo_url field."</em></p>
+    <textarea id="exportJson" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeExport()">Close</button>
+      <button class="btn btn-primary" onclick="copyJson()">Copy JSON</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ACCELERATORS = [
+  {
+    id:1, name:"Y Combinator", short:"YC",
+    domain:"ycombinator.com",
+    url:"https://www.ycombinator.com/",
+    apply_url:"https://www.ycombinator.com/apply/",
+    location:"Mountain View, CA", region:"usa",
+    deal:"$500K (7% + SAFE)", equity_pct:7, equity_type:"equity",
+    duration:"3 months", stage:"Pre-seed / Seed",
+    sectors:["Agnostic","AI","SaaS","Fintech","Health"],
+    sector_tag:"agnostic",
+    notable_alumni:"Airbnb, Stripe, Dropbox, Reddit",
+    description:"The world's most prestigious accelerator. 7% equity for $500K total. Demo Day connects you to top-tier investors globally.",
+    investments:7464,
+    logo_url:"https://logo.clearbit.com/ycombinator.com",
+    favicon:"https://www.google.com/s2/favicons?domain=ycombinator.com&sz=64"
+  },
+  {
+    id:2, name:"Techstars", short:"TS",
+    domain:"techstars.com",
+    url:"https://www.techstars.com/",
+    apply_url:"https://www.techstars.com/accelerators",
+    location:"Global (50+ cities)", region:"global",
+    deal:"$220K for 5%", equity_pct:5, equity_type:"equity",
+    duration:"3 months", stage:"Pre-seed / Seed",
+    sectors:["Agnostic","AI","HealthTech","SaaS","Fintech"],
+    sector_tag:"agnostic",
+    notable_alumni:"Uber, Twilio, DigitalOcean, SendGrid",
+    description:"Mentorship-driven accelerator with 50+ programs worldwide. Strong alumni network and lifelong access to Techstars community.",
+    investments:6271,
+    logo_url:"https://logo.clearbit.com/techstars.com",
+    favicon:"https://www.google.com/s2/favicons?domain=techstars.com&sz=64"
+  },
+  {
+    id:3, name:"500 Global", short:"500",
+    domain:"500.co",
+    url:"https://500.co/",
+    apply_url:"https://500.co/accelerator",
+    location:"Global", region:"global",
+    deal:"$150K for 6%", equity_pct:6, equity_type:"equity",
+    duration:"4 months", stage:"Seed",
+    sectors:["Agnostic","E-Commerce","SaaS","Fintech"],
+    sector_tag:"agnostic",
+    notable_alumni:"Canva, Udemy, Grab, Talkdesk",
+    description:"Growth-focused 4-month program with strong distribution curriculum. Known for diversity and international founder support.",
+    investments:3185,
+    logo_url:"https://logo.clearbit.com/500.co",
+    favicon:"https://www.google.com/s2/favicons?domain=500.co&sz=64"
+  },
+  {
+    id:4, name:"Google for Startups", short:"GFS",
+    domain:"startup.google.com",
+    url:"https://startup.google.com/",
+    apply_url:"https://startup.google.com/programs/accelerator/",
+    location:"Global", region:"global",
+    deal:"Equity-Free", equity_pct:0, equity_type:"free",
+    duration:"3 months", stage:"Seed / Series A",
+    sectors:["AI/ML","Cloud","Tech Infrastructure"],
+    sector_tag:"tech",
+    notable_alumni:"Diverse global cohorts",
+    description:"Equity-free program with Google Cloud credits, technical mentorship, and access to Google's global network. Multiple regional tracks.",
+    investments:1743,
+    logo_url:"https://logo.clearbit.com/startup.google.com",
+    favicon:"https://www.google.com/s2/favicons?domain=google.com&sz=64"
+  },
+  {
+    id:5, name:"MassChallenge", short:"MC",
+    domain:"masschallenge.org",
+    url:"https://masschallenge.org/",
+    apply_url:"https://masschallenge.org/programs-find/",
+    location:"Global", region:"global",
+    deal:"Equity-Free + Up to $200K prizes", equity_pct:0, equity_type:"free",
+    duration:"Varies", stage:"Pre-seed to Growth",
+    sectors:["HealthTech","Fintech","CleanTech","Cybersecurity","Food"],
+    sector_tag:"agnostic",
+    notable_alumni:"3,200+ companies, $9B+ raised",
+    description:"Non-profit equity-free accelerator. Gives cash prizes without taking equity. Best for mission-driven founders who don't want dilution.",
+    investments:3205,
+    logo_url:"https://logo.clearbit.com/masschallenge.org",
+    favicon:"https://www.google.com/s2/favicons?domain=masschallenge.org&sz=64"
+  },
+  {
+    id:6, name:"SOSV", short:"SOSV",
+    domain:"sosv.com",
+    url:"https://sosv.com/",
+    apply_url:"https://sosv.com/for-founders/",
+    location:"Global", region:"global",
+    deal:"$250K–$550K (~10%)", equity_pct:10, equity_type:"equity",
+    duration:"3–6 months", stage:"Pre-seed",
+    sectors:["Hardware","Biotech","CleanTech","Climate"],
+    sector_tag:"deeptech",
+    notable_alumni:"150+ startups/year funded",
+    description:"Multi-stage VC running HAX (hardware), IndieBio (biotech), Chinaccelerator and more. Deep sector expertise in physical-world startups.",
+    investments:2866,
+    logo_url:"https://logo.clearbit.com/sosv.com",
+    favicon:"https://www.google.com/s2/favicons?domain=sosv.com&sz=64"
+  },
+  {
+    id:7, name:"Plug and Play", short:"PnP",
+    domain:"plugandplaytechcenter.com",
+    url:"https://www.plugandplaytechcenter.com/",
+    apply_url:"https://www.plugandplaytechcenter.com/startups/",
+    location:"Silicon Valley + Global", region:"global",
+    deal:"Equity-Free (VC arm invests separately)", equity_pct:0, equity_type:"free",
+    duration:"3 months", stage:"Seed / Series A",
+    sectors:["B2B","Enterprise","Fintech","Health","Mobility"],
+    sector_tag:"b2b",
+    notable_alumni:"PayPal, Dropbox, LoanDepot",
+    description:"Corporate-backed accelerator connecting startups to Fortune 500 partners. Best for B2B teams seeking pilot deals and enterprise traction.",
+    investments:2223,
+    logo_url:"https://logo.clearbit.com/plugandplaytechcenter.com",
+    favicon:"https://www.google.com/s2/favicons?domain=plugandplaytechcenter.com&sz=64"
+  },
+  {
+    id:8, name:"Alchemist Accelerator", short:"AA",
+    domain:"alchemistaccelerator.com",
+    url:"https://www.alchemistaccelerator.com/",
+    apply_url:"https://www.alchemistaccelerator.com/apply",
+    location:"San Francisco, CA", region:"usa",
+    deal:"~5% + $30K SAFE + $450K credits", equity_pct:5, equity_type:"equity",
+    duration:"6 months", stage:"Seed",
+    sectors:["Enterprise","B2B Software","AI","SaaS"],
+    sector_tag:"b2b",
+    notable_alumni:"650+ companies, $3.9B+ funded",
+    description:"World's #1 enterprise-focused accelerator. 6-month program with the deepest B2B mentor and investor network for complex sales cycles.",
+    investments:605,
+    logo_url:"https://logo.clearbit.com/alchemistaccelerator.com",
+    favicon:"https://www.google.com/s2/favicons?domain=alchemistaccelerator.com&sz=64"
+  },
+  {
+    id:9, name:"AngelPad", short:"AP",
+    domain:"angelpad.com",
+    url:"https://angelpad.com/",
+    apply_url:"https://angelpad.com/",
+    location:"NYC & San Francisco", region:"usa",
+    deal:"$120K for ~7% + $300K+ credits", equity_pct:7, equity_type:"equity",
+    duration:"3 months", stage:"Seed",
+    sectors:["B2B","SaaS","Mobile","Consumer"],
+    sector_tag:"agnostic",
+    notable_alumni:"Postmates, Viki, Buffer",
+    description:"Elite boutique accelerator with ~15 teams per cohort. Consistently top-ranked. Intense, hands-on with founding partners. Very competitive.",
+    investments:185,
+    logo_url:"https://logo.clearbit.com/angelpad.com",
+    favicon:"https://www.google.com/s2/favicons?domain=angelpad.com&sz=64"
+  },
+  {
+    id:10, name:"a16z Speedrun", short:"a16z",
+    domain:"speedrun.a16z.com",
+    url:"https://speedrun.a16z.com/",
+    apply_url:"https://speedrun.a16z.com/",
+    location:"USA (In-person)", region:"usa",
+    deal:"Up to $1M for 10% SAFE", equity_pct:10, equity_type:"equity",
+    duration:"12 weeks", stage:"Pre-seed / Seed",
+    sectors:["Tech","AI","Gaming","Interactive Media"],
+    sector_tag:"tech",
+    notable_alumni:"Andreessen Horowitz portfolio",
+    description:"a16z's accelerator program investing up to $1M per startup. Demo Day reaches 1,000+ investors. $5M+ in AWS/GCP/OpenAI credits.",
+    investments:220,
+    logo_url:"https://logo.clearbit.com/a16z.com",
+    favicon:"https://www.google.com/s2/favicons?domain=a16z.com&sz=64"
+  },
+  {
+    id:11, name:"Seedcamp", short:"SC",
+    domain:"seedcamp.com",
+    url:"https://seedcamp.com/",
+    apply_url:"https://seedcamp.com/apply/",
+    location:"London, UK", region:"europe",
+    deal:"€100K–€200K for 7–10%", equity_pct:8, equity_type:"equity",
+    duration:"Ongoing", stage:"Pre-seed / Seed",
+    sectors:["SaaS","Fintech","AI","Consumer","B2B"],
+    sector_tag:"agnostic",
+    notable_alumni:"Revolut, UiPath, Transferwise",
+    description:"Europe's leading pre-seed fund and accelerator. Known for backing exceptional founders very early. Strong London/EU investor network.",
+    investments:633,
+    logo_url:"https://logo.clearbit.com/seedcamp.com",
+    favicon:"https://www.google.com/s2/favicons?domain=seedcamp.com&sz=64"
+  },
+  {
+    id:12, name:"Entrepreneurs First", short:"EF",
+    domain:"joinef.com",
+    url:"https://www.joinef.com/",
+    apply_url:"https://www.joinef.com/apply/",
+    location:"Global (London, Berlin, Bangalore, Singapore)", region:"global",
+    deal:"~£80K for 10%", equity_pct:10, equity_type:"equity",
+    duration:"12 weeks", stage:"Idea Stage",
+    sectors:["AI","Deep Tech","B2B","Health","Frontier Tech"],
+    sector_tag:"deeptech",
+    notable_alumni:"Magic Pony, Cleo, Faculty",
+    description:"Unique model — recruits top talent BEFORE they have a co-founder or idea. Builds companies from scratch with exceptional individuals.",
+    investments:471,
+    logo_url:"https://logo.clearbit.com/joinef.com",
+    favicon:"https://www.google.com/s2/favicons?domain=joinef.com&sz=64"
+  },
+  {
+    id:13, name:"Startupbootcamp", short:"SBC",
+    domain:"startupbootcamp.org",
+    url:"https://www.startupbootcamp.org/",
+    apply_url:"https://www.startupbootcamp.org/startups/",
+    location:"Global (30+ programs)", region:"global",
+    deal:"€15K–€40K + €450K in services for ~8%", equity_pct:8, equity_type:"equity",
+    duration:"3 months", stage:"Seed",
+    sectors:["Fintech","IoT","HealthTech","RetailTech","AgriTech"],
+    sector_tag:"agnostic",
+    notable_alumni:"600+ graduates",
+    description:"Network of 30+ vertical accelerators globally. Industry-specific cohorts mean deep sector mentors and relevant corporate partners.",
+    investments:614,
+    logo_url:"https://logo.clearbit.com/startupbootcamp.org",
+    favicon:"https://www.google.com/s2/favicons?domain=startupbootcamp.org&sz=64"
+  },
+  {
+    id:14, name:"Creative Destruction Lab", short:"CDL",
+    domain:"creativedestructionlab.com",
+    url:"https://creativedestructionlab.com/",
+    apply_url:"https://creativedestructionlab.com/apply/",
+    location:"Global (16 locations)", region:"global",
+    deal:"No equity taken — mentors may invest", equity_pct:0, equity_type:"free",
+    duration:"10 months (5 sessions)", stage:"Pre-seed / Seed",
+    sectors:["AI","Quantum","Climate","Biomedical","Deep Tech"],
+    sector_tag:"deeptech",
+    notable_alumni:"Deep tech / science startups globally",
+    description:"Nonprofit. Zero equity taken. Connects science founders with exited unicorn entrepreneurs as mentors. 23 streams across 16 global sites.",
+    investments:300,
+    logo_url:"https://logo.clearbit.com/creativedestructionlab.com",
+    favicon:"https://www.google.com/s2/favicons?domain=creativedestructionlab.com&sz=64"
+  },
+  {
+    id:15, name:"Startup Chile", short:"SUP",
+    domain:"startupchile.org",
+    url:"https://startupchile.org/",
+    apply_url:"https://startupchile.org/programs/",
+    location:"Santiago, Chile", region:"latam",
+    deal:"Equity-Free: $12K–$100K grants", equity_pct:0, equity_type:"free",
+    duration:"3–6 months", stage:"Pre-seed to Growth",
+    sectors:["Agnostic"],
+    sector_tag:"agnostic",
+    notable_alumni:"1,077+ companies",
+    description:"Government-backed equity-free accelerator. Non-dilutive grants up to $100K. Ideal entry point into Latin America.",
+    investments:1077,
+    logo_url:"https://logo.clearbit.com/startupchile.org",
+    favicon:"https://www.google.com/s2/favicons?domain=startupchile.org&sz=64"
+  },
+  {
+    id:16, name:"Founders Factory", short:"FF",
+    domain:"foundersfactory.com",
+    url:"https://foundersfactory.com/",
+    apply_url:"https://foundersfactory.com/apply/",
+    location:"London, UK", region:"europe",
+    deal:"£30K–£250K for 7% (Accelerator)", equity_pct:7, equity_type:"equity",
+    duration:"4 months", stage:"Pre-seed / Seed",
+    sectors:["Fintech","Climate","Health","Deep Tech","Education"],
+    sector_tag:"agnostic",
+    notable_alumni:"Sector-specific corporate-backed cohorts",
+    description:"Blends cohort accelerator with venture studio model. Corporate partner programs can lead to pilots and contracts during the 4-month program.",
+    investments:250,
+    logo_url:"https://logo.clearbit.com/foundersfactory.com",
+    favicon:"https://www.google.com/s2/favicons?domain=foundersfactory.com&sz=64"
+  },
+  {
+    id:17, name:"ERA (Entrepreneurs Roundtable)", short:"ERA",
+    domain:"eranyc.com",
+    url:"https://www.eranyc.com/",
+    apply_url:"https://www.eranyc.com/apply/",
+    location:"New York, NY", region:"usa",
+    deal:"$150K for 6% SAFE", equity_pct:6, equity_type:"equity",
+    duration:"4 months", stage:"Seed",
+    sectors:["B2B","B2C Software","SaaS","AI"],
+    sector_tag:"b2b",
+    notable_alumni:"415+ companies",
+    description:"NYC-focused accelerator with transparent 6% terms. Deep access to New York investor and enterprise ecosystem. Strong mentor network.",
+    investments:415,
+    logo_url:"https://logo.clearbit.com/eranyc.com",
+    favicon:"https://www.google.com/s2/favicons?domain=eranyc.com&sz=64"
+  },
+  {
+    id:18, name:"EWOR", short:"EWOR",
+    domain:"ewor.com",
+    url:"https://www.ewor.com/",
+    apply_url:"https://www.ewor.com/apply/",
+    location:"Europe (Virtual-first)", region:"europe",
+    deal:"Up to €500K for 7% (Traction)", equity_pct:7, equity_type:"equity",
+    duration:"Ongoing fellowship", stage:"Idea / Pre-seed",
+    sectors:["Agnostic"],
+    sector_tag:"agnostic",
+    notable_alumni:"0.1% acceptance rate — elite cohort",
+    description:"Elite founder fellowship with 0.1% acceptance rate. Virtual-first, bespoke support from unicorn founders. Up to €500K investment for ambitious founders.",
+    investments:100,
+    logo_url:"https://logo.clearbit.com/ewor.com",
+    favicon:"https://www.google.com/s2/favicons?domain=ewor.com&sz=64"
+  },
+  {
+    id:19, name:"Wayra", short:"WYR",
+    domain:"wayra.com",
+    url:"https://www.wayra.com/",
+    apply_url:"https://www.wayra.com/en/apply",
+    location:"Global (Telefónica-backed)", region:"global",
+    deal:"€50K–€5M minority stake", equity_pct:8, equity_type:"equity",
+    duration:"Varies", stage:"Seed / Series A",
+    sectors:["AI","IoT","Cloud","Fintech","Telecom"],
+    sector_tag:"tech",
+    notable_alumni:"Telefónica's global portfolio",
+    description:"Telefónica's corporate venture arm. Access to 300M+ customer distribution network. Best for B2B startups targeting telco and enterprise.",
+    investments:350,
+    logo_url:"https://logo.clearbit.com/wayra.com",
+    favicon:"https://www.google.com/s2/favicons?domain=wayra.com&sz=64"
+  },
+  {
+    id:20, name:"Berkeley SkyDeck", short:"BSD",
+    domain:"skydeck.berkeley.edu",
+    url:"https://skydeck.berkeley.edu/",
+    apply_url:"https://skydeck.berkeley.edu/apply/",
+    location:"Berkeley, CA", region:"usa",
+    deal:"$200K for 7.5% SAFE (Cohort)", equity_pct:7.5, equity_type:"equity",
+    duration:"6 months", stage:"Seed",
+    sectors:["Deep Tech","Biotech","AI","Hardware"],
+    sector_tag:"deeptech",
+    notable_alumni:"487 companies, $4.4B raised",
+    description:"UC Berkeley's flagship accelerator. Research-to-market expertise. Two tracks: full Cohort (funded) and Pad-13 incubator (mentorship only).",
+    investments:487,
+    logo_url:"https://logo.clearbit.com/berkeley.edu",
+    favicon:"https://www.google.com/s2/favicons?domain=berkeley.edu&sz=64"
+  },
+  {
+    id:21, name:"StartX (Stanford)", short:"STX",
+    domain:"startx.com",
+    url:"https://startx.com/",
+    apply_url:"https://startx.com/apply",
+    location:"Palo Alto, CA", region:"usa",
+    deal:"Equity-Free", equity_pct:0, equity_type:"free",
+    duration:"Ongoing community", stage:"Idea to Series A",
+    sectors:["Agnostic","HealthTech","AI","Software"],
+    sector_tag:"agnostic",
+    notable_alumni:"$40B+ total valuation across portfolio",
+    description:"Stanford-affiliated. Zero equity taken. Access to $1.2M+ in free resources, mentorship, and the Stanford network. Must have Stanford affiliation.",
+    investments:339,
+    logo_url:"https://logo.clearbit.com/startx.com",
+    favicon:"https://www.google.com/s2/favicons?domain=startx.com&sz=64"
+  },
+  {
+    id:22, name:"Forum Ventures", short:"FV",
+    domain:"forumvc.com",
+    url:"https://www.forumvc.com/",
+    apply_url:"https://www.forumvc.com/accelerator",
+    location:"Global", region:"global",
+    deal:"$100K for 7.5% SAFE", equity_pct:7.5, equity_type:"equity",
+    duration:"4 months", stage:"Pre-seed / Seed",
+    sectors:["B2B SaaS","Enterprise Software"],
+    sector_tag:"b2b",
+    notable_alumni:"498 companies",
+    description:"B2B SaaS specialist. Each founder gets a dedicated MD as fractional co-founder. Access to 300+ Fortune 500 customers and 250+ global investors.",
+    investments:498,
+    logo_url:"https://logo.clearbit.com/forumvc.com",
+    favicon:"https://www.google.com/s2/favicons?domain=forumvc.com&sz=64"
+  },
+  {
+    id:23, name:"Village Capital", short:"VCap",
+    domain:"vilcap.com",
+    url:"https://vilcap.com/",
+    apply_url:"https://vilcap.com/programs",
+    location:"Global", region:"global",
+    deal:"Varies by cohort", equity_pct:5, equity_type:"equity",
+    duration:"Varies", stage:"Pre-seed to Seed",
+    sectors:["Impact","Fintech","EdTech","AgriTech","ClimateTech"],
+    sector_tag:"impact",
+    notable_alumni:"367 companies",
+    description:"Impact-first accelerator with unique peer-selection model. Founders evaluate and rank each other for investment. Mission-driven teams thrive here.",
+    investments:367,
+    logo_url:"https://logo.clearbit.com/vilcap.com",
+    favicon:"https://www.google.com/s2/favicons?domain=vilcap.com&sz=64"
+  },
+  {
+    id:24, name:"Capital Factory", short:"CF",
+    domain:"capitalfactory.com",
+    url:"https://capitalfactory.com/",
+    apply_url:"https://capitalfactory.com/startups/",
+    location:"Austin, TX", region:"usa",
+    deal:"$100K for up to 1%", equity_pct:1, equity_type:"equity",
+    duration:"Flexible", stage:"Pre-seed to Seed",
+    sectors:["Agnostic","Tech","Defense Tech","SaaS"],
+    sector_tag:"agnostic",
+    notable_alumni:"222 investments",
+    description:"Texas' top tech accelerator and investor. Central hub for Austin's startup ecosystem. Known for defense tech and government contracting connections.",
+    investments:222,
+    logo_url:"https://logo.clearbit.com/capitalfactory.com",
+    favicon:"https://www.google.com/s2/favicons?domain=capitalfactory.com&sz=64"
+  },
+  {
+    id:25, name:"Mucker Capital (MuckerLab)", short:"MCL",
+    domain:"mucker.com",
+    url:"https://mucker.com/",
+    apply_url:"https://mucker.com/accelerator/",
+    location:"Los Angeles, CA", region:"usa",
+    deal:"$100K–$175K for 10–15%", equity_pct:12, equity_type:"equity",
+    duration:"~12 months", stage:"Pre-seed / Seed",
+    sectors:["Agnostic","B2B","Consumer"],
+    sector_tag:"agnostic",
+    notable_alumni:"302 companies",
+    description:"Deep-dive operator accelerator — no Demo Day sprint. 12-month engagement with operating partners. 20-25 companies per year, very hands-on.",
+    investments:302,
+    logo_url:"https://logo.clearbit.com/mucker.com",
+    favicon:"https://www.google.com/s2/favicons?domain=mucker.com&sz=64"
+  },
+  {
+    id:26, name:"MetaProp", short:"MP",
+    domain:"metaprop.vc",
+    url:"https://www.metaprop.vc/",
+    apply_url:"https://www.metaprop.vc/apply",
+    location:"New York, NY", region:"usa",
+    deal:"~$150K for ~6% SAFE (up to $250K)", equity_pct:6, equity_type:"equity",
+    duration:"22 weeks", stage:"Pre-seed / Seed",
+    sectors:["PropTech","Real Estate","Construction","Smart Cities"],
+    sector_tag:"proptech",
+    notable_alumni:"179 companies",
+    description:"Leading global PropTech accelerator. Access to real estate operators, investors, and owners. Pilot opportunities in a relationship-driven sector.",
+    investments:179,
+    logo_url:"https://logo.clearbit.com/metaprop.vc",
+    favicon:"https://www.google.com/s2/favicons?domain=metaprop.vc&sz=64"
+  },
+  {
+    id:27, name:"NFX", short:"NFX",
+    domain:"nfx.com",
+    url:"https://www.nfx.com/",
+    apply_url:"https://signal.nfx.com/",
+    location:"San Francisco, CA", region:"usa",
+    deal:"$1M–$3M for 10–15% (seed fund)", equity_pct:12, equity_type:"equity",
+    duration:"Ongoing", stage:"Pre-seed / Seed",
+    sectors:["Network Effects","Marketplace","Fintech","Consumer","AI"],
+    sector_tag:"agnostic",
+    notable_alumni:"426 portfolio companies",
+    description:"VC fund focused exclusively on network-effect businesses. Provides the NFX Signal platform for instant founder applications. Very fast decisions.",
+    investments:426,
+    logo_url:"https://logo.clearbit.com/nfx.com",
+    favicon:"https://www.google.com/s2/favicons?domain=nfx.com&sz=64"
+  },
+  {
+    id:28, name:"Betaworks", short:"BW",
+    domain:"betaworks.com",
+    url:"https://betaworks.com/",
+    apply_url:"https://betaworks.com/camp/",
+    location:"New York, NY", region:"usa",
+    deal:"$250K for ~10%", equity_pct:10, equity_type:"equity",
+    duration:"14 weeks", stage:"Pre-seed",
+    sectors:["Consumer Tech","AI","Social","Media","Tools"],
+    sector_tag:"consumer",
+    notable_alumni:"Tumblr, Bitly, Giphy — 37% exit rate",
+    description:"NYC's highest exit-rate accelerator. Theme-based cohorts (AI, spatial computing). Built in NYC, with deep media and consumer tech DNA.",
+    investments:240,
+    logo_url:"https://logo.clearbit.com/betaworks.com",
+    favicon:"https://www.google.com/s2/favicons?domain=betaworks.com&sz=64"
+  },
+  {
+    id:29, name:"Outlier Ventures", short:"OV",
+    domain:"outlierventures.io",
+    url:"https://outlierventures.io/",
+    apply_url:"https://outlierventures.io/base-camp/",
+    location:"London, UK + Global", region:"europe",
+    deal:"Varies (~$150K for ~8%)", equity_pct:8, equity_type:"equity",
+    duration:"12 weeks", stage:"Pre-seed",
+    sectors:["Web3","Blockchain","DeFi","AI + Crypto","Token Economies"],
+    sector_tag:"web3",
+    notable_alumni:"343 companies",
+    description:"Leading Web3 and open metaverse accelerator. Base Camp program for early-stage token and protocol startups. Deep crypto-native investor network.",
+    investments:343,
+    logo_url:"https://logo.clearbit.com/outlierventures.io",
+    favicon:"https://www.google.com/s2/favicons?domain=outlierventures.io&sz=64"
+  },
+  {
+    id:30, name:"Rockstart", short:"RS",
+    domain:"rockstart.com",
+    url:"https://rockstart.com/",
+    apply_url:"https://rockstart.com/apply/",
+    location:"Netherlands + Global", region:"europe",
+    deal:"~€20K + $3M fund access for 8%", equity_pct:8, equity_type:"equity",
+    duration:"6 months", stage:"Seed",
+    sectors:["AgriFood","Energy","Health","AI","SaaS"],
+    sector_tag:"impact",
+    notable_alumni:"258 companies",
+    description:"Dutch accelerator with impact focus. Three vertical tracks: AgriFood, Energy, and Health. Strong European investor access and global scaling support.",
+    investments:258,
+    logo_url:"https://logo.clearbit.com/rockstart.com",
+    favicon:"https://www.google.com/s2/favicons?domain=rockstart.com&sz=64"
+  },
+  {
+    id:31, name:"Surge (Sequoia)", short:"SRG",
+    domain:"surge.global",
+    url:"https://www.surge.global/",
+    apply_url:"https://www.surge.global/apply",
+    location:"Southeast Asia & India", region:"asia",
+    deal:"$1M–$2M for 10–15%", equity_pct:12, equity_type:"equity",
+    duration:"16 weeks", stage:"Pre-seed / Seed",
+    sectors:["Agnostic","SaaS","Consumer","Fintech","HealthTech"],
+    sector_tag:"agnostic",
+    notable_alumni:"Sequoia-backed founders in SEA/India",
+    description:"Sequoia's accelerator for Southeast Asia and India. $1M–$2M initial investment. Deep Sequoia network, world-class operating support for the region.",
+    investments:212,
+    logo_url:"https://logo.clearbit.com/surge.global",
+    favicon:"https://www.google.com/s2/favicons?domain=sequoiacap.com&sz=64"
+  },
+  {
+    id:32, name:"India Accelerator", short:"IA",
+    domain:"indiaaccelerator.co",
+    url:"https://www.indiaaccelerator.co/",
+    apply_url:"https://www.indiaaccelerator.co/apply",
+    location:"India", region:"india",
+    deal:"₹25L–₹75L for 3–8%", equity_pct:5, equity_type:"equity",
+    duration:"4 months", stage:"Pre-seed / Seed",
+    sectors:["Agnostic","Fintech","HealthTech","EdTech","AgriTech"],
+    sector_tag:"agnostic",
+    notable_alumni:"174 companies",
+    description:"Sector-agnostic accelerator across multiple India cities. Strong India-specific mentorship, regulatory guidance, and investor network.",
+    investments:174,
+    logo_url:"https://logo.clearbit.com/indiaaccelerator.co",
+    favicon:"https://www.google.com/s2/favicons?domain=indiaaccelerator.co&sz=64"
+  },
+  {
+    id:33, name:"JioGenNext", short:"JGN",
+    domain:"jiogennext.com",
+    url:"https://jiogennext.com/",
+    apply_url:"https://jiogennext.com/apply",
+    location:"Mumbai, India", region:"india",
+    deal:"Equity-free mentorship + Jio network access", equity_pct:0, equity_type:"free",
+    duration:"4 months", stage:"Seed / Series A",
+    sectors:["Consumer Tech","Telecom","AI","FinTech","Media"],
+    sector_tag:"tech",
+    notable_alumni:"182 companies",
+    description:"Jio's startup accelerator. Access to Reliance's 500M+ user base. Equity-free with go-to-market support through Jio's distribution network.",
+    investments:182,
+    logo_url:"https://logo.clearbit.com/jiogennext.com",
+    favicon:"https://www.google.com/s2/favicons?domain=jio.com&sz=64"
+  },
+  {
+    id:34, name:"100Unicorns", short:"100U",
+    domain:"100unicorns.vc",
+    url:"https://100unicorns.vc/",
+    apply_url:"https://100unicorns.vc/apply/",
+    location:"India", region:"india",
+    deal:"₹25L–₹1Cr for 3–10%", equity_pct:6, equity_type:"equity",
+    duration:"3–6 months", stage:"Seed / Pre-Series A",
+    sectors:["Fintech","AI","SaaS","Consumer","B2B"],
+    sector_tag:"agnostic",
+    notable_alumni:"242 companies",
+    description:"India-focused accelerator targeting the next generation of unicorns. Led by experienced operators and VCs. Strong domestic investor network.",
+    investments:242,
+    logo_url:"https://logo.clearbit.com/100unicorns.vc",
+    favicon:"https://www.google.com/s2/favicons?domain=100unicorns.vc&sz=64"
+  },
+  {
+    id:35, name:"Axilor Ventures", short:"AXL",
+    domain:"axilor.com",
+    url:"https://axilor.com/",
+    apply_url:"https://axilor.com/programs/",
+    location:"Bangalore, India", region:"india",
+    deal:"$50K–$500K for 10–20%", equity_pct:15, equity_type:"equity",
+    duration:"3–6 months", stage:"Pre-seed to Series A",
+    sectors:["Agnostic","HealthTech","EdTech","Consumer","B2B SaaS"],
+    sector_tag:"agnostic",
+    notable_alumni:"Founded by Infosys co-founders",
+    description:"Founded by Infosys co-founders. Operates seed accelerator, scale program, and early-stage fund. Strong India enterprise and global network.",
+    investments:150,
+    logo_url:"https://logo.clearbit.com/axilor.com",
+    favicon:"https://www.google.com/s2/favicons?domain=axilor.com&sz=64"
+  },
+  {
+    id:36, name:"T-Hub", short:"THB",
+    domain:"t-hub.co",
+    url:"https://t-hub.co/",
+    apply_url:"https://t-hub.co/programs/",
+    location:"Hyderabad, India", region:"india",
+    deal:"Equity-free programs + funding access", equity_pct:0, equity_type:"free",
+    duration:"3–6 months", stage:"Pre-seed to Series A",
+    sectors:["Agnostic","DeepTech","GovTech","AgriTech","HealthTech"],
+    sector_tag:"agnostic",
+    notable_alumni:"World's largest startup incubator (campus)",
+    description:"Telangana government-backed. World's largest startup incubator by space. Connects to Indian government contracts, corporates, and international programs.",
+    investments:400,
+    logo_url:"https://logo.clearbit.com/t-hub.co",
+    favicon:"https://www.google.com/s2/favicons?domain=t-hub.co&sz=64"
+  },
+  {
+    id:37, name:"IndieBio (SOSV)", short:"IDB",
+    domain:"indiebio.co",
+    url:"https://indiebio.co/",
+    apply_url:"https://indiebio.co/apply/",
+    location:"San Francisco & NYC", region:"usa",
+    deal:"Up to $550K for ~10%", equity_pct:10, equity_type:"equity",
+    duration:"4 months", stage:"Pre-seed",
+    sectors:["Biotech","HealthTech","Life Sciences","Food Tech","Climate Bio"],
+    sector_tag:"biotech",
+    notable_alumni:"546 companies, $3B+ raised",
+    description:"World's top biotech accelerator. Lab space included. $550K for deep biotech startups. SOSV's flagship life sciences program in SF and NYC.",
+    investments:546,
+    logo_url:"https://logo.clearbit.com/indiebio.co",
+    favicon:"https://www.google.com/s2/favicons?domain=indiebio.co&sz=64"
+  },
+  {
+    id:38, name:"HAX (SOSV)", short:"HAX",
+    domain:"hax.co",
+    url:"https://hax.co/",
+    apply_url:"https://hax.co/apply/",
+    location:"Newark, NJ (+ Shenzhen)", region:"usa",
+    deal:"$250K for 8–16%", equity_pct:12, equity_type:"equity",
+    duration:"3–6 months", stage:"Pre-seed",
+    sectors:["Hardware","Robotics","IoT","CleanTech","Med Devices"],
+    sector_tag:"hardware",
+    notable_alumni:"642 companies, world's top hardware accelerator",
+    description:"World's #1 hardware accelerator. Manufacturing access, prototyping support, Shenzhen supply chain. For physical-product startups, unmatched resources.",
+    investments:642,
+    logo_url:"https://logo.clearbit.com/hax.co",
+    favicon:"https://www.google.com/s2/favicons?domain=hax.co&sz=64"
+  },
+  {
+    id:39, name:"Tenity (formerly F10)", short:"TNT",
+    domain:"tenity.com",
+    url:"https://www.tenity.com/",
+    apply_url:"https://www.tenity.com/programs",
+    location:"Switzerland + Singapore + Estonia", region:"europe",
+    deal:"~CHF 150K for 8%", equity_pct:8, equity_type:"equity",
+    duration:"6 months", stage:"Pre-seed / Seed",
+    sectors:["Fintech","InsurTech","WealthTech","RegTech","Web3"],
+    sector_tag:"fintech",
+    notable_alumni:"331 companies",
+    description:"Leading fintech accelerator backed by major Swiss banks and insurers. Access to UBS, SIX Group and other financial institution partnerships.",
+    investments:331,
+    logo_url:"https://logo.clearbit.com/tenity.com",
+    favicon:"https://www.google.com/s2/favicons?domain=tenity.com&sz=64"
+  },
+  {
+    id:40, name:"Endless Frontier Labs", short:"EFL",
+    domain:"endlessfrontierlabs.com",
+    url:"https://endlessfrontierlabs.com/",
+    apply_url:"https://endlessfrontierlabs.com/apply",
+    location:"New York, NY", region:"usa",
+    deal:"Equity-free mentorship only", equity_pct:0, equity_type:"free",
+    duration:"9 months", stage:"Pre-seed",
+    sectors:["Deep Tech","Life Sciences","Physical Sciences","Digital Health"],
+    sector_tag:"deeptech",
+    notable_alumni:"NYU-affiliated program",
+    description:"9-month equity-free deep tech program. Best for research-driven founders who need time to translate science into a market-ready story. No dilution.",
+    investments:200,
+    logo_url:"https://logo.clearbit.com/endlessfrontierlabs.com",
+    favicon:"https://www.google.com/s2/favicons?domain=endlessfrontierlabs.com&sz=64"
+  }
+];
+
+// State
+let activeRegion = 'all';
+let activeEquity = 'all';
+let searchQuery = '';
+
+function getEquityClass(a) {
+  if (a.equity_type === 'free') return 'badge-free';
+  if (a.equity_pct <= 6) return 'badge-equity';
+  return 'badge-equity';
+}
+
+function getRegionColor(region) {
+  const map = {usa:'badge-region',europe:'badge-region',india:'badge-india',global:'badge-sector',asia:'badge-region',latam:'badge-region'};
+  return map[region] || 'badge-sector';
+}
+
+function sectorColor(tag) {
+  const m = {agnostic:'badge-sector',b2b:'badge-equity',deeptech:'badge-region',tech:'badge-region',fintech:'badge-equity',biotech:'badge-free',hardware:'badge-region',web3:'badge-sector',impact:'badge-free',consumer:'badge-sector',proptech:'badge-equity'};
+  return m[tag] || 'badge-sector';
+}
+
+function buildCard(a) {
+  const equityLabel = a.equity_type === 'free' ? '🟢 Equity-Free' : `${a.equity_pct}% equity`;
+  const regionDisplay = {usa:'🇺🇸 USA',europe:'🇪🇺 Europe',global:'🌍 Global',india:'🇮🇳 India',asia:'🌏 Asia',latam:'🌎 LATAM'};
+  const mainSectors = a.sectors.slice(0,3).join(' · ');
+  
+  return `
+  <div class="card" data-id="${a.id}" data-region="${a.region}" data-equity="${a.equity_type}" data-equity-pct="${a.equity_pct}">
+    <div class="card-top">
+      <div class="card-logo" id="logo-${a.id}">
+        <img src="${a.logo_url}" alt="${a.name} logo" width="44" height="44"
+          onerror="this.parentElement.innerHTML='<span class=\'card-logo-fallback\'>${a.short.charAt(0)}</span>'"
+          loading="lazy">
+      </div>
+      <div class="card-identity">
+        <div class="card-name">${a.name}</div>
+        <div class="card-location">${a.location}</div>
+      </div>
+    </div>
+    
+    <div class="card-badges">
+      <span class="badge ${getRegionColor(a.region)}">${regionDisplay[a.region]||a.region}</span>
+      <span class="badge ${a.equity_type==='free'?'badge-free':'badge-equity'}">${equityLabel}</span>
+      <span class="badge ${sectorColor(a.sector_tag)}">${a.sectors[0]}</span>
+    </div>
+    
+    <div class="card-deal">
+      <div class="deal-item">
+        <span class="deal-label">Deal</span>
+        <span class="deal-value" style="font-size:0.76rem">${a.deal}</span>
+      </div>
+      <div class="deal-item">
+        <span class="deal-label">Duration</span>
+        <span class="deal-value">${a.duration}</span>
+      </div>
+      <div class="deal-item">
+        <span class="deal-label">Stage</span>
+        <span class="deal-value" style="font-size:0.76rem">${a.stage}</span>
+      </div>
+      <div class="deal-item">
+        <span class="deal-label">Sectors</span>
+        <span class="deal-value" style="font-size:0.72rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${mainSectors}</span>
+      </div>
+    </div>
+    
+    <p class="card-desc">${a.description}</p>
+    
+    <div class="card-footer">
+      <button class="card-btn card-btn-logo" onclick="copyLogoUrl(${a.id},'${a.logo_url}')" title="Copy logo URL for ChatGPT">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Copy Logo URL
+      </button>
+      <a class="card-btn card-btn-apply" href="${a.apply_url}" target="_blank" rel="noopener noreferrer">
+        Apply Now →
+      </a>
+    </div>
+  </div>`;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('cardGrid');
+  let filtered = ACCELERATORS.filter(a => {
+    const matchRegion = activeRegion === 'all' || a.region === activeRegion;
+    const matchEquity = activeEquity === 'all' ||
+      (activeEquity === 'free' && a.equity_type === 'free') ||
+      (activeEquity === 'low' && a.equity_type !== 'free' && a.equity_pct <= 6) ||
+      (activeEquity === 'high' && a.equity_type !== 'free' && a.equity_pct > 6);
+    const q = searchQuery.toLowerCase();
+    const matchSearch = !q || 
+      a.name.toLowerCase().includes(q) ||
+      a.sectors.some(s => s.toLowerCase().includes(q)) ||
+      a.location.toLowerCase().includes(q) ||
+      a.description.toLowerCase().includes(q) ||
+      a.notable_alumni.toLowerCase().includes(q);
+    return matchRegion && matchEquity && matchSearch;
+  });
+  
+  document.getElementById('shownCount').textContent = filtered.length;
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = `<div class="empty-state">
+      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:var(--color-text-faint)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <h3>No accelerators found</h3>
+      <p>Try a different search term or reset filters</p>
+    </div>`;
+    return;
+  }
+  
+  grid.innerHTML = filtered.map(buildCard).join('');
+}
+
+// Filter chips
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const type = chip.dataset.filterType;
+    const val = chip.dataset.filterVal;
+    document.querySelectorAll(`[data-filter-type="${type}"]`).forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    if (type === 'region') activeRegion = val;
+    if (type === 'equity') activeEquity = val;
+    renderGrid();
+  });
+});
+
+// Search
+document.getElementById('searchInput').addEventListener('input', e => {
+  searchQuery = e.target.value;
+  renderGrid();
+});
+
+// Copy logo URL
+function copyLogoUrl(id, url) {
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('Logo URL copied! Paste into ChatGPT →');
+  }).catch(() => {
+    showToast('URL: ' + url);
+  });
+}
+
+// Export JSON
+function openExport() {
+  const data = ACCELERATORS.map(a => ({
+    name: a.name,
+    website: a.url,
+    apply_url: a.apply_url,
+    logo_url: a.logo_url,
+    location: a.location,
+    region: a.region,
+    deal: a.deal,
+    equity_pct: a.equity_pct,
+    equity_type: a.equity_type,
+    duration: a.duration,
+    stage: a.stage,
+    sectors: a.sectors,
+    description: a.description,
+    notable_alumni: a.notable_alumni,
+    total_investments: a.investments
+  }));
+  const prompt = `STARTUP ACCELERATOR DIRECTORY — ${data.length} Programs\n\nInstructions for ChatGPT: Download logos from each "logo_url" field. Build a searchable HTML directory with logos, deal terms, and apply buttons.\n\n${JSON.stringify(data, null, 2)}`;
+  document.getElementById('exportJson').value = prompt;
+  document.getElementById('exportModal').classList.add('open');
+}
+
+function closeExport() {
+  document.getElementById('exportModal').classList.remove('open');
+}
+
+function copyJson() {
+  const txt = document.getElementById('exportJson').value;
+  navigator.clipboard.writeText(txt).then(() => {
+    showToast('JSON copied! Paste into ChatGPT 🚀');
+    closeExport();
+  });
+}
+
+// Toast
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Theme toggle
+(function(){
+  const toggle = document.querySelector('[data-theme-toggle]');
+  const root = document.documentElement;
+  let theme = root.getAttribute('data-theme') || 'dark';
+  
+  const sunIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+  const moonIcon = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  
+  toggle.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+  
+  toggle.addEventListener('click', () => {
+    theme = theme === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    toggle.innerHTML = theme === 'dark' ? sunIcon : moonIcon;
+  });
+})();
+
+// Close modal on overlay click
+document.getElementById('exportModal').addEventListener('click', function(e) {
+  if (e.target === this) closeExport();
+});
+
+// Init
+document.getElementById('totalCount').textContent = ACCELERATORS.length;
+renderGrid();
+</script>
+</body>
+</html>
