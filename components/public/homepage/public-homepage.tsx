@@ -3,6 +3,7 @@
 import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
@@ -1097,6 +1098,7 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
 export function PublicHomepage() {
   const router = useRouter();
+  const { isSignedIn } = useAuth();
 
   function openAuth(_destination = "/onboarding") {
     if (isSignedIn) {

@@ -1,4 +1,10 @@
 import { Suspense } from "react";
+import { type Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Explore Startup Programs | Fundme",
+  description: "Search and filter top startup accelerators, grants, cloud credits, and fellowships. Draft your application in one click.",
+};
 
 import { PublicAuthController } from "@/components/public/public-auth-controller";
 import { SearchShell } from "@/components/startup-programs/search-shell";

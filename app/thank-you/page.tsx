@@ -98,13 +98,19 @@ export default function ThankYouPage() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6, duration: 0.4 }}
-          className="mt-8 sm:mt-10"
+          className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-3"
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-black/[0.03] hover:bg-black/[0.06] transition-colors text-[13px] sm:text-[14px] font-semibold text-black"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-black/[0.03] hover:bg-black/[0.06] transition-colors text-[13px] sm:text-[14px] font-semibold text-black min-w-[160px]"
           >
             <ArrowLeft className="size-4" /> Back to home
+          </Link>
+          <Link
+            href="/search"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#171513] hover:bg-[#2a2622] transition-colors text-[13px] sm:text-[14px] font-medium text-white min-w-[160px]"
+          >
+            Explore programs
           </Link>
         </motion.div>
       </motion.div>
