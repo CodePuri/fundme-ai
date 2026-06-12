@@ -7,12 +7,13 @@ node_modules/
 .next/
 out/
 
-# local environment files
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Environment files
+.env*
+*.env
+
+# Allow example/template env files
+!.env.example
+!.env.template
 
 # local agent / auth artifacts
 .agents/
@@ -31,9 +32,6 @@ pnpm-debug.log*
 # TypeScript
 *.tsbuildinfo
 
-# extra local environment files
-.env.development
-.env.preview
 
 # temporary artifacts
 *.png
