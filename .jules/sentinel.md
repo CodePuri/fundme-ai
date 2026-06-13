@@ -18,3 +18,8 @@
 **Security Standards Enforced:**
 - Failing Securely: Ensuring the middleware is properly registered so that unprotected routes fail closed (require authentication) by default.
 - Defense in Depth: Multiple layers of protection (middleware routing + component-level state checks) are now properly aligned.
+
+## 2026-04-25 - Fix Open Redirect in Login Route
+**Vulnerability:** Open Redirect vulnerability in `app/login/page.tsx` via unvalidated `redirect` URL parameter passed to Clerk's `redirect_url`.
+**Learning:** Next.js Clerk integrations frequently construct redirect paths dynamically using URL search parameters. If `params.redirect` is passed directly without validation, an attacker could supply an absolute URL (`//malicious.site`) that Clerk blindly accepts, leading to an open redirect that compromises user safety after sign-in.
+**Prevention:** Always validate and sanitize user-provided redirect paths, ensuring they begin with a single slash (`/`) and are not protocol-relative (`//`), to enforce local application redirects.
