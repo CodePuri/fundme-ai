@@ -2,7 +2,6 @@
 
 import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   CheckCircle2,
@@ -89,8 +88,10 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
   const shouldReduceMotion = useReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
-  return <>{shouldReduceMotion ? value : count}{suffix}</>;
+  return <>{mounted && shouldReduceMotion ? value : count}{suffix}</>;
 }
 
 /* ─── 1. Header ─────────────────────────────────────────────── */
@@ -405,16 +406,16 @@ function HomepageHero() {
 
             {/* CTA row — single primary action */}
             <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
-              <motion.button
-                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                onClick={() => { router.push("/onboarding"); }}
-                type="button"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                Get Started Free
-                <ArrowRight className="size-3.5" />
-              </motion.button>
+              <Link href="/onboarding" passHref legacyBehavior>
+                <motion.a
+                  className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                  whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+                  whileTap={shouldReduceMotion ? undefined : tapCompress}
+                >
+                  Get Started Free
+                  <ArrowRight className="size-3.5" />
+                </motion.a>
+              </Link>
             </motion.div>
             <motion.div className="mt-3 text-[13px] font-medium text-[#8b8276]" variants={fadeRise}>
               Free assessment. No credit card required.
@@ -545,7 +546,7 @@ function StatsStrip() {
                 <div className="text-[34px] font-semibold leading-[0.92] tracking-[-0.05em] text-[#171513]">
                   <CountUpValue isVisible={isInView} suffix={suffix} value={num} />
                 </div>
-                <div className="mt-3 max-w-[250px] text-[14px] leading-6 text-[#6f6559]">{stat.label}</div>
+                <div className="mt-3 max-w-[250px] text-[14px] leading-6 text-[#645d54]">{stat.label}</div>
               </motion.div>
             );
           })}
@@ -827,15 +828,15 @@ function MatchedProgramsSection() {
               </div>
             </div>
 
-            <motion.button
-              className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
-              onClick={() => { const router = document.createElement("a"); router.href = "/onboarding"; router.click(); }}
-              type="button"
-              whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-              whileTap={shouldReduceMotion ? undefined : tapCompress}
-            >
-              Analyze my funding fit →
-            </motion.button>
+            <Link href="/onboarding" passHref legacyBehavior>
+              <motion.a
+                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                Analyze my funding fit →
+              </motion.a>
+            </Link>
           </div>
 
           <div className="mt-5">
@@ -881,14 +882,14 @@ function MatchedProgramsSection() {
 
               <p className="mt-4 text-[14px] leading-6 text-[#645d54]">{program.why}</p>
 
-              <motion.button
-                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
-                onClick={() => { const router = document.createElement("a"); router.href = "/onboarding"; router.click(); }}
-                type="button"
-                whileHover={shouldReduceMotion ? undefined : { x: 3 }}
-              >
-                Analyze my funding fit <ArrowRight className="size-3.5" />
-              </motion.button>
+              <Link href="/onboarding" passHref legacyBehavior>
+                <motion.a
+                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
+                  whileHover={shouldReduceMotion ? undefined : { x: 3 }}
+                >
+                  Analyze my funding fit <ArrowRight className="size-3.5" />
+                </motion.a>
+              </Link>
             </motion.article>
           ))}
         </motion.div>

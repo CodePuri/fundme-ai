@@ -10,6 +10,7 @@ const isPublicRoute = createRouteMatcher([
   "/onboarding(.*)",
   "/account-save(.*)",
   "/thank-you(.*)",
+  "/explore(.*)",
   "/api/onboarding(.*)",
 ]);
 

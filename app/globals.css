@@ -101,11 +101,15 @@ body {
   color: var(--text-primary);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+@layer base {
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 button,
@@ -334,6 +338,22 @@ textarea {
   animation-play-state: paused !important;
 }
 
+@keyframes logo-rail {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.logo-rail-strip {
+  display: flex;
+  width: max-content;
+  animation: logo-rail linear infinite;
+}
+
+.logo-rail-strip--duplicate {
+  position: absolute;
+  top: 0;
+  left: 100%;
+}
 
 @media (prefers-reduced-motion: reduce) {
   html {
