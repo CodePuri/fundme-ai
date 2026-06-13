@@ -18,14 +18,14 @@ interface PhoneFieldProps {
   error?: string | null;
 }
 
-const CustomInput = forwardRef<HTMLInputElement, any>((props, ref) => {
+const CustomInput = forwardRef<HTMLInputElement, any>(({ error, className, ...props }, ref) => {
   return (
     <Input
       {...props}
       ref={ref}
       className={`h-10 sm:h-12 rounded-[10px] sm:rounded-[12px] bg-black/[0.02] border transition-all text-[14px] sm:text-[16px] px-3 sm:px-4 ${
-        props.className || ""
-      } ${props.error ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
+        className || ""
+      } ${error ? "border-[#ff6b3d] bg-[#fff5f0]" : "border-black/5 focus:bg-white"}`}
     />
   );
 });
@@ -89,6 +89,7 @@ export function PhoneInputField({ value, onChange, error }: PhoneFieldProps) {
         .PhoneInputCountryIcon--border { box-shadow: 0 0 0 1px rgba(0,0,0,0.1), inset 0 0 0 1px rgba(0,0,0,0.1); }
         .PhoneInputCountryIconImg { display: block; width: 100%; height: 100%; object-fit: cover; }
         .PhoneInputInput { flex: 1; min-width: 0; }
+        .has-error input { border-color: #ff6b3d !important; background-color: #fff5f0 !important; }
       `}} />
       <div className="relative phone-wrapper w-full">
         <PhoneInput

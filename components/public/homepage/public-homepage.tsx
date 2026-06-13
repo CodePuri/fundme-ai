@@ -3,7 +3,6 @@
 import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@clerk/nextjs";
 import {
   ArrowRight,
   CheckCircle2,
@@ -96,7 +95,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 /* ─── 1. Header ─────────────────────────────────────────────── */
 
-function Header({ onOpenAssessment }: { onOpenAssessment: () => void }) {
+function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
@@ -335,7 +334,7 @@ function FloatingCardMid({
   );
 }
 
-function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
+function HomepageHero() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -408,7 +407,7 @@ function HomepageHero({ onOpenAuth }: { onOpenAuth: () => void }) {
             <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
               <motion.button
                 className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                onClick={onOpenAuth}
+                onClick={() => { router.push("/onboarding"); }}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
                 whileTap={shouldReduceMotion ? undefined : tapCompress}
@@ -486,7 +485,7 @@ function LogoRailSection() {
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
 
-        <div className={cn("logo-rail-strip", shouldReduceMotion && "animation-play-state-paused")}>
+        <div className="logo-rail-strip">
           {programsToRender.map((program) => (
             <LogoRailCard key={program.id} {...program} />
           ))}
@@ -494,7 +493,7 @@ function LogoRailSection() {
 
         <div
           aria-hidden="true"
-          className={cn("logo-rail-strip logo-rail-strip--duplicate", shouldReduceMotion && "animation-play-state-paused")}
+          className="logo-rail-strip logo-rail-strip--duplicate"
         >
           {programsToRender.map((program) => (
             <LogoRailCard key={`${program.id}-duplicate`} {...program} />
@@ -783,7 +782,7 @@ function ProductProofSection() {
 
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
-function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () => void }) {
+function MatchedProgramsSection() {
   const shouldReduceMotion = useReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
@@ -830,7 +829,7 @@ function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () =
 
             <motion.button
               className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
-              onClick={onStartAssessment}
+              onClick={() => { const router = document.createElement("a"); router.href = "/onboarding"; router.click(); }}
               type="button"
               whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
               whileTap={shouldReduceMotion ? undefined : tapCompress}
@@ -884,7 +883,7 @@ function MatchedProgramsSection({ onStartAssessment }: { onStartAssessment: () =
 
               <motion.button
                 className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
-                onClick={onStartAssessment}
+                onClick={() => { const router = document.createElement("a"); router.href = "/onboarding"; router.click(); }}
                 type="button"
                 whileHover={shouldReduceMotion ? undefined : { x: 3 }}
               >
@@ -976,7 +975,7 @@ function FAQSection() {
 
 /* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
-function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
+function CinematicFooter() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
@@ -993,7 +992,7 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 
         {/* Top Marquee Band */}
         <div className="relative z-10 overflow-hidden py-3">
-          <div className={cn("logo-rail-strip gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
+          <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-10">
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
@@ -1007,7 +1006,7 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
               </div>
             ))}
           </div>
-          <div aria-hidden="true" className={cn("logo-rail-strip logo-rail-strip--duplicate gap-10", shouldReduceMotion && "animation-play-state-paused")} style={{ animationDuration: "60s" }}>
+          <div aria-hidden="true" className="logo-rail-strip logo-rail-strip--duplicate gap-10" style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={`${i}-dup`} className="flex items-center gap-10">
                 <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
@@ -1058,12 +1057,9 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
         <div className="relative z-10 grid gap-10 px-6 py-8 sm:grid-cols-[1fr_auto_1fr] sm:items-start xl:px-12 border-t border-[#e5d8c8]">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-2">
-               <div className="flex size-8 items-center justify-center rounded-lg bg-[#ff6b3d] text-white">
-                  <Target className="size-5" />
-               </div>
-               <span className="text-[20px] font-bold tracking-[-0.04em] text-[#171513]">Fundme.ai</span>
+               <BrandLockup />
             </div>
-            <p className="max-w-[300px] text-[13px] leading-relaxed text-[#645d54]">
+            <p className="mt-2 max-w-[300px] text-[13px] leading-relaxed text-[#645d54]">
               Fundme helps founders stop applying blindly and prepare stronger funding applications.
             </p>
             <p className="text-[13px] text-[#8b8276]">
@@ -1097,31 +1093,20 @@ function CinematicFooter({ onOpenAuth }: { onOpenAuth: () => void }) {
 /* ─── Assembled Homepage ────────────────────────────────────── */
 
 export function PublicHomepage() {
-  const router = useRouter();
-  const { isSignedIn } = useAuth();
-
-  function openAuth(_destination = "/onboarding") {
-    if (isSignedIn) {
-      router.push("/thank-you");
-    } else {
-      router.push("/onboarding");
-    }
-  }
-
   return (
     <main className="min-h-screen bg-[#eee3d6] text-[#171513]" data-theme="public">
-      <Header onOpenAuth={() => openAuth()} />
+      <Header />
       <div className="relative z-10 bg-[#f6f1ea] shadow-[0_40px_80px_rgba(0,0,0,0.15)] rounded-b-[40px] pb-8">
-        <HomepageHero onOpenAuth={() => openAuth()} />
+        <HomepageHero />
         <LogoRailSection />
         <StatsStrip />
         <HowItWorksSection />
         {/* <ProductProofSection /> temporarily disabled per UX conversion hierarchy pass */}
-        <MatchedProgramsSection onOpenAuth={() => openAuth()} />
+        <MatchedProgramsSection />
         <FAQSection />
       </div>
 
-      <CinematicFooter onOpenAuth={() => openAuth()} />
+      <CinematicFooter />
     </main>
   );
 }
