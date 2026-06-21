@@ -17,6 +17,12 @@ function getSupabase() {
 // GET /api/onboarding — check if the signed-in user has already submitted
 export async function GET() {
   try {
+    return NextResponse.json({ 
+      submitted: false, 
+      debug_url: process.env.SUPABASE_URL,
+      debug_key_length: process.env.SUPABASE_SERVICE_ROLE_KEY?.length 
+    });
+    
     const { userId } = await auth();
     if (!userId) {
       return NextResponse.json({ submitted: false });
