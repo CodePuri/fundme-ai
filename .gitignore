@@ -37,7 +37,10 @@ next-env.d.ts
 docs/archive/
 
 # Agent and tool configurations
-#.agent-os/
+.agent-os/*
+!.agent-os/*.md
+!.agent-os/FUNDME MD OS/
+.agent-os/FUNDME MD OS/fundme_project_os/archive/fundme_repo_install/
 .claude/
 .codex/
 
