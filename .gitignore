@@ -31,7 +31,22 @@ pnpm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+next-env.d.ts
 
+# docs archive
+docs/archive/
+
+# Agent and tool configurations
+.agent-os/
+.claude/
+.codex/
+
+# Backups
+*.bak
+.gitignore-wrong-opencode-backup
+
+# Environment archives
+infrastructure/env-archive/
 
 # temporary artifacts
 *.png
