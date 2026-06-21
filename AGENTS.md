@@ -18,9 +18,9 @@ When a contradiction is found between layers, the higher-numbered source is over
 
 ## Mandatory reading order
 
-1. `PROJECT_STATE.md` — at `.agent-os/FUNDME MD OS/fundme_project_os/PROJECT_STATE.md`
-2. `FUNDME_PROJECT_OS.md` — at `.agent-os/FUNDME MD OS/fundme_project_os/FUNDME_PROJECT_OS.md`
-3. This file (`AGENTS.md`)
+1. This file (`AGENTS.md`)
+2. `PROJECT_STATE.md` — at `.agent-os/FUNDME MD OS/fundme_project_os/PROJECT_STATE.md`
+3. `FUNDME_PROJECT_OS.md` — at `.agent-os/FUNDME MD OS/fundme_project_os/FUNDME_PROJECT_OS.md`
 4. Current phase contract inside `.agent-os/FUNDME MD OS/fundme_project_os/`
 5. Relevant specialist specification (PRD, tech arch, data spec, etc.)
 

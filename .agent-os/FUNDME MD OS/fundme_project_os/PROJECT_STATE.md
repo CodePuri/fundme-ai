@@ -5,7 +5,7 @@
 > Last updated: 2026-06-21
 > Repository root: `/Users/totem/Desktop/Projects/Fundme` (flattened; `Codex/` eliminated)
 > Production baseline: `main` at `c363eb2`, live at `https://tryfundme.in`
-> Current repository HEAD: `ee58eeaec6ecb5e4f4f3bc0c1889c3b510d5ae04`
+> Current repository HEAD: `61a14c16316e80241fb688575eebc68e9fcc3163`
 > Rule: Repository and production behavior override stale documents.
 
 
@@ -17,7 +17,7 @@
 | Production branch | `main` |
 | Accepted production release SHA | `c363eb2` |
 | Release tag | `fundme-early-access-accepted-c363eb2` |
-| Current repository HEAD | `ee58eeaec6ecb5e4f4f3bc0c1889c3b510d5ae04` |
+| Current repository HEAD | `61a14c16316e80241fb688575eebc68e9fcc3163` |
 | Framework | Next.js 16 App Router, TypeScript |
 | Package manager | pnpm v10.12.4 |
 | Hosting | Vercel |
@@ -96,7 +96,7 @@ The repository was flattened on 2026-06-21. The Next.js application previously l
 
 ## Current active phase
 
-Phase 0: Truth lock and documentation installation. In progress.
+Phase 1: Platform Foundation. In progress.
 
 ## Frozen items
 
