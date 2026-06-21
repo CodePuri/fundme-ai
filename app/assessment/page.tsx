@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
+import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
 import { 
   ArrowRight, 
   Globe, 
@@ -63,7 +64,7 @@ export default function AssessmentPage() {
     setStartupNotes, 
     setUploadedFiles 
   } = useAssessment();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   const [website, setWebsite] = useState(state.websiteUrl);
   const [startup, setStartup] = useState(state.startupName);

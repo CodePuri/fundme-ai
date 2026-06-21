@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
 import {
   ArrowRight,
   Lock,
@@ -36,7 +37,7 @@ import { EASE_OUT } from "@/lib/animations";
 function ScoreRing({ score, label, color = "#ff6b3d" }: { score: number; label: string; color?: string }) {
   const circumference = 2 * Math.PI * 36;
   const strokeDashoffset = circumference - (score / 100) * circumference;
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -167,7 +168,7 @@ function LockedMatchPreview({
 
 function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [isCheckoutState, setIsCheckoutState] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   // Reset state when closed
   useEffect(() => {
@@ -289,7 +290,7 @@ function PaywallModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
 export default function AssessmentReportPage() {
   const { state } = useAssessment();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 

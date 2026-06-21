@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
 import {
   LoaderCircle,
   Globe,
@@ -256,7 +257,7 @@ function ScanStatus({ activeId }: { activeId: string }) {
 export default function AssessmentAnalyzingPage() {
   const router = useRouter();
   const { state, generateReport, setAnswer, getAnswerForQuestion } = useAssessment();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   const [progress, setProgress] = useState(0);
   const [activeScanId, setActiveScanId] = useState("read");

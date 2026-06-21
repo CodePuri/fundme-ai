@@ -2,7 +2,8 @@
 
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
 import { ArrowRight, CheckCircle2, ArrowLeft, Sparkles } from "lucide-react";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -170,7 +171,7 @@ const slideVariants = {
 export default function AssessmentQuestionsPage() {
   const router = useRouter();
   const { state, setAnswer, getAnswerForQuestion } = useAssessment();
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0);

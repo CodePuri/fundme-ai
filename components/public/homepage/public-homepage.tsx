@@ -15,7 +15,8 @@ import {
   Upload,
   X,
 } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
 
 // import { PublicAuthController } from "@/components/public/public-auth-controller";
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -68,7 +69,7 @@ const stepIcons = {
 /* ─── Utility ────────────────────────────────────────────────── */
 
 function SectionReveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   return (
     <motion.div
@@ -86,7 +87,7 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 /* ─── CountUp display ────────────────────────────────────────── */
 
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -98,7 +99,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
 
@@ -279,7 +280,7 @@ function FloatingCard({
         {/* Label */}
         <div className="min-w-0 pr-1">
           <div className="text-[13px] font-semibold leading-tight tracking-[-0.02em] text-[#171513]">{card.label}</div>
-          <div className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[#8b8276]">Program</div>
+          <div className="mt-0.5 text-[10px] uppercase tracking-[0.14em] text-[#615a51]">Program</div>
         </div>
       </div>
     </motion.div>
@@ -336,7 +337,7 @@ function FloatingCardMid({
 }
 
 function HomepageHero() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -365,7 +366,7 @@ function HomepageHero() {
           <div className="flex max-w-[780px] flex-col items-center text-center">
             {/* Badge */}
             <motion.div
-              className="inline-flex items-center gap-2.5 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-2 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#8b8276] shadow-[0_8px_24px_rgba(18,15,11,0.04)] backdrop-blur"
+              className="inline-flex items-center gap-2.5 rounded-full border border-[#e7ddd0] bg-white/92 px-4 py-2 text-[10.5px] font-medium uppercase tracking-[0.2em] text-[#615a51] shadow-[0_8px_24px_rgba(18,15,11,0.04)] backdrop-blur"
               variants={fadeRise}
             >
               <motion.span
@@ -417,7 +418,7 @@ function HomepageHero() {
                 </motion.a>
               </Link>
             </motion.div>
-            <motion.div className="mt-3 text-[13px] font-medium text-[#8b8276]" variants={fadeRise}>
+            <motion.div className="mt-3 text-[13px] font-medium text-[#615a51]" variants={fadeRise}>
               Free assessment. No credit card required.
             </motion.div>
 
@@ -447,14 +448,14 @@ function LogoRailCard({
       />
       <div className="min-w-0">
         <div className="text-[14px] font-semibold leading-[1.1] tracking-[-0.03em] text-[#171513]">{name}</div>
-        <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#8b8276]">{label}</div>
+        <div className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#615a51]">{label}</div>
       </div>
     </div>
   );
 }
 
 function LogoRailSection() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   // Combine data to render exactly the required mix
   const programsToRender = trustLogos.map((tl, i) => ({
@@ -473,7 +474,7 @@ function LogoRailSection() {
   return (
     <section className="relative border-y border-[#e3d6c7] bg-[#eee3d6] py-4">
       <SectionReveal className="mx-auto max-w-[1240px] px-4 sm:px-6 xl:px-8">
-        <div className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#8b8276]">Now matching with</div>
+        <div className="text-center text-[11px] font-semibold uppercase tracking-[0.22em] text-[#615a51]">Now matching with</div>
       </SectionReveal>
 
       <motion.div
@@ -517,7 +518,7 @@ function parseStatValue(raw: string): { num: number; suffix: string } {
 }
 
 function StatsStrip() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
@@ -559,7 +560,7 @@ function StatsStrip() {
 /* ─── 5. How it works ────────────────────────────────────────── */
 
 function HowItWorksSection() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   const steps = [
     {
@@ -637,7 +638,7 @@ function HowItWorksSection() {
 /* ─── 6. Product proof — one dominant visual ─────────────────── */
 
 function ProductProofSection() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#d4c4b3] bg-[#eae0d2] px-4 py-20 sm:px-6 xl:px-8" id="product-proof">
@@ -668,7 +669,7 @@ function ProductProofSection() {
               className={cn(
                 "rounded-full px-3 py-1.5 text-[13px]",
                 i === 0
-                  ? "border border-[#d4c4b3] bg-white/60 text-[12px] font-medium uppercase tracking-[0.12em] text-[#8b8276] px-3.5"
+                  ? "border border-[#d4c4b3] bg-white/60 text-[12px] font-medium uppercase tracking-[0.12em] text-[#615a51] px-3.5"
                   : "border border-black/6 bg-white/80 text-[#645d54]",
               )}
               key={tag}
@@ -690,12 +691,12 @@ function ProductProofSection() {
           {/* Top bar */}
           <div className="flex flex-col gap-3 border-b border-black/8 px-6 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div>
-              <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Application operating layer</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-[#615a51]">Application operating layer</div>
               <div className="mt-2 text-[22px] font-semibold leading-tight tracking-[-0.04em] text-[#171513] sm:text-[26px]">
                 Everything in one place
               </div>
             </div>
-            <div className="rounded-full border border-black/8 bg-[#faf4ec] px-4 py-1.5 text-[11px] uppercase tracking-[0.18em] text-[#8b8276]">
+            <div className="rounded-full border border-black/8 bg-[#faf4ec] px-4 py-1.5 text-[11px] uppercase tracking-[0.18em] text-[#615a51]">
               One working surface
             </div>
           </div>
@@ -709,7 +710,7 @@ function ProductProofSection() {
                   <div className={cn(index < proofTrackerSummary.length - 1 && "sm:border-r sm:border-black/8 sm:pr-5", index > 0 && "sm:pl-5")} key={item.subtitle}>
                     <div className="text-[24px] font-semibold tracking-[-0.04em] text-[#171513]">{item.title}</div>
                     <div className="mt-1.5 text-[13px] font-medium text-[#4a4540]">{item.subtitle}</div>
-                    <div className="mt-1 text-[12px] leading-5 text-[#8b8276]">{item.detail}</div>
+                    <div className="mt-1 text-[12px] leading-5 text-[#615a51]">{item.detail}</div>
                   </div>
                 ))}
               </div>
@@ -732,7 +733,7 @@ function ProductProofSection() {
                       <div className="flex-1">
                         <div className="flex items-center justify-between gap-2">
                           <div className="text-[15px] font-semibold tracking-[-0.03em] text-[#171513]">{item.title}</div>
-                          <span className="rounded-full bg-[#f0e6d9] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#8b8276]">{item.status}</span>
+                          <span className="rounded-full bg-[#f0e6d9] px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-[#615a51]">{item.status}</span>
                         </div>
                         <div className="mt-1 text-[14px] leading-6 text-[#645d54]">{item.description}</div>
                       </div>
@@ -744,7 +745,7 @@ function ProductProofSection() {
 
             {/* Right: Why + CTA */}
             <div className="border-t border-black/8 bg-[#faf5ee] px-6 py-6 sm:px-8 xl:border-l xl:border-t-0">
-              <div className="text-[12px] uppercase tracking-[0.18em] text-[#8b8276]">Why this is worth your time</div>
+              <div className="text-[12px] uppercase tracking-[0.18em] text-[#615a51]">Why this is worth your time</div>
               <motion.div
                 className="mt-5 space-y-4"
                 initial={shouldReduceMotion ? false : "hidden"}
@@ -784,7 +785,7 @@ function ProductProofSection() {
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
 function MatchedProgramsSection() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
   return (
@@ -819,7 +820,7 @@ function MatchedProgramsSection() {
                     {featured.fitScore}% fit
                   </span>
                 </div>
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[#8b8276]">
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-[#615a51]">
                   <span className="rounded-full border border-black/6 bg-white/70 px-2.5 py-0.5 text-[11px] uppercase tracking-[0.14em]">{featured.type}</span>
                   <span>{featured.deadline}</span>
                   <span className="text-[#d2c4b5]">•</span>
@@ -840,7 +841,7 @@ function MatchedProgramsSection() {
           </div>
 
           <div className="mt-5">
-            <div className="text-[11px] uppercase tracking-[0.14em] text-[#8b8276]">Why it is worth your time</div>
+            <div className="text-[11px] uppercase tracking-[0.14em] text-[#615a51]">Why it is worth your time</div>
             <p className="mt-2 max-w-[700px] text-[15px] leading-7 text-[#645d54]">{featured.why}</p>
           </div>
         </motion.article>
@@ -865,7 +866,7 @@ function MatchedProgramsSection() {
                   <ProgramMark className="shadow-[0_8px_18px_rgba(18,15,11,0.04)]" program={program} size={40} />
                   <div>
                     <div className="text-[17px] font-semibold tracking-[-0.03em] text-[#171513]">{program.name}</div>
-                    <div className="mt-1.5 flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-[#8b8276]">
+                    <div className="mt-1.5 flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-[#615a51]">
                       <span>{program.type}</span>
                       <span className="text-[#d2c4b5]">•</span>
                       <span>{program.deadline}</span>
@@ -977,7 +978,7 @@ function FAQSection() {
 /* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
 function CinematicFooter() {
-  const shouldReduceMotion = false; // useReducedMotion();
+  const shouldReduceMotion = useSafeReducedMotion();
 
   return (
     <footer
@@ -996,13 +997,13 @@ function CinematicFooter() {
           <div className="logo-rail-strip gap-10" style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={i} className="flex items-center gap-10">
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Founder application workflow</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Matched to real programs</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Tailored drafts</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Deadlines tracked</span>
                 <span className="text-[#d2c5b3]">•</span>
               </div>
             ))}
@@ -1010,13 +1011,13 @@ function CinematicFooter() {
           <div aria-hidden="true" className="logo-rail-strip logo-rail-strip--duplicate gap-10" style={{ animationDuration: "60s" }}>
             {[...Array(4)].map((_, i) => (
               <div key={`${i}-dup`} className="flex items-center gap-10">
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Founder application workflow</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Founder application workflow</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Matched to real programs</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Matched to real programs</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Tailored drafts</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Tailored drafts</span>
                 <span className="text-[#d2c5b3]">•</span>
-                <span className="text-[12px] uppercase tracking-[0.2em] text-[#8b8276]">Deadlines tracked</span>
+                <span className="text-[12px] uppercase tracking-[0.2em] text-[#615a51]">Deadlines tracked</span>
                 <span className="text-[#d2c5b3]">•</span>
               </div>
             ))}
@@ -1029,7 +1030,7 @@ function CinematicFooter() {
             <h2 className="text-[clamp(3.2rem,6.5vw,5.5rem)] font-bold leading-[0.92] tracking-[-0.04em] text-[#171513]">
               One startup.
               <br />
-              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#8b8276]">Many applications.</span>
+              <span className="font-[family-name:var(--font-instrument)] italic font-light text-[#615a51]">Many applications.</span>
             </h2>
             <p className="mt-6 max-w-[480px] text-[17px] leading-8 text-[#645d54]">
               Upload once. Match faster. Draft smarter.
@@ -1063,7 +1064,7 @@ function CinematicFooter() {
             <p className="mt-2 max-w-[300px] text-[13px] leading-relaxed text-[#645d54]">
               Fundme helps founders stop applying blindly and prepare stronger funding applications.
             </p>
-            <p className="text-[13px] text-[#8b8276]">
+            <p className="text-[13px] text-[#615a51]">
               A Totem Interactive product.
             </p>
           </div>
@@ -1082,7 +1083,7 @@ function CinematicFooter() {
             </div>
           </div>
 
-          <div className="flex h-full flex-col justify-end text-[12px] text-[#8b8276] sm:text-right">
+          <div className="flex h-full flex-col justify-end text-[12px] text-[#615a51] sm:text-right">
             © 2026 Fundme. All rights reserved.
           </div>
         </div>

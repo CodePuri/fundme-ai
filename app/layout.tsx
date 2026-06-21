@@ -63,6 +63,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     >
       <html lang="en" suppressHydrationWarning>
         <body className="font-[family-name:var(--font-sans)]">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "WebApplication",
+                "name": "Fundme",
+                "url": "https://tryfundme.in",
+                "description": "Assess your startup profile, pitch direction, and funding readiness before applying to accelerators, grants, credits, and founder programs.",
+                "applicationCategory": "BusinessApplication",
+                "operatingSystem": "All",
+                "offers": {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD"
+                }
+              })
+            }}
+          />
           <DemoProvider>
             <AssessmentProvider>
               {children}
