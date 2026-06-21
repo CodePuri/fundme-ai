@@ -68,7 +68,7 @@ const stepIcons = {
 /* ─── Utility ────────────────────────────────────────────────── */
 
 function SectionReveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   return (
     <motion.div
@@ -86,7 +86,7 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 /* ─── CountUp display ────────────────────────────────────────── */
 
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -98,7 +98,7 @@ function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix
 
 function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
 
@@ -336,7 +336,7 @@ function FloatingCardMid({
 }
 
 function HomepageHero() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -454,7 +454,7 @@ function LogoRailCard({
 }
 
 function LogoRailSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   // Combine data to render exactly the required mix
   const programsToRender = trustLogos.map((tl, i) => ({
@@ -517,7 +517,7 @@ function parseStatValue(raw: string): { num: number; suffix: string } {
 }
 
 function StatsStrip() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
   const [ref, isInView] = useInViewOnce<HTMLDivElement>(0.4);
 
   return (
@@ -559,7 +559,7 @@ function StatsStrip() {
 /* ─── 5. How it works ────────────────────────────────────────── */
 
 function HowItWorksSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   const steps = [
     {
@@ -637,7 +637,7 @@ function HowItWorksSection() {
 /* ─── 6. Product proof — one dominant visual ─────────────────── */
 
 function ProductProofSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   return (
     <section className="scroll-mt-28 border-b border-[#d4c4b3] bg-[#eae0d2] px-4 py-20 sm:px-6 xl:px-8" id="product-proof">
@@ -784,7 +784,7 @@ function ProductProofSection() {
 /* ─── 7. Matched programs — featured lead + ranked shortlist ── */
 
 function MatchedProgramsSection() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
   const [featured, ...shortlist] = matchedPrograms;
 
   return (
@@ -977,7 +977,7 @@ function FAQSection() {
 /* ─── 9. Simplified Footer ──────────────────────────────────────── */
 
 function CinematicFooter() {
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotion = false; // useReducedMotion();
 
   return (
     <footer
