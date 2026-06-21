@@ -1,8 +1,8 @@
 # Phase 1 Build Contract — Platform Foundation
 
-> Status: Ready — Phase 0 (truth lock) complete
+> Status: Blocked — External Configuration Required
 > Target window: 2026-06-25 to 2026-06-30
-> Depends on: Documentation installation and `PROJECT_STATE.md` verification (done)
+> Depends on: Clerk production setup, Error Monitoring selection, Analytics selection
 > Repository root: `/Users/totem/Desktop/Projects/Fundme`
 > Current HEAD: `ee58eeaec6ecb5e4f4f3bc0c1889c3b510d5ae04`
 

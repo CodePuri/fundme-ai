@@ -56,3 +56,8 @@ Critical product actions require events and error observability before phase acc
 ## D-012 - `llms.txt` is optional and experimental
 
 It may help machine orientation but is not treated as a ranking requirement or substitute for SEO.
+
+## D-013 - Phase 1 blocked for external configuration
+
+Platform foundational setup (Clerk production keys, Sentry DSN, PostHog tokens) requires explicit user creation in external dashboards before production cutover can proceed.
+
