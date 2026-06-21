@@ -22,8 +22,9 @@ export function SearchShell({
           <div className="min-w-0 flex-1 lg:max-w-[700px]">{headerContent}</div>
           <div className="hidden shrink-0 lg:block">
             <Link
-              className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
+              className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
               href="/onboarding"
+              style={{ color: "#ffffff" }}
             >
               Get assessed first
             </Link>

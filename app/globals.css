@@ -346,7 +346,7 @@ textarea {
 .logo-rail-strip {
   display: flex;
   width: max-content;
-  animation: logo-rail linear infinite;
+  animation: logo-rail 60s linear infinite;
 }
 
 .logo-rail-strip--duplicate {
