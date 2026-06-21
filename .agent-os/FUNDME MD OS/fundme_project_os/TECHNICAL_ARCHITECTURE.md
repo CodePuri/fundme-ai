@@ -74,6 +74,8 @@ The exact folder structure will evolve within the current `lib/` directory. The 
 
 ## Environment model
 
+See `.agent-os/FUNDME MD OS/fundme_project_os/ENVIRONMENT_POLICY.md` for explicit environment tiers, variable requirements, and secret policies.
+
 ### Production
 
 - `main` only.

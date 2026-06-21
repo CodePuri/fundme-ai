@@ -29,6 +29,7 @@ Fundme may store founder identity, startup strategy, traction, pitch decks, fina
 
 ## Secret handling
 
+- See `.agent-os/FUNDME MD OS/fundme_project_os/ENVIRONMENT_POLICY.md` for explicit environment tiers, variable requirements, and secret policies.
 - `.env*` ignored except templates.
 - Never print secrets in agent logs or command transcripts.
 - Never include secrets in prompts, screenshots, recordings, URLs, query strings, or client code.
