@@ -57,7 +57,10 @@ Critical product actions require events and error observability before phase acc
 
 It may help machine orientation but is not treated as a ranking requirement or substitute for SEO.
 
-## D-013 - Phase 1 blocked for external configuration
+## D-013 - Phase 1 blocked for external Clerk configuration
 
-Platform foundational setup (Clerk production keys, Sentry DSN, PostHog tokens) requires explicit user creation in external dashboards before production cutover can proceed.
+Clerk production configuration is an external cutover dependency.
+Analytics-provider and Observability-provider selections are not blockers (scaffolds remain active).
+The draft identity migration is not approved merely because it exists and has been moved to drafts.
+No new Vercel project or staging branch is required automatically.
 

@@ -2,7 +2,7 @@
 
 > Status: Blocked — External Configuration Required
 > Target window: 2026-06-25 to 2026-06-30
-> Depends on: Clerk production setup, Error Monitoring selection, Analytics selection
+> Depends on: Clerk production setup (Analytics and Observability are not blockers)
 > Repository root: `/Users/totem/Desktop/Projects/Fundme`
 > Current HEAD: `ee58eeaec6ecb5e4f4f3bc0c1889c3b510d5ae04`
 

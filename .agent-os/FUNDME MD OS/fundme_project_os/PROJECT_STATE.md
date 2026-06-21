@@ -37,10 +37,10 @@ The repository was flattened on 2026-06-21. The Next.js application previously l
 |---|---|---|
 | Production landing page | PRODUCTION | Live at `tryfundme.in`, static render |
 | Four-step onboarding flow | PRODUCTION | `/onboarding` with Supabase persistence via `/api/onboarding` |
-| Clerk authentication | PARTIAL | Sign-in/sign-up routes exist; using development instance, not production Clerk |
-| Supabase persistence | PARTIAL | Only `onboarding_submissions` table; no application data tables |
-| Explore page | PRODUCTION | `/explore` renders curated program data from `lib/startup-programs.ts` |
-| Search page | PRODUCTION | `/search` with client-side filtering |
+| Clerk authentication | PARTIAL | Sign-in/sign-up routes exist; pending production-instance cutover |
+| Supabase onboarding persistence | PRODUCTION | `onboarding_submissions` table active |
+| Explore page | PRODUCTION | `/explore` for route/functionality, while opportunity coverage may be `PARTIAL` |
+| Search page | PRODUCTION | `/search` for route/functionality, while data depth may be `PARTIAL` |
 | Opportunity data | PARTIAL | ~50 curated programs in `lib/startup-programs.ts`; no database table, no admin |
 | Public program detail pages | PRODUCTION | `/search/[slug]/draft` renders program details |
 | Assessment engine | MOCK | `/assessment/*` routes exist with `AssessmentProvider` client-side state; no real AI assessment |
@@ -49,7 +49,7 @@ The repository was flattened on 2026-06-21. The Next.js application previously l
 | Tracker | MOCK | `/app/tracker` exists with `DemoProvider` mock data |
 | Founder profile | MOCK | `/app/founder-profile` exists with `DemoProvider` mock state |
 | Startup profile | MOCK | `/app/startup-profile` exists with `DemoProvider` mock state |
-| Analytics | NOT BUILT | No analytics SDK or event tracking |
+| Analytics | SCAFFOLD | Shell implemented in `lib/analytics.ts`, not connected to provider |
 | SEO metadata | PARTIAL | OG tags and structured data in root layout; `robots.ts` and `sitemap.ts` exist |
 | AEO | NOT BUILT | No Answer Engine Optimization |
 | Sitemap | PARTIAL | `app/sitemap.ts` exists (needs audit of generated URLs) |
@@ -58,10 +58,10 @@ The repository was flattened on 2026-06-21. The Next.js application previously l
 | `llms.txt` | NOT BUILT | No `llms.txt` file |
 | Referrals | NOT BUILT | No referral system |
 | Monetization | NOT BUILT | No billing, credits, or entitlements |
-| Monitoring | NOT BUILT | No error monitoring or structured logging |
-| Automated QA | NOT BUILT | `tests-acceptance/` directory exists but no automated test suite |
+| Observability | SCAFFOLD | Shell implemented in `lib/observability.ts`, not connected to provider |
+| Automated QA | PARTIAL | `tests-acceptance/` directory exists with `smoke.test.mjs` verifying critical paths |
 | API `/api/roast` | PARTIAL | Legacy GROQ-based critique endpoint; role and cost unverified |
-| API `/api/env` | PARTIAL | Debug endpoint exposing service role key length; should be removed or secured |
+| API `/api/env` | PRODUCTION | Secured and returns boolean service statuses only |
 
 ## What is real and working
 
