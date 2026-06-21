@@ -34,10 +34,17 @@ export async function GET() {
       return NextResponse.json({ submitted: false });
     }
 
-    return NextResponse.json({ submitted: !!data });
+    return NextResponse.json({ 
+      submitted: !!data, 
+      debug_url: process.env.SUPABASE_URL 
+    });
   } catch (e: any) {
     console.warn("Exception during GET submission check:", e?.message);
-    return NextResponse.json({ submitted: false });
+    return NextResponse.json({ 
+      submitted: false, 
+      debug_url: process.env.SUPABASE_URL,
+      debug_key_length: process.env.SUPABASE_SERVICE_ROLE_KEY?.length 
+    });
   }
 }
 
