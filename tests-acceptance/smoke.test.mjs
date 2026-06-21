@@ -47,7 +47,9 @@ async function run() {
     assert.strictEqual(apiEnv.status, 200);
     const data = await (await fetch('http://localhost:3000/api/env')).json();
     assert.strictEqual(data.status, "ok");
-    assert.ok(!data.keyPreview.includes(process.env.SUPABASE_SERVICE_ROLE_KEY || "dummy"), "Should not expose full key in preview");
+    assert.strictEqual(typeof data.services.supabase, "boolean", "Should expose boolean supabase service status");
+    assert.strictEqual(typeof data.services.clerk, "boolean", "Should expose boolean clerk service status");
+    assert.ok(data.keyPreview === undefined, "Should not expose any key preview");
 
     console.log("✅ All tests passed successfully.");
   } catch (err) {
