@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "build": "node -e \"if(!require('fs').existsSync('./middleware.ts')){console.error('ERROR: middleware.ts is missing!');process.exit(1)}\" && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "checkpoint": "bash scripts/checkpoint-backup.sh"
