@@ -35,3 +35,15 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 > [!CAUTION]
 > NEVER delete, rename, or modify core build-pipeline configuration files (`postcss.config.mjs`, `next.config.ts`, `tsconfig.json`, `package.json`) unless explicitly requested and verified.
 > If a change is made to these files, you MUST run a clean build (`rm -rf .next && pnpm run build`) locally and verify the output size before proceeding.
+
+## Persistent Project Memory (BRAIN.md)
+> [!IMPORTANT]
+> You must treat `BRAIN.md` as the authoritative source of truth for the project. 
+> 1. Read `BRAIN.md` before making architectural decisions or investigating complex bugs.
+> 2. At the end of every substantial task, evaluate if any new patterns, fixes, constraints, or decisions should be persisted. If so, update `BRAIN.md` directly. Do not duplicate information.
+
+## Framer Motion Hydration Safeguards
+> [!WARNING]
+> Never conditionally toggle or remove structural Framer Motion props (`initial`, `animate`, `whileInView`) based on client-side state that differs from SSR (e.g., `prefers-reduced-motion`, `window` size) during the initial hydration pass.
+> - **Why:** If a component renders on the server with `initial={{ opacity: 0 }}`, and on the client the `whileInView` prop is stripped due to an OS setting, the component will be permanently stuck at `opacity: 0` causing a blank screen.
+> - **How to fix:** Instead of conditionally stripping the prop, conditionally set the `transition` duration to `0`, or use `<MotionConfig reducedMotion="user">` at the root.
