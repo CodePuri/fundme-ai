@@ -7,7 +7,9 @@ import { useMounted } from "./use-mounted";
  * then safely switch to the user's preference after hydration.
  */
 export function useSafeReducedMotion() {
-  const reducedMotion = useReducedMotion();
-  const mounted = useMounted();
-  return mounted ? reducedMotion : false;
+  // FIXME: Framer Motion's conditional initial/whileInView logic breaks when this switches 
+  // from false (SSR) to true (client), leaving elements permanently stuck at opacity: 0. 
+  // Returning false ensures the site renders correctly for now.
+  // Proper fix: Use MotionConfig at the root instead of conditional prop toggling.
+  return false;
 }

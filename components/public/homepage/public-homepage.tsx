@@ -74,10 +74,10 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
   return (
     <motion.div
       className={className}
-      initial={shouldReduceMotion ? false : { opacity: 0, y: 28 }}
-      transition={{ duration: 0.7, ease: EASE_OUT, delay }}
+      initial={{ opacity: 0, y: 28 }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.7, ease: EASE_OUT, delay }}
       viewport={{ once: true, amount: 0.15 }}
-      whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
     >
       {children}
     </motion.div>
@@ -479,10 +479,10 @@ function LogoRailSection() {
 
       <motion.div
         className="logo-rail-viewport relative mt-5 overflow-hidden"
-        initial={shouldReduceMotion ? false : { opacity: 0 }}
-        transition={{ duration: 0.8, ease: EASE_OUT, delay: 0.2 }}
+        initial={{ opacity: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 0.8, ease: EASE_OUT, delay: 0.2 }}
         viewport={{ once: true }}
-        whileInView={shouldReduceMotion ? undefined : { opacity: 1 }}
+        whileInView={{ opacity: 1 }}
       >
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#eee3d6] to-transparent sm:w-24" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#eee3d6] to-transparent sm:w-24" />
