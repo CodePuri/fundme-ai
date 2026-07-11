@@ -59,3 +59,4 @@ api_*_response.json
 *_api_test.json
 *_supabase_row.json
 payload*.json
+nextjs.log
