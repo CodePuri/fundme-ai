@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, type ReactNode, useState, useEffect, useRef } from "react";
+import { Suspense, type ReactNode, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -53,6 +53,12 @@ const heroStagger = staggerContainer(0.12, 0.15);
 
 const cardStagger = staggerContainer(0.1, 0);
 
+const MotionLink = motion.create(Link);
+
+const subscribeToHydration = () => () => undefined;
+const getClientHydrationSnapshot = () => true;
+const getServerHydrationSnapshot = () => false;
+
 const navItems = [
   { label: "How it works", href: "#how-it-works" },
   { label: "Programs", href: "#matched-programs" },
@@ -89,8 +95,11 @@ function SectionReveal({ children, className, delay = 0 }: { children: ReactNode
 function CountUpValue({ value, suffix = "", isVisible }: { value: number; suffix?: string; isVisible: boolean }) {
   const shouldReduceMotion = useSafeReducedMotion();
   const count = useCountUp(value, isVisible, shouldReduceMotion ? 0 : 1200);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    subscribeToHydration,
+    getClientHydrationSnapshot,
+    getServerHydrationSnapshot,
+  );
 
   return <>{mounted && shouldReduceMotion ? value : count}{suffix}</>;
 }
@@ -137,10 +146,10 @@ function Header() {
         <div className="hidden items-center gap-3 md:flex">
           <Link
             className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
-            href="/onboarding"
+            href="/grill"
             style={{ color: "#ffffff" }}
           >
-            Get Started
+            Start Grill
           </Link>
         </div>
 
@@ -175,11 +184,11 @@ function Header() {
             ))}
             <Link
               className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
-              href="/onboarding"
+              href="/grill"
               onClick={() => setMenuOpen(false)}
               style={{ color: "#ffffff" }}
             >
-              Get Started
+              Start Grill
             </Link>
           </div>
         </motion.div>
@@ -407,16 +416,15 @@ function HomepageHero() {
 
             {/* CTA row — single primary action */}
             <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
-              <Link href="/onboarding" passHref legacyBehavior>
-                <motion.a
-                  className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
-                  whileTap={shouldReduceMotion ? undefined : tapCompress}
-                >
-                  Get Started Free
-                  <ArrowRight className="size-3.5" />
-                </motion.a>
-              </Link>
+              <MotionLink
+                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                href="/grill"
+                whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+                whileTap={shouldReduceMotion ? undefined : tapCompress}
+              >
+                Start Funding Grill
+                <ArrowRight className="size-3.5" />
+              </MotionLink>
             </motion.div>
             <motion.div className="mt-3 text-[13px] font-medium text-[#615a51]" variants={fadeRise}>
               Free assessment. No credit card required.
@@ -829,15 +837,14 @@ function MatchedProgramsSection() {
               </div>
             </div>
 
-            <Link href="/onboarding" passHref legacyBehavior>
-              <motion.a
-                className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
-                whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
-                whileTap={shouldReduceMotion ? undefined : tapCompress}
-              >
-                Analyze my funding fit →
-              </motion.a>
-            </Link>
+            <MotionLink
+              className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-5 py-3 text-[14px] font-medium text-white transition-colors hover:bg-[#2a2622]"
+              href="/grill"
+              whileHover={shouldReduceMotion ? undefined : { scale: 1.03 }}
+              whileTap={shouldReduceMotion ? undefined : tapCompress}
+            >
+              Analyze my funding fit →
+            </MotionLink>
           </div>
 
           <div className="mt-5">
@@ -883,14 +890,13 @@ function MatchedProgramsSection() {
 
               <p className="mt-4 text-[14px] leading-6 text-[#645d54]">{program.why}</p>
 
-              <Link href="/onboarding" passHref legacyBehavior>
-                <motion.a
-                  className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
-                  whileHover={shouldReduceMotion ? undefined : { x: 3 }}
-                >
-                  Analyze my funding fit <ArrowRight className="size-3.5" />
-                </motion.a>
-              </Link>
+              <MotionLink
+                className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-[#b15d37] transition-colors hover:text-[#963b1a]"
+                href="/grill"
+                whileHover={shouldReduceMotion ? undefined : { x: 3 }}
+              >
+                Analyze my funding fit <ArrowRight className="size-3.5" />
+              </MotionLink>
             </motion.article>
           ))}
         </motion.div>
@@ -1041,7 +1047,7 @@ function CinematicFooter() {
                 className="inline-flex items-center gap-2 rounded-full bg-[#ff6b3d] px-7 py-4 text-[15px] font-medium text-white shadow-[0_12px_32px_rgba(255,107,61,0.24)] transition-colors hover:bg-[#f45d2e]"
                 onClick={() => {
                   const el = document.createElement("a");
-                  el.href = "/onboarding";
+                  el.href = "/grill";
                   el.click();
                 }}
                 type="button"

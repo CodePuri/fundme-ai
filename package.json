@@ -7,6 +7,7 @@
     "build": "node -e \"if(!require('fs').existsSync('./middleware.ts')){console.error('ERROR: middleware.ts is missing!');process.exit(1)}\" && next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "test:grill": "tsx --test tests/grill/*.test.ts",
     "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {
@@ -20,7 +21,8 @@
     "react-dom": "^19.2.0",
     "react-phone-number-input": "^3.4.17",
     "sonner": "^2.0.6",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "unpdf": "^1.6.2"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.5",
@@ -32,6 +34,7 @@
     "eslint": "^9.36.0",
     "eslint-config-next": "^16.0.0",
     "tailwindcss": "^4.1.5",
+    "tsx": "^4.23.1",
     "typescript": "^5.9.3"
   },
   "packageManager": "pnpm@10.12.4"

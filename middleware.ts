@@ -1,4 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { type NextFetchEvent, type NextRequest, NextResponse } from "next/server";
+
+import { isGrillPublicPath } from "@/lib/grill/public-routes";
 
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -11,16 +14,21 @@ const isPublicRoute = createRouteMatcher([
   "/account-save(.*)",
   "/thank-you(.*)",
   "/explore(.*)",
+  "/grill(.*)",
+  "/api/grill(.*)",
   "/api/onboarding(.*)",
   "/robots.txt",
   "/sitemap.xml",
 ]);
 
-export default clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
+const clerkRoutes = clerkMiddleware(async (auth, request) => {
+  if (!isPublicRoute(request)) await auth.protect();
 });
+
+export default function middleware(request: NextRequest, event: NextFetchEvent) {
+  if (isGrillPublicPath(request.nextUrl.pathname)) return NextResponse.next();
+  return clerkRoutes(request, event);
+}
 
 export const config = {
   matcher: [
