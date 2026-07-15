@@ -23,7 +23,7 @@ export function SearchShell({
           <div className="hidden shrink-0 lg:block">
             <Link
               className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
-              href="/onboarding"
+              href="/grill"
               style={{ color: "#ffffff" }}
             >
               Get assessed first

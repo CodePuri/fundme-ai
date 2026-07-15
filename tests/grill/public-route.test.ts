@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 
 import {
@@ -24,4 +25,13 @@ test("the public homepage does not require Clerk initialization", () => {
   assert.equal(isClerkIndependentPublicPath("/search/program/draft"), true);
   assert.equal(isClerkIndependentPublicPath("/explore"), true);
   assert.equal(isClerkIndependentPublicPath("/app/matches"), false);
+});
+
+test("public program assessment links enter the Clerk-independent Grill", () => {
+  const shell = readFileSync("components/startup-programs/search-shell.tsx", "utf8");
+  const searchPage = readFileSync("app/search/page.tsx", "utf8");
+
+  assert.match(shell, /href="\/grill"/);
+  assert.doesNotMatch(shell, /href="\/onboarding"/);
+  assert.match(searchPage, /destination: "\/grill"/);
 });
