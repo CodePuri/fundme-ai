@@ -8,5 +8,12 @@ export function isGrillPublicPath(pathname: string) {
 }
 
 export function isClerkIndependentPublicPath(pathname: string) {
-  return pathname === "/" || isGrillPublicPath(pathname);
+  return (
+    pathname === "/" ||
+    pathname === "/search" ||
+    pathname.startsWith("/search/") ||
+    pathname === "/explore" ||
+    pathname.startsWith("/explore/") ||
+    isGrillPublicPath(pathname)
+  );
 }

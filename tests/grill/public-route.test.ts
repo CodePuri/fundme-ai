@@ -20,6 +20,8 @@ test("the public homepage does not require Clerk initialization", () => {
   assert.equal(isClerkIndependentPublicPath("/"), true);
   assert.equal(isClerkIndependentPublicPath("/grill"), true);
   assert.equal(isClerkIndependentPublicPath("/api/grill/analyze"), true);
-  assert.equal(isClerkIndependentPublicPath("/search"), false);
+  assert.equal(isClerkIndependentPublicPath("/search"), true);
+  assert.equal(isClerkIndependentPublicPath("/search/program/draft"), true);
+  assert.equal(isClerkIndependentPublicPath("/explore"), true);
   assert.equal(isClerkIndependentPublicPath("/app/matches"), false);
 });
