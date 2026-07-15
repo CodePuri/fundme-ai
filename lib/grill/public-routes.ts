@@ -6,3 +6,7 @@ export function isGrillPublicPath(pathname: string) {
     pathname.startsWith("/api/grill/")
   );
 }
+
+export function isClerkIndependentPublicPath(pathname: string) {
+  return pathname === "/" || isGrillPublicPath(pathname);
+}

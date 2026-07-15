@@ -1,7 +1,7 @@
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 import { type NextFetchEvent, type NextRequest, NextResponse } from "next/server";
 
-import { isGrillPublicPath } from "@/lib/grill/public-routes";
+import { isClerkIndependentPublicPath } from "@/lib/grill/public-routes";
 
 const isPublicRoute = createRouteMatcher([
   "/",
@@ -26,7 +26,7 @@ const clerkRoutes = clerkMiddleware(async (auth, request) => {
 });
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
-  if (isGrillPublicPath(request.nextUrl.pathname)) return NextResponse.next();
+  if (isClerkIndependentPublicPath(request.nextUrl.pathname)) return NextResponse.next();
   return clerkRoutes(request, event);
 }
 

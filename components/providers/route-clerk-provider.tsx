@@ -3,11 +3,11 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
-import { isGrillPublicPath } from "@/lib/grill/public-routes";
+import { isClerkIndependentPublicPath } from "@/lib/grill/public-routes";
 
 export function RouteClerkProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (isGrillPublicPath(pathname)) return children;
+  if (isClerkIndependentPublicPath(pathname)) return children;
 
   return (
     <ClerkProvider
