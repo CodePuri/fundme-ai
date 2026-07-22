@@ -1,5 +1,7 @@
 # Roast Feature Implementation Plan
 
+> Archived 2026-07-23. This plan conflicts with the canonical evidence-grounded assessment policy and must not be executed.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Add website URL, LinkedIn URL, and X URL fields to onboarding Step 1, then route users to a new `/roast` page after onboarding where GROQ generates a brutal savage AI critique of their pitch, followed by a "Fix my deck" CTA to `/thank-you`.

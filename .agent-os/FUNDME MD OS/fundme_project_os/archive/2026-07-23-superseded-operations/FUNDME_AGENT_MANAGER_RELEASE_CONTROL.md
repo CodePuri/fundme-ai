@@ -1,5 +1,7 @@
 # FUNDME AGENT MANAGER RELEASE CONTROL
 
+> **ARCHIVED 2026-07-23:** This document is superseded by [CANONICAL_SOURCE_MAP.md](../../CANONICAL_SOURCE_MAP.md) and [OPERATING_RULES.md](../../OPERATING_RULES.md). Its branch, release, and deployment instructions are stale and must not be executed.
+
 ## 0. Mission
 
 This document is the single source of truth for the Fundme early-access website recovery, local QA, and release control process.

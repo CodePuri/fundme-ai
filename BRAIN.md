@@ -1,10 +1,11 @@
-# Project Brain & Knowledge Base
+# Supporting Engineering Memory
 
-This document serves as the shared project memory for all contributors and AI agents. It tracks architectural decisions, constraints, patterns, and critical bug resolutions. 
-Agents: Continuously read and update this document at the end of substantial tasks. Do not duplicate information; update existing entries.
+Status: Supporting incident and implementation memory. It is not product, deployment, design, or architecture truth.
+
+The canonical authority order and active project state live in [CANONICAL_SOURCE_MAP.md](./.agent-os/FUNDME%20MD%20OS/fundme_project_os/CANONICAL_SOURCE_MAP.md) and [PROJECT_STATE.md](./.agent-os/FUNDME%20MD%20OS/fundme_project_os/PROJECT_STATE.md). Keep this file limited to reusable engineering lessons that do not duplicate or override those documents.
 
 ## 1. Architectural Decisions & Rationale
-- **Next.js & Framer Motion:** The site heavily utilizes Framer Motion for scroll-based `SectionReveal` animations. 
+- **Next.js & Framer Motion:** The site heavily utilizes Framer Motion for scroll-based `SectionReveal` animations.
 
 ## 2. Critical Bugs & Root Causes
 - **SEV-0 Blank UI (July 2026):** Users with `prefers-reduced-motion` enabled in their OS saw a completely blank beige page below the header.

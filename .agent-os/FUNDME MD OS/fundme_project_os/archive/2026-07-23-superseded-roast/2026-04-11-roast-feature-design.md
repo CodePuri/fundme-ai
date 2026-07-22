@@ -1,5 +1,7 @@
 # Roast Feature Design
 
+> Archived 2026-07-23. This design conflicts with the canonical evidence-grounded assessment policy and must not be implemented.
+
 **Date:** 2026-04-11  
 **Status:** Approved  
 
