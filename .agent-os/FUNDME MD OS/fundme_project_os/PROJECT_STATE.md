@@ -41,7 +41,7 @@ The prior `codex/v1-grill-demo` line is clean and pushed but not accepted. Its f
 
 ## Preview policy
 
-There is no active Preview for `product/v1-grill`. The ready `codex/v1-grill-demo` Preview at deployed SHA `5722fe8` is historical evidence only and must not be promoted. Future phases may maintain one stable Preview from `product/v1-grill` after the active contract, build, tests, and review pass.
+The first authorized documentation push, commit `4588ba5`, automatically created ready Preview `dpl_BfXxsC7K3vBG68ySfATtEzcN1Qvi` and the `fundme-ai-git-product-v1-grill` branch alias through the repository's existing Git integration. No manual Vercel deployment command was run. Subsequent Step 0 documentation pushes may create successor Previews; all such branch builds are non-operative evidence only and do not authorize phase testing, external sharing, promotion, or Production changes. The ready `codex/v1-grill-demo` Preview at deployed SHA `5722fe8` is historical evidence only and must not be promoted. A later approved phase may designate one stable `product/v1-grill` Preview after its contract, build, tests, and review pass.
 
 ## Capability summary
 
@@ -91,4 +91,4 @@ Git rollback baseline: `fundme-homepage-baseline-optimized-1040928`.
 Current Production remains `dpl_7gCD…` at `1040928`.
 Previous ready deployment fallback: `dpl_2x7C…` at `1244802`.
 
-No Production, deployment, environment, Clerk, Supabase, DNS, or migration setting was changed in Step 0.
+No Production deployment or alias, Production SHA, deployment setting, environment value, Clerk setting, Supabase setting, DNS record, or migration was changed in Step 0. The only deployment-state change was automatic Git-connected Preview creation from the authorized documentation branch push; no manual deploy command, phase testing authorization, external sharing, promotion, rollback, or deletion occurred.

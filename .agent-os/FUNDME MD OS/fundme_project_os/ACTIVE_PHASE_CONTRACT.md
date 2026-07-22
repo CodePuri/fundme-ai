@@ -12,7 +12,7 @@ This file is the active-contract selector, not a duplicate implementation contra
 | Branch | `product/v1-grill` |
 | Worktree | `/Users/totem/Desktop/Projects/Fundme-Product-V1` |
 | Starting SHA | `10409284c56f2b5dea968b9e4b727d420b96aaeb` |
-| Preview | None; no deployment permitted for this acceptance phase |
+| Preview | No phase Preview authorized; automatic Git branch builds are non-operative evidence only |
 | Required approval | Explicit approval from Aakash and Yasha before execution |
 | Next bounded contract | [PHASE_2A_DOSSIER_EVIDENCE_CONVERSATION.md](./PHASE_2A_DOSSIER_EVIDENCE_CONVERSATION.md), only after Phase 1A acceptance |
 
