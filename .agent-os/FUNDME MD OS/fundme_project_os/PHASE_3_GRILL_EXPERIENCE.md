@@ -1,7 +1,7 @@
 # Active Phase Contract — Phase 3 Grill Experience
 
-Status: Proposed; not approved
-Owner: Product + Design + Engineering
+Status: Superseded by `PHASE_1_UI_BASELINE_AND_FLOW.md`; retained for historical traceability
+Owner: Product + Engineering
 Branch: `product/v1-grill`
 Worktree: `/Users/totem/Desktop/Projects/Fundme-Product-V1`
 Starting SHA: **UNKNOWN — set after Phases 1A and 2A–2C acceptance**
@@ -9,7 +9,7 @@ Preview: One stable Preview may be created after local acceptance
 
 ## One user outcome
 
-A founder completes minimal intake, one voice/text mentor conversation, evidence confirmation, deterministic assessment, and a useful responsive report using the approved design.
+A founder completes minimal intake, one voice/text mentor conversation, evidence confirmation, deterministic assessment, and a useful responsive report using the accepted FundMe UI baseline.
 
 ## Scope
 
@@ -27,7 +27,7 @@ A founder completes minimal intake, one voice/text mentor conversation, evidence
 
 - [PROJECT_STATE.md](./PROJECT_STATE.md)
 - [PRODUCT_GROUND_TRUTH.md](./PRODUCT_GROUND_TRUTH.md)
-- [DESIGN_SOURCE_OF_TRUTH.md](./DESIGN_SOURCE_OF_TRUTH.md)
+- [UI_IMPLEMENTATION_CONTRACT.md](./UI_IMPLEMENTATION_CONTRACT.md)
 - [supporting/V1_EXPERIENCE_CONTRACT.md](./supporting/V1_EXPERIENCE_CONTRACT.md)
 - [SYSTEM_CONTRACT.md](./SYSTEM_CONTRACT.md)
 - [PHASE_2C_RETRIEVAL_REPORT.md](./PHASE_2C_RETRIEVAL_REPORT.md)
@@ -35,7 +35,7 @@ A founder completes minimal intake, one voice/text mentor conversation, evidence
 ## Existing code to reuse
 
 - Accepted Phase 2 contracts/adapters.
-- Existing shared controls only when they match approved Figma and accessibility requirements.
+- Existing shared controls when they match the UI implementation contract and accessibility requirements.
 
 ## Files/domains allowed to change
 
@@ -50,10 +50,10 @@ A founder completes minimal intake, one voice/text mentor conversation, evidence
 
 ## Design contract
 
-- Figma file: Required from accepted Phase 1A
-- Frame IDs: Required from accepted Phase 1A
-- Palette: Required from accepted Phase 1A
-- Mobile: 390px frames required
+- Visual authority: Existing Production design, implemented components/tokens, and `UI_IMPLEMENTATION_CONTRACT.md`
+- External file/frame dependency: None
+- Palette: Existing FundMe token set
+- Mobile: Complete 390px flow required
 - Edge states: microphone denied, transcription failed, upload rejected, parsing partial/failed, interrupted, assessment failed, partial report
 
 ## Tests
@@ -79,7 +79,7 @@ A founder completes minimal intake, one voice/text mentor conversation, evidence
 ## Stop conditions
 
 - Production moved
-- approved Figma detail missing/conflicting
+- verified FundMe UI baseline unavailable or conflicting
 - Phase 2 contract mismatch
 - accessibility or mobile acceptance fails
 - any silent live/demo fallback

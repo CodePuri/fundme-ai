@@ -4,8 +4,9 @@
 
 - ChatGPT: product and architecture orchestrator
 - Codex: bounded implementation and repository work
-- Yasha-owned, explicitly approved Figma handoff: customer-facing design source of truth
-- Claude and other design assistants: non-authoritative reference and production support only
+- Aakash: product authority and explicit visual-reference acceptance
+- Existing Production UI, implemented components/tokens, and `UI_IMPLEMENTATION_CONTRACT.md`: customer-facing engineering authority
+- External designers and design assistants: optional non-authoritative input until explicitly accepted by Aakash
 - Antigravity: browser walkthrough and independent QA
 - Reviewer: acceptance without implementation
 
@@ -19,7 +20,7 @@
 6. Store raw logs outside Git.
 7. Summarize test output; preserve exact files.
 8. Maximum three autonomous fix/test cycles before reporting a real blocker.
-9. No visual polishing without approved Figma.
+9. No visual redesign; polish must extend the verified FundMe UI baseline and active UI contract.
 10. No speculative abstractions.
 11. No implementation of future phases “for completeness.”
 12. No full roadmap pasted into every task.

@@ -41,7 +41,7 @@ Maximum three domains unless approved:
 
 ## Design contract
 
-- Figma file:
+- Visual authority and supplied references:
 - Frame IDs:
 - Palette:
 - Mobile:

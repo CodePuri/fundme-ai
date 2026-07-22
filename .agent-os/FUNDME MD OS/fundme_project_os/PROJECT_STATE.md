@@ -1,6 +1,6 @@
 # FundMe Project State
 
-Status: Step 0 canonicalization complete on the development line; Phase 1A is proposed and not approved
+Status: Phase 1 functional Grill stub approved; implementation in progress on the isolated development line
 Last verified: 2026-07-23 Asia/Kolkata
 Evidence root: `/Users/totem/Desktop/Projects/Fundme_Canonicalization/20260723-012638`
 
@@ -62,17 +62,16 @@ See [implementation-capability-matrix.md](/Users/totem/Desktop/Projects/Fundme_C
 
 **Supabase:** onboarding uses a server-side service role but can report false success. Canonical founder/startup ownership, accepted RLS proof, private storage, and backup/restore evidence are absent. A tracked credential must be treated as compromised. Status: **BROKEN/PARTIAL; rotation and platform proof require separate approval**.
 
-## Design status
+## UI status
 
-The design policy is canonical, but the approved Yasha/Figma URL, frame IDs, mobile states, token library, palette, prototype, and edge-state decisions are **UNKNOWN**. No polished Grill UI may be implemented until [PHASE_1A_DESIGN_ACCEPTANCE.md](./PHASE_1A_DESIGN_ACCEPTANCE.md) passes.
+The obsolete external designer/Figma gate is superseded by D-009. [UI_IMPLEMENTATION_CONTRACT.md](./UI_IMPLEMENTATION_CONTRACT.md) now governs engineering from the verified Production design, implemented components/tokens, accepted homepage/onboarding patterns, and explicitly supplied references. Optional future design input is not a blocker.
 
 ## Current phase and blockers
 
-Current phase: **Step 0 complete — Phase 1A awaiting explicit approval**. No product implementation is approved. The operative proposed contract is the design-acceptance contract linked below.
+Current phase: **Phase 1 — functional Grill Preview implementation**. Aakash approved the route structure, intake, deterministic mentor/report, email-only early access, local Preview persistence, and removal of the external design dependency.
 
 Blocking later implementation:
 
-- approved Figma file, frames, mobile states, tokens, palette, and edge states
 - credential rotation and deletion of the secret-disclosure surfaces in a separately approved security contract
 - Clerk Production ownership and claim design
 - Supabase project tier, RLS, storage, and backup/restore proof
@@ -81,9 +80,9 @@ Blocking later implementation:
 
 ## Exact next contract
 
-Proposed next contract: [PHASE_1A_DESIGN_ACCEPTANCE.md](./PHASE_1A_DESIGN_ACCEPTANCE.md).
+Active contract: [PHASE_1_UI_BASELINE_AND_FLOW.md](./PHASE_1_UI_BASELINE_AND_FLOW.md).
 
-Required approval: Aakash and Yasha approve the canonical Figma file/page/frame IDs, mobile states, component/token library, palette, prototype behavior, and documented exceptions. This is a design acceptance phase, not a UI implementation phase.
+Exact next action: implement and verify the complete local Grill flow test-first, then update only the existing `product/v1-grill` branch Preview and prove Production remains unchanged. The next product contract after acceptance is the intelligence foundation.
 
 ## Rollback baseline
 

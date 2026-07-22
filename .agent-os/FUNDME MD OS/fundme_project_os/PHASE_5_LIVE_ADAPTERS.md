@@ -56,8 +56,8 @@ An authenticated founder claims an anonymous assessment session and later retrie
 
 ## Design contract
 
-- Figma file: Accepted Phase 1A file
-- Frame IDs: Existing accepted Grill/share states only
+- Visual authority: `UI_IMPLEMENTATION_CONTRACT.md` and the accepted Grill/share behavior
+- External file/frame dependency: None
 - Palette: No change
 - Mobile: No regression
 - Edge states: signed-out claim, expired claim, persistence failure, retry, ownership conflict

@@ -25,17 +25,14 @@ Last verified: 2026-07-23
 
 Step 0 documents these defects but does not change application code, credentials, settings, or history.
 
-## Design prerequisites
+## Resolved UI prerequisites
 
-- canonical Figma URL and owner
-- approved page and desktop/mobile frame IDs
-- component library and token/variable page
-- approved `FUNDME_UI_PALETTE.md`
-- prototype link and interaction notes
-- loading, empty, partial, error, microphone-denied, upload-failed, and interrupted-session states
-- explicit list of retained Production patterns and approved exceptions
+- D-009 removed the external designer and Figma dependency.
+- Existing Production design and implemented components/tokens are the baseline.
+- `UI_IMPLEMENTATION_CONTRACT.md` defines desktop/mobile structure, mentor/voice states, loading/error states, report hierarchy, retained interaction concepts, and explicit exclusions.
+- Aakash approved the Phase 1 route, interaction, deterministic demo, and email-only early-access structure.
 
-These block polished customer-facing implementation.
+These items no longer block Phase 1 implementation.
 
 ## Product decisions
 
@@ -72,6 +69,6 @@ These block polished customer-facing implementation.
 
 Unknown platform values remain explicitly unknown; Step 0 did not probe or change protected dashboard settings.
 
-## Approval required next
+## Active approved work
 
-Approve [PHASE_1A_DESIGN_ACCEPTANCE.md](./PHASE_1A_DESIGN_ACCEPTANCE.md) and supply/confirm its Figma inputs. Do not begin product implementation from the prepared later-phase contracts.
+Execute [PHASE_1_UI_BASELINE_AND_FLOW.md](./PHASE_1_UI_BASELINE_AND_FLOW.md). Do not expand into live identity, Production persistence, payments, matching, or later intelligence work during this phase.

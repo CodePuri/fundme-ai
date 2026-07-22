@@ -52,7 +52,7 @@ A founder can supply minimal startup context, artifact descriptors, and text/voi
 
 ## Design contract
 
-- Figma file: Not used
+- Visual authority: Not applicable; no customer-facing UI in this phase
 - Frame IDs: Not used
 - Palette: Not used
 - Mobile: Not used

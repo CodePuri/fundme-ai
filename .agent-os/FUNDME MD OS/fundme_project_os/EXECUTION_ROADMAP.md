@@ -22,86 +22,67 @@ Exit gate:
 - conflicts recorded
 - Phase 1 contract prepared
 
-## Step 1 — Lock design contract
+## Step 1 — Functional Grill Preview
 
-Owner: Yasha + Product
-
-Outcome:
-
-- approved desktop/mobile Figma flow
-- interaction notes
-- components and tokens
-- edge states
-- `FUNDME_UI_PALETTE.md`
-- developer handoff
-
-Codex may not build polished customer UI before this gate.
-
-## Step 2A — Dossier, evidence and conversation
-
-Outcome:
-
-- founder/startup dossier
-- evidence records
-- conversation event model
-- artifact state model
-- missing-information ranking
-- demo fixtures
-- tests
-
-Limit:
-
-- no final UI
-- no retrieval
-- no payments
-- no matching
-
-## Step 2B — Rubric and findings
-
-Outcome:
-
-- versioned deterministic rubric
-- scoring bands
-- confidence/evidence behavior
-- findings schema
-- strong/weak/contradictory fixtures
-- calibration report
-
-## Step 2C — Retrieval and report contract
-
-Outcome:
-
-- curated source registry
-- deterministic retrieval
-- report JSON contract
-- provenance references
-- partial-result behavior
-
-## Step 3 — Grill experience
+Owner: Aakash + Engineering
 
 Outcome:
 
 ```text
-minimal intake
-→ voice/text mentor
-→ evidence confirmation
-→ assessment
-→ report
+existing homepage
+→ minimal intake
+→ founder review
+→ deterministic voice/text mentor
+→ evidence-grounded demo assessment
+→ funding-readiness report
+→ download/share
+→ email-only optimization early access
 ```
 
-Uses approved Figma only.
+Boundaries:
 
-## Step 4 — Download, share and referral
+- existing FundMe Production design and implemented tokens/components are the visual baseline
+- local versioned Preview persistence only
+- `fundme-demo-rubric@1`
+- no external designer/Figma dependency
+- no live identity, database, AI, payment, matching or Production deployment
+
+## Step 2 — Intelligence foundation
 
 Outcome:
 
-- downloadable assessment
-- private-by-default share
-- team-share summary
-- early-access signup
-- referral attribution
+- canonical founder/startup dossier and evidence records
+- conversation and artifact event contracts
+- calibrated versioned rubric and findings schema
+- deterministic retrieval/provenance registry
+- accepted report JSON contract and partial-result behavior
+- strong, weak and contradictory calibration fixtures
+
+Limit:
+
+- preserve the accepted Phase 1 flow and UI
+- no live provider, Production persistence, payment or matching
+
+## Step 3 — Private share and referral foundation
+
+Outcome:
+
+- durable private-by-default report sharing
+- owner-controlled expiry and revocation
+- verified referral attribution
 - transparent priority logic
-- funnel analytics
+- privacy-safe funnel analytics
+
+The local Phase 1 download/share/referral behavior remains explicitly a Preview stub until this step passes.
+
+## Step 4 — Security and platform prerequisites
+
+Outcome:
+
+- credential rotation and tracked disclosure removal
+- login redirect regression coverage
+- live/demo separation verified
+- Production identity, RLS, private storage, backup/restore and observability plans accepted
 
 ## Step 5 — Live adapters
 

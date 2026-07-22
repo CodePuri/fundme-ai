@@ -50,7 +50,7 @@ A confirmed evidence dossier produces the same transparent funding-readiness sco
 
 ## Design contract
 
-- Figma file: Not used
+- Visual authority: Not applicable; no customer-facing UI in this phase
 - Frame IDs: Not used
 - Palette: Not used
 - Mobile: Not used

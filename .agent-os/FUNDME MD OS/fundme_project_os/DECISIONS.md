@@ -54,3 +54,9 @@ New entries may supersede earlier decisions but must not silently rewrite them.
 **Decision:** Clarify the D-006 phrase “No Step 0 deployment”: it prohibits manual and phase-approved deployment actions but does not claim that authorized Git pushes produce no deployment state. The first documentation push, commit `4588ba5`, automatically created ready Preview `dpl_BfXxsC7K3vBG68ySfATtEzcN1Qvi` through the existing Git integration. This entry supersedes only that ambiguous phrase; the remainder of D-006 stands.
 
 **Consequence:** Automatic `product/v1-grill` branch builds are non-operative evidence until a later contract accepts one. Step 0 authorizes no manual deploy command, phase testing, external sharing, promotion, Production change, rollback, deletion, or deployment-setting change.
+
+## 2026-07-23 — D-009: Engineering-owned UI baseline
+
+**Decision:** Supersede D-005. FundMe engineering does not depend on Yasha, an external designer, Figma files, or frame approval. Visual authority follows verified Production design, implemented components/tokens, Aakash-supplied references, `UI_IMPLEMENTATION_CONTRACT.md`, and the supplied mentor interaction reference in that order. Aakash approved the Phase 1 functional Grill structure and email-only early access.
+
+**Consequence:** `PHASE_1_UI_BASELINE_AND_FLOW.md` is authorized for immediate execution. Optional future design work may be evaluated through a new decision but cannot block this phase or silently override the accepted FundMe visual language.

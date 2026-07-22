@@ -50,9 +50,9 @@ A founder downloads or deliberately shares a privacy-safe assessment summary, jo
 
 ## Design contract
 
-- Figma file: Accepted Phase 1A file
-- Frame IDs: Download/share/early-access/referral states required
-- Palette: Accepted token set
+- Visual authority: `UI_IMPLEMENTATION_CONTRACT.md`
+- Reference dependency: None; future accepted visual input is optional
+- Palette: Existing FundMe token set
 - Mobile: Complete 390px states
 - Edge states: expired/revoked link, download failure, duplicate signup, self-referral, attribution conflict
 

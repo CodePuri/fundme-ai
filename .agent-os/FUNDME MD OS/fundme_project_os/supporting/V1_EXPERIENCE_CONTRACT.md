@@ -1,6 +1,6 @@
 # V1 Experience Contract
 
-Status: Supporting experience specification. Subordinate to `PRODUCT_GROUND_TRUTH.md`, the approved design handoff, and the active phase contract.
+Status: Supporting experience specification. Subordinate to `PRODUCT_GROUND_TRUTH.md`, `UI_IMPLEMENTATION_CONTRACT.md`, and the active phase contract.
 
 ## One complete user outcome
 

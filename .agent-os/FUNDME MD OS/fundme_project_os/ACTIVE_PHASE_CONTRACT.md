@@ -1,19 +1,19 @@
 # Active Phase Contract
 
-Status: **Proposed; not approved for execution**
+Status: **Approved; execution in progress**
 
 This file is the active-contract selector, not a duplicate implementation contract.
 
 | Item | Value |
 |---|---|
-| Operative proposed contract | [PHASE_1A_DESIGN_ACCEPTANCE.md](./PHASE_1A_DESIGN_ACCEPTANCE.md) |
-| Outcome | Accept one developer-ready desktop/mobile design contract for the V1 assessment loop |
-| Owners | Aakash Puri + Yasha |
+| Operative contract | [PHASE_1_UI_BASELINE_AND_FLOW.md](./PHASE_1_UI_BASELINE_AND_FLOW.md) |
+| Outcome | Deliver the complete deterministic functional Grill stub locally and on one branch Preview |
+| Owners | Aakash Puri + Engineering |
 | Branch | `product/v1-grill` |
 | Worktree | `/Users/totem/Desktop/Projects/Fundme-Product-V1` |
-| Starting SHA | `10409284c56f2b5dea968b9e4b727d420b96aaeb` |
-| Preview | No phase Preview authorized; automatic Git branch builds are non-operative evidence only |
-| Required approval | Explicit approval from Aakash and Yasha before execution |
-| Next bounded contract | [PHASE_2A_DOSSIER_EVIDENCE_CONVERSATION.md](./PHASE_2A_DOSSIER_EVIDENCE_CONVERSATION.md), only after Phase 1A acceptance |
+| Starting SHA | `1f3500ea237b3ef3089f0280b3b5cb5cd1c7ee3a` |
+| Preview | Update the existing Git-connected branch Preview only after local acceptance; never promote it |
+| Approval | Aakash approved the engineering-owned flow and email-only early access on 2026-07-23 |
+| Next bounded contract | Intelligence foundation after Phase 1 acceptance |
 
-No application code, UI implementation, redesign, backend, AI, database, environment, or deployment change is authorized by this selector. Scope, sources, domains, tests, evidence, exit gate, and stop conditions are defined only in the operative proposed contract.
+Only the files, demo behavior, local persistence, tests, and branch Preview defined by the operative contract are authorized. Production, live identity, databases, AI providers, payments, matching, environments, and platform settings remain excluded.

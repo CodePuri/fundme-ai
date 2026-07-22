@@ -51,7 +51,7 @@ An accepted assessment retrieves permitted, traceable guidance and returns a str
 
 ## Design contract
 
-- Figma file: Not used
+- Visual authority: Not applicable; no customer-facing UI in this phase
 - Frame IDs: Not used
 - Palette: Not used
 - Mobile: Not used
