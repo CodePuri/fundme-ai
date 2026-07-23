@@ -80,7 +80,6 @@ function DimensionRow({
           </div>
           <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black/8 text-[#8b8276] transition-transform group-open:rotate-45 motion-reduce:transition-none">+</span>
         </div>
-        <p className="mt-2 line-clamp-1 pr-11 text-xs leading-5 text-[#6f685f]">{dimension.explanation}</p>
       </summary>
       <div className="mt-3 rounded-xl bg-[#faf7f2] p-3 text-xs leading-5 text-[#6f685f]">
         <p>{dimension.explanation}</p>
@@ -113,6 +112,13 @@ function CategoryIcon({ label }: { label: string }) {
   if (label.includes("Incubator")) return <Building2 className={className} />;
   if (label.includes("Grant")) return <Landmark className={className} />;
   return <BadgeIndianRupee className={className} />;
+}
+
+function compactMatchReason(category: string): string {
+  if (category.includes("Accelerator")) return "Cohort support for an early team.";
+  if (category.includes("Incubator")) return "Operator support from idea to MVP.";
+  if (category.includes("Grant")) return "A possible non-dilutive funding path.";
+  return "A stage-aligned capital path.";
 }
 
 const MATCH_TONES = [
@@ -367,13 +373,12 @@ export function FundingReadinessReport() {
                   </div>
                   <span className="rounded-full bg-white px-2 py-1 text-[9px] font-semibold text-[#6f685f]">Preview example</span>
                 </div>
-                <p className="mt-3 line-clamp-2 text-xs leading-5 text-[#6f685f]">{match.reason}</p>
+                <p className="mt-3 text-xs leading-5 text-[#6f685f]">{compactMatchReason(match.category)}</p>
                 <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-[#6f685f]">
                   <span className="rounded-full bg-white/80 px-2 py-1">{match.stage}</span>
                   <span className="rounded-full bg-white/80 px-2 py-1">{match.geography}</span>
                   <span className="rounded-full bg-white/80 px-2 py-1">{match.value}</span>
                 </div>
-                <p className="mt-3 text-[10px] text-[#91887d]">{match.previewSignal} · {match.sourceStatus}</p>
               </article>
             ))}
           </div>

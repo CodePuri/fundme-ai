@@ -56,6 +56,10 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
   assert.match(report, /Preview example/);
   assert.match(report, /Preview methodology/);
   assert.match(report, /<details/);
+  const dimensionSummary = report.match(/<summary className="cursor-pointer list-none[\s\S]*?<\/summary>/)?.[0] ?? "";
+  assert.doesNotMatch(dimensionSummary, /dimension\.explanation/);
+  assert.match(report, /compactMatchReason\(match\.category\)/);
+  assert.doesNotMatch(report, /\{match\.previewSignal\} · \{match\.sourceStatus\}/);
   assert.doesNotMatch(report, /live verified|verified matches/i);
   assert.doesNotMatch(report, /Deterministic Preview fixtures/);
   assert.doesNotMatch(report, /rubric version/i);
