@@ -12,9 +12,16 @@ test("homepage assessment calls to action start at the approved intake", async (
 });
 
 test("the Preview assessment is public without opening authenticated app routes", async () => {
-  const middleware = await readFile(new URL("middleware.ts", root), "utf8");
+  const [middleware, layout] = await Promise.all([
+    readFile(new URL("middleware.ts", root), "utf8"),
+    readFile(new URL("app/layout.tsx", root), "utf8"),
+  ]);
   assert.match(middleware, /"\/assessment\(\.\*\)"/);
   assert.doesNotMatch(middleware, /"\/app\(\.\*\)"/);
+  assert.match(middleware, /isClerkIndependentPublicPath/);
+  assert.match(middleware, /NextResponse\.next\(\)/);
+  assert.match(layout, /RouteClerkProvider/);
+  assert.doesNotMatch(layout, /import\s+\{\s*ClerkProvider\s*\}/);
 });
 
 test("legacy assessment pages are redirects without mock scoring or paywalls", async () => {
