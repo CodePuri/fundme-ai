@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Bell, X } from "lucide-react";
+import { Bell, CircleUserRound, X } from "lucide-react";
 
 import { ONBOARDING_STEP_KEY, useDemo } from "@/components/app/demo-provider";
 import { Sidebar } from "@/components/app/sidebar";
@@ -79,8 +79,9 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
             <Link aria-label="FundMe home" href="/"><BrandLockup size="sm" /></Link>
             <div className="flex items-center gap-2">
-              <Link className="hidden text-xs font-semibold text-[#6f685f] hover:text-[#171513] sm:block" href="/assessment/result">Saved diagnosis</Link>
+              <Link className="hidden text-xs font-semibold text-[#6f685f] hover:text-[#171513] sm:block" href="/assessment/result">Assessment</Link>
               <Link className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold hover:border-black/20" href="/search">Explore</Link>
+              <span aria-label="Preview profile" className="grid size-10 place-items-center rounded-full bg-[#171513] text-white"><CircleUserRound className="size-4" /></span>
             </div>
           </div>
         </header>

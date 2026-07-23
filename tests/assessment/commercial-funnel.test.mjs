@@ -16,10 +16,19 @@ test("the commercial funnel is value-first and removes mentor/chat from the free
   ]);
 
   assert.match(intake, /Analyze my funding fit/);
-  assert.match(intake, /LinkedIn|profile/i);
+  assert.match(intake, /Founder profile/);
+  assert.match(intake, /Startup website/);
+  assert.match(intake, /Pitch deck/);
+  assert.match(intake, /Optional sources/);
+  assert.match(intake, /How profile sources work/);
+  assert.doesNotMatch(intake, /Get a deterministic funding-readiness diagnosis/);
+  assert.doesNotMatch(intake, /No long questionnaire/);
   assert.doesNotMatch(intake, /Review context|Continue to mentor/);
-  assert.match(analyzing, /Scoring funding readiness/);
-  assert.match(report, /Save my assessment and see my matches/);
+  assert.match(analyzing, /Analyzing your funding fit/);
+  assert.match(analyzing, /role="progressbar"/);
+  assert.doesNotMatch(analyzing, /stages\.map/);
+  assert.doesNotMatch(analyzing, /fundme-demo-rubric/);
+  assert.match(report, /Save assessment &amp; see matches|Save assessment & see matches/);
   assert.doesNotMatch(report, /Early access-email|Save Preview interest/);
 });
 
@@ -31,9 +40,12 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
 
   for (const phrase of [
     "Funding Readiness Score",
-    "What is missing",
-    "How to improve it",
-    "illustrative Preview opportunities",
+    "Strongest signal",
+    "Biggest risk",
+    "Evidence coverage",
+    "Missing proof",
+    "Best next move",
+    "Preview opportunities",
     "Investors and VC firms",
     "Accelerators",
     "Incubators",
@@ -41,18 +53,29 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
   ]) {
     assert.match(`${report}\n${fixtures}`, new RegExp(phrase));
   }
-  assert.match(report, /Preview fixtures|Preview data/);
+  assert.match(report, /Preview example/);
+  assert.match(report, /Preview methodology/);
+  assert.match(report, /<details/);
   assert.doesNotMatch(report, /live verified|verified matches/i);
+  assert.doesNotMatch(report, /Deterministic Preview fixtures/);
+  assert.doesNotMatch(report, /rubric version/i);
   assert.doesNotMatch(fixtures, /fitScore|baseFit|readinessAdjustment/);
 });
 
-test("the Preview dashboard is compact, transparent, and keeps optimization locked", async () => {
+test("the Preview dashboard is premium, compact, and groups the locked workspace", async () => {
   const sourceText = await source("components/assessment/preview-dashboard.tsx");
 
   assert.match(sourceText, /Saved assessment/);
-  assert.match(sourceText, /Limited Preview matches/);
-  assert.match(sourceText, /Open public Explore/);
-  assert.match(sourceText, /Early access|Upgrade required/);
+  assert.match(sourceText, /Top opportunities/);
+  assert.match(sourceText, /View assessment/);
+  assert.match(sourceText, /Optimize/);
+  assert.match(sourceText, /Reach/);
+  assert.match(sourceText, /Manage/);
+  assert.match(sourceText, /Preview example/);
+  assert.doesNotMatch(sourceText, /Tab-local Preview workspace/);
+  assert.doesNotMatch(sourceText, /deterministic fixtures/);
+  assert.doesNotMatch(sourceText, /Browser persistence/);
+  assert.doesNotMatch(sourceText, /LOCKED_ACTIONS/);
   assert.doesNotMatch(sourceText, /checkout|stripe|Supabase/i);
 });
 
@@ -65,7 +88,8 @@ test("Clerk is conditional and the browser-local profile is never called Google 
   assert.match(provider, /NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY/);
   assert.match(report, /Continue with Google/);
   assert.match(report, /Continue with Preview profile/);
-  assert.match(report, /tab-local|local Preview/i);
+  assert.match(report, /Google sign-in isn’t configured for this Preview/);
+  assert.doesNotMatch(report, /tab-local demo identity/);
 });
 
 test("the auth handoff is storage-truthful and traps keyboard focus", async () => {
@@ -77,6 +101,8 @@ test("the auth handoff is storage-truthful and traps keyboard focus", async () =
   assert.match(report, /dialogRef/);
   assert.match(report, /authTriggerRef/);
   assert.match(report, /inert=\{authOpen\}/);
+  assert.match(report, /Save your assessment/);
+  assert.match(report, /Your assessment is not shared or published/);
 });
 
 test("the Preview identity tolerates browser storage denial", async () => {

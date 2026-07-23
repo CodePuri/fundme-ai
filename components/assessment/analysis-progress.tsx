@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Check, LoaderCircle } from "lucide-react";
+import { FileText, Globe2, Linkedin, LoaderCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { useAssessment } from "@/components/assessment/assessment-provider";
@@ -13,22 +13,24 @@ export function AnalysisProgress() {
   const [activeIndex, setActiveIndex] = useState(0);
   const startedRef = useRef(false);
 
-  const stages = useMemo(() => {
-    const hasFounderEvidence = Boolean(
-      session.input.linkedInUrl?.trim()
-      || session.input.profileText.trim()
-      || session.artifacts.some((artifact) => artifact.kind === "founder-profile"),
-    );
-    const hasDeck = session.artifacts.some((artifact) => artifact.kind === "pitch-deck");
-    return [
-      hasFounderEvidence ? "Organizing submitted founder evidence" : "Recording missing founder-profile evidence",
-      session.input.websiteUrl.trim() ? "Recording submitted website address — contents are not fetched" : "Using the submitted startup description",
-      hasDeck ? "Recording pitch-deck metadata — contents are not parsed" : "Confirming that no pitch deck was supplied",
-      "Checking submitted evidence and explicit gaps",
-      "Scoring funding readiness with fundme-demo-rubric@1",
-      "Finding relevant Preview opportunity categories",
-    ];
-  }, [session.artifacts, session.input]);
+  const stages = useMemo(() => [
+    "Preparing your evidence",
+    "Validating founder signals",
+    "Checking startup clarity",
+    "Finding the strongest signal",
+    "Identifying the biggest risk",
+    "Preparing your diagnosis",
+  ], []);
+
+  const sources = useMemo(() => [
+    {
+      available: Boolean(session.input.linkedInUrl?.trim() || session.input.profileText.trim() || session.artifacts.some((artifact) => artifact.kind === "founder-profile")),
+      icon: Linkedin,
+      label: "Founder",
+    },
+    { available: Boolean(session.input.websiteUrl.trim()), icon: Globe2, label: "Website" },
+    { available: session.artifacts.some((artifact) => artifact.kind === "pitch-deck"), icon: FileText, label: "Deck" },
+  ], [session.artifacts, session.input]);
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -60,48 +62,45 @@ export function AnalysisProgress() {
       if (completionTimer !== null) window.clearTimeout(completionTimer);
       startedRef.current = false;
     };
-  }, [
-    generateReport,
-    hasHydrated,
-    router,
-    session.artifacts,
-    session.input,
-    session.processingState,
-    session.report,
-    stages.length,
-  ]);
+  }, [generateReport, hasHydrated, router, session.artifacts, session.input, session.processingState, session.report, stages.length]);
+
+  const progress = Math.round(((activeIndex + 1) / stages.length) * 100);
 
   return (
-    <div className="mx-auto grid max-w-[920px] gap-8 py-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-center lg:py-12">
-      <div>
-        <p className="eyebrow">Local deterministic analysis</p>
-        <h1 className="instrument-serif mt-3 text-5xl leading-[0.98] tracking-[-0.035em] sm:text-6xl">
-          Turning submitted evidence into a clear diagnosis.
-        </h1>
-        <p className="mt-5 max-w-2xl text-[15px] leading-7 text-[var(--text-muted)]">
-          FundMe is applying one stable Preview rubric. It is not browsing the web, reading unparsed deck slides, or generating live matches.
-        </p>
+    <div className="mx-auto flex min-h-[62vh] max-w-[760px] flex-col items-center justify-center py-8 text-center">
+      <div className="relative grid size-32 place-items-center rounded-full bg-white shadow-[0_24px_70px_rgba(17,17,17,0.08)]">
+        <span className="absolute inset-2 rounded-full border border-[#ff6b3d]/20" />
+        <span className="absolute inset-5 rounded-full bg-[#fff4ed]" />
+        <LoaderCircle className="relative size-8 animate-spin text-[#ff6b3d] motion-reduce:animate-none" />
       </div>
-
-      <section aria-live="polite" className="rounded-[26px] border border-[var(--border)] bg-white p-5 shadow-[0_24px_70px_rgba(17,17,17,0.06)] sm:p-6">
-        <div className="space-y-1">
-          {stages.map((stage, index) => {
-            const complete = index < activeIndex;
-            const active = index === activeIndex;
-            return (
-              <div className={`flex items-start gap-3 rounded-xl px-3 py-3 text-sm ${active ? "bg-[#fff4ed] text-[#171513]" : "text-[#777066]"}`} key={stage}>
-                <span className={`mt-0.5 grid size-5 shrink-0 place-items-center rounded-full ${complete ? "bg-[#2f7d57] text-white" : active ? "bg-[#ff6b3d] text-white" : "border border-black/10"}`}>
-                  {complete ? <Check className="size-3" /> : active ? <LoaderCircle className="size-3 animate-spin motion-reduce:animate-none" /> : null}
-                </span>
-                <span className={active ? "font-semibold" : undefined}>{stage}</span>
-              </div>
-            );
-          })}
+      <p className="eyebrow mt-7">Analyzing your funding fit</p>
+      <h1 className="instrument-serif mt-3 text-[42px] leading-none tracking-[-0.035em] sm:text-6xl">
+        {stages[activeIndex]}
+      </h1>
+      <p className="mt-4 max-w-lg text-sm leading-6 text-[var(--text-muted)]">
+        We use only the evidence you supplied and make missing proof visible.
+      </p>
+      <div className="mt-6 flex flex-wrap justify-center gap-2">
+        {sources.map(({ available, icon: Icon, label }) => (
+          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${available ? "border-[#2f7d57]/20 bg-[#f3fbf6] text-[#2f7d57]" : "border-black/8 bg-white text-[#8b8276]"}`} key={label}>
+            <Icon className="size-3.5" />
+            {label}
+          </span>
+        ))}
+      </div>
+      <div className="mt-7 w-full max-w-md">
+        <div
+          aria-label="Assessment analysis progress"
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={progress}
+          className="h-1.5 overflow-hidden rounded-full bg-black/8"
+          role="progressbar"
+        >
+          <div className="h-full rounded-full bg-[#ff6b3d] transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${progress}%` }} />
         </div>
-        <p className="mt-4 border-t border-black/8 pt-4 text-xs leading-5 text-[#8b8276]">
-          Your browser-local assessment is preserved if you refresh during this step.
-        </p>
-      </section>
+        <p aria-live="polite" className="mt-3 text-xs font-medium text-[#8b8276]">{progress}%</p>
+      </div>
     </div>
   );
 }
