@@ -150,7 +150,7 @@ export default function OnboardingPage() {
         const data = await res.json();
         if (data.submitted) {
           mapOnboardingToAssessment();
-          router.replace("/assessment/report");
+          window.location.assign("/assessment");
         }
       } catch {/* ignore, let user proceed */}
     }

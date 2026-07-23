@@ -7,6 +7,7 @@
     "build": "node -e \"if(!require('fs').existsSync('./middleware.ts')){console.error('ERROR: middleware.ts is missing!');process.exit(1)}\" && next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "test:assessment": "node --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types tests/assessment/*.test.mjs",
     "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 # FundMe Project State
 
-Status: Phase 1 functional Grill stub approved; implementation in progress on the isolated development line
+Status: Phase 1 functional Grill stub remediation implemented; verification and independent review pending
 Last verified: 2026-07-23 Asia/Kolkata
 Evidence root: `/Users/totem/Desktop/Projects/Fundme_Canonicalization/20260723-012638`
 
@@ -66,6 +66,8 @@ See [implementation-capability-matrix.md](/Users/totem/Desktop/Projects/Fundme_C
 
 The obsolete external designer/Figma gate is superseded by D-009. [UI_IMPLEMENTATION_CONTRACT.md](./UI_IMPLEMENTATION_CONTRACT.md) now governs engineering from the verified Production design, implemented components/tokens, accepted homepage/onboarding patterns, and explicitly supplied references. Optional future design input is not a blocker.
 
+The uncommitted Phase 1 candidate now implements the four-route local Preview flow, structurally validated session recovery, negation-aware deterministic traction classification, complete/partial report states, confirmed browser-local early-access persistence, and truthful assessment processing states. This remains a candidate until focused/build/browser acceptance and a fresh independent review pass.
+
 ## Current phase and blockers
 
 Current phase: **Phase 1 — functional Grill Preview implementation**. Aakash approved the route structure, intake, deterministic mentor/report, email-only early access, local Preview persistence, and removal of the external design dependency.
@@ -82,7 +84,7 @@ Blocking later implementation:
 
 Active contract: [PHASE_1_UI_BASELINE_AND_FLOW.md](./PHASE_1_UI_BASELINE_AND_FLOW.md).
 
-Exact next action: implement and verify the complete local Grill flow test-first, then update only the existing `product/v1-grill` branch Preview and prove Production remains unchanged. The next product contract after acceptance is the intelligence foundation.
+Exact next action: complete the remediation acceptance matrix and independent review; only after PASS, commit and push `product/v1-grill`, verify its branch Preview, and prove Production remains unchanged. The next product contract after acceptance is the intelligence foundation.
 
 ## Rollback baseline
 

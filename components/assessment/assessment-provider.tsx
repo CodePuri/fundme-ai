@@ -1,265 +1,319 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState, useCallback } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
-import type { AssessmentState, AssessmentAnswer, AnalysisStatus, AssessmentReport } from "./assessment-types";
+import { assessSession } from "@/lib/assessment/engine";
+import {
+  clearSession,
+  createInitialSession,
+  GRILL_STORAGE_KEY,
+  loadSession,
+  persistEarlyAccess,
+  saveSession,
+  type EarlyAccessPersistenceResult,
+} from "@/lib/assessment/persistence";
+import { nextMentorQuestion } from "@/lib/assessment/questions";
+import type {
+  AnswerSource,
+  ArtifactKind,
+  GrillSession,
+  StartupInput,
+} from "@/lib/assessment/types";
+import { validateFile, validateIntake, type IntakeValidation } from "@/lib/assessment/validation";
 
-export const ASSESSMENT_STORAGE_KEY = "fundme-assessment-v1";
+export const ASSESSMENT_STORAGE_KEY = GRILL_STORAGE_KEY;
 
-const defaultState: AssessmentState = {
-  websiteUrl: "",
-  startupName: "",
-  linkedInUrl: "",
-  startupNotes: "",
-  uploadedFiles: [],
-  answers: [],
-  analysisStatus: "idle",
-  creditsRemaining: 10,
-  hasPaid: false,
-  reportGenerated: false,
-  report: null,
-};
-
-function loadState(): AssessmentState {
-  if (typeof window === "undefined") return defaultState;
-  try {
-    const raw = window.localStorage.getItem(ASSESSMENT_STORAGE_KEY);
-    if (!raw) return defaultState;
-    const parsed = JSON.parse(raw) as Partial<AssessmentState>;
-    return { ...defaultState, ...parsed };
-  } catch {
-    return defaultState;
-  }
-}
-
-export type AssessmentContextValue = {
-  state: AssessmentState;
+type AssessmentContextValue = {
+  session: GrillSession;
   hasHydrated: boolean;
-  setWebsiteUrl: (url: string) => void;
-  setStartupName: (name: string) => void;
-  setLinkedInUrl: (url: string) => void;
-  setStartupNotes: (notes: string) => void;
-  setUploadedFiles: (files: string[]) => void;
-  setAnswer: (questionId: number, selectedOption: string) => void;
-  setAnalysisStatus: (status: AnalysisStatus) => void;
+  updateInput: (field: keyof StartupInput, value: string) => void;
+  attachFile: (file: File, kind: ArtifactKind) => string | null;
+  removeArtifact: (id: string) => void;
+  submitIntake: () => IntakeValidation;
+  editIntake: () => void;
+  confirmReview: () => void;
+  submitAnswer: (text: string, source: AnswerSource) => boolean;
+  skipQuestion: () => void;
+  beginAssessment: () => void;
   generateReport: () => void;
-  resetAssessment: () => void;
-  getAnswerForQuestion: (questionId: number) => string | undefined;
+  setEarlyAccessDraft: (email: string) => void;
+  submitEarlyAccess: (email: string) => EarlyAccessPersistenceResult;
+  restart: () => void;
 };
 
 const AssessmentContext = createContext<AssessmentContextValue | null>(null);
 
+function now(): string {
+  return new Date().toISOString();
+}
+
+function eventId(prefix: string, timestamp: string): string {
+  return `${prefix}-${timestamp.replace(/[^0-9]/g, "")}`;
+}
+
 export function AssessmentProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<AssessmentState>(defaultState);
+  const [session, setSession] = useState<GrillSession>(() => createInitialSession());
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    const saved = loadState();
-    setState(saved);
-    setHasHydrated(true);
+    const hydrationTimer = window.setTimeout(() => {
+      try {
+        setSession(loadSession(window.localStorage));
+      } catch {
+        setSession(createInitialSession(undefined, "Browser storage is unavailable. Progress can continue in this tab but cannot be recovered after refresh."));
+      }
+      setHasHydrated(true);
+    }, 0);
+    return () => window.clearTimeout(hydrationTimer);
   }, []);
 
   useEffect(() => {
     if (!hasHydrated) return;
-    window.localStorage.setItem(ASSESSMENT_STORAGE_KEY, JSON.stringify(state));
-  }, [hasHydrated, state]);
+    let result: ReturnType<typeof saveSession>;
+    try {
+      result = saveSession(window.localStorage, session);
+    } catch {
+      result = { ok: false, error: "Progress could not be saved because browser storage is unavailable." };
+    }
+    if (!result.ok && session.persistenceWarning !== result.error) {
+      const warningTimer = window.setTimeout(() => {
+        setSession((current) => ({ ...current, persistenceWarning: result.error }));
+      }, 0);
+      return () => window.clearTimeout(warningTimer);
+    }
+  }, [hasHydrated, session]);
 
-  const setWebsiteUrl = useCallback((url: string) => {
-    setState((current) => ({ ...current, websiteUrl: url }));
+  const updateInput = useCallback((field: keyof StartupInput, value: string) => {
+    setSession((current) => ({
+      ...current,
+      input: { ...current.input, [field]: value },
+      processingState: "preparing",
+      report: null,
+      updatedAt: now(),
+    }));
   }, []);
 
-  const setStartupName = useCallback((name: string) => {
-    setState((current) => ({ ...current, startupName: name }));
+  const attachFile = useCallback((file: File, kind: ArtifactKind): string | null => {
+    const validation = validateFile(file, kind);
+    if (!validation.valid) return validation.error;
+    const timestamp = now();
+    setSession((current) => ({
+      ...current,
+      artifacts: [
+        ...current.artifacts.filter((artifact) => artifact.kind !== kind),
+        {
+          id: eventId(kind, timestamp),
+          kind,
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          status: "attached",
+          attachedAt: timestamp,
+        },
+      ],
+      report: null,
+      updatedAt: timestamp,
+    }));
+    return null;
   }, []);
 
-  const setLinkedInUrl = useCallback((url: string) => {
-    setState((current) => ({ ...current, linkedInUrl: url }));
+  const removeArtifact = useCallback((id: string) => {
+    setSession((current) => ({
+      ...current,
+      artifacts: current.artifacts.filter((artifact) => artifact.id !== id),
+      report: null,
+      updatedAt: now(),
+    }));
   }, []);
 
-  const setStartupNotes = useCallback((notes: string) => {
-    setState((current) => ({ ...current, startupNotes: notes }));
+  const submitIntake = useCallback((): IntakeValidation => {
+    const validation = validateIntake(session.input);
+    if (validation.valid) {
+      setSession((current) => ({ ...current, stage: "review", processingState: "ready", report: null, updatedAt: now() }));
+    } else {
+      setSession((current) => ({ ...current, processingState: "validating", updatedAt: now() }));
+    }
+    return validation;
+  }, [session.input]);
+
+  const editIntake = useCallback(() => {
+    setSession((current) => ({ ...current, stage: "intake", processingState: "preparing", updatedAt: now() }));
   }, []);
 
-  const setUploadedFiles = useCallback((files: string[]) => {
-    setState((current) => ({ ...current, uploadedFiles: files }));
+  const confirmReview = useCallback(() => {
+    const timestamp = now();
+    setSession((current) => ({
+      ...current,
+      stage: "mentor",
+      processingState: "questioning",
+      reviewedAt: timestamp,
+      report: null,
+      updatedAt: timestamp,
+    }));
   }, []);
 
-  const setAnswer = useCallback((questionId: number, selectedOption: string) => {
-    setState((current) => {
-      const nextAnswers = current.answers.filter((a) => a.questionId !== questionId);
+  const submitAnswer = useCallback((text: string, source: AnswerSource): boolean => {
+    const trimmed = text.trim();
+    const question = nextMentorQuestion(session);
+    if (!question || trimmed.length < 2) return false;
+    const timestamp = now();
+    setSession((current) => {
+      const answers = {
+        ...current.answers,
+        [question.id]: { questionId: question.id, text: trimmed, source, answeredAt: timestamp },
+      };
+      const resolvedCount = Object.keys(answers).length + current.skippedQuestionIds.length;
       return {
         ...current,
-        answers: [...nextAnswers, { questionId, selectedOption }],
+        answers,
+        processingState: resolvedCount >= 5 ? "ready" : "questioning",
+        conversation: [
+        ...current.conversation,
+        ...(current.conversation.some((event) => event.questionId === question.id && event.kind === "question") ? [] : [{
+          id: eventId(`mentor-${question.id}`, timestamp),
+          role: "mentor" as const,
+          kind: "question" as const,
+          questionId: question.id,
+          content: question.prompt,
+          createdAt: timestamp,
+        }]),
+        {
+          id: eventId(`founder-${question.id}`, timestamp),
+          role: "founder",
+          kind: "answer",
+          questionId: question.id,
+          content: trimmed,
+          source,
+          createdAt: timestamp,
+        },
+        ],
+        report: null,
+        updatedAt: timestamp,
       };
     });
-  }, []);
+    return true;
+  }, [session]);
 
-  const getAnswerForQuestion = useCallback((questionId: number) => {
-    return state.answers.find((a) => a.questionId === questionId)?.selectedOption;
-  }, [state.answers]);
+  const skipQuestion = useCallback(() => {
+    const question = nextMentorQuestion(session);
+    if (!question) return;
+    const timestamp = now();
+    setSession((current) => {
+      const skippedQuestionIds = [...current.skippedQuestionIds, question.id];
+      const resolvedCount = Object.keys(current.answers).length + skippedQuestionIds.length;
+      return {
+      ...current,
+      skippedQuestionIds,
+      processingState: resolvedCount >= 5 ? "ready" : "questioning",
+      conversation: [...current.conversation, {
+        id: eventId(`skip-${question.id}`, timestamp),
+        role: "system",
+        kind: "skip",
+        questionId: question.id,
+        content: `Skipped: ${question.prompt}`,
+        createdAt: timestamp,
+      }],
+      report: null,
+      updatedAt: timestamp,
+    };
+    });
+  }, [session]);
 
-  const setAnalysisStatus = useCallback((status: AnalysisStatus) => {
-    setState((current) => ({ ...current, analysisStatus: status }));
+  const beginAssessment = useCallback(() => {
+    setSession((current) => ({
+      ...current,
+      stage: "result",
+      processingState: "assessing",
+      report: null,
+      updatedAt: now(),
+    }));
   }, []);
 
   const generateReport = useCallback(() => {
-    setState((current) => {
-      const report = generateMockReport(current);
+    const timestamp = now();
+    setSession((current) => {
+      const report = assessSession(current, timestamp);
       return {
         ...current,
-        reportGenerated: true,
-        analysisStatus: "complete",
+        stage: "result",
+        processingState: report.completionState,
         report,
+        updatedAt: timestamp,
       };
     });
   }, []);
 
-  const resetAssessment = useCallback(() => {
-    setState(defaultState);
-    if (typeof window !== "undefined") {
-      window.localStorage.removeItem(ASSESSMENT_STORAGE_KEY);
+  const setEarlyAccessDraft = useCallback((email: string) => {
+    setSession((current) => ({
+      ...current,
+      earlyAccess: { email, status: "idle", referralCode: null },
+      updatedAt: now(),
+    }));
+  }, []);
+
+  const submitEarlyAccess = useCallback((email: string): EarlyAccessPersistenceResult => {
+    let storage: Storage | null = null;
+    try { storage = window.localStorage; } catch { /* handled by persistEarlyAccess */ }
+    const result = persistEarlyAccess(storage, session, email);
+    setSession(result.session);
+    return result;
+  }, [session]);
+
+  const restart = useCallback(() => {
+    try {
+      clearSession(window.localStorage);
+      setSession(createInitialSession());
+    } catch {
+      setSession(createInitialSession(undefined, "Browser storage is unavailable. The in-memory assessment was restarted."));
     }
   }, []);
 
-  const value = useMemo<AssessmentContextValue>(
-    () => ({
-      state,
-      hasHydrated,
-      setWebsiteUrl,
-      setStartupName,
-      setLinkedInUrl,
-      setStartupNotes,
-      setUploadedFiles,
-      setAnswer,
-      setAnalysisStatus,
-      generateReport,
-      resetAssessment,
-      getAnswerForQuestion,
-    }),
-    [
-      state,
-      hasHydrated,
-      setWebsiteUrl,
-      setStartupName,
-      setLinkedInUrl,
-      setStartupNotes,
-      setUploadedFiles,
-      setAnswer,
-      setAnalysisStatus,
-      generateReport,
-      resetAssessment,
-      getAnswerForQuestion,
-    ]
-  );
+  const value = useMemo<AssessmentContextValue>(() => ({
+    session,
+    hasHydrated,
+    updateInput,
+    attachFile,
+    removeArtifact,
+    submitIntake,
+    editIntake,
+    confirmReview,
+    submitAnswer,
+    skipQuestion,
+    beginAssessment,
+    generateReport,
+    setEarlyAccessDraft,
+    submitEarlyAccess,
+    restart,
+  }), [
+    session,
+    hasHydrated,
+    updateInput,
+    attachFile,
+    removeArtifact,
+    submitIntake,
+    editIntake,
+    confirmReview,
+    submitAnswer,
+    skipQuestion,
+    beginAssessment,
+    generateReport,
+    setEarlyAccessDraft,
+    submitEarlyAccess,
+    restart,
+  ]);
 
-  return (
-    <AssessmentContext.Provider value={value}>
-      {children}
-    </AssessmentContext.Provider>
-  );
+  return <AssessmentContext.Provider value={value}>{children}</AssessmentContext.Provider>;
 }
 
-export function useAssessment() {
+export function useAssessment(): AssessmentContextValue {
   const context = useContext(AssessmentContext);
-  if (!context) {
-    throw new Error("useAssessment must be used within AssessmentProvider");
-  }
+  if (!context) throw new Error("useAssessment must be used within AssessmentProvider");
   return context;
-}
-
-/* ─── Mock Report Generation ─────────────────────────────────── */
-
-function generateMockReport(state: AssessmentState): AssessmentReport {
-  const answers = state.answers;
-  const q2 = answers.find((a) => a.questionId === 2)?.selectedOption ?? "";
-  const q3 = answers.find((a) => a.questionId === 3)?.selectedOption ?? "";
-  const q5 = answers.find((a) => a.questionId === 5)?.selectedOption ?? "";
-  const q6 = answers.find((a) => a.questionId === 6)?.selectedOption ?? "";
-  const q8 = answers.find((a) => a.questionId === 8)?.selectedOption ?? "";
-
-  // Determine base score from answers
-  let baseScore = 45;
-  if (q2.includes("More than 10") || q2.includes("without a clear system")) baseScore += 10;
-  else if (q2.includes("4 to 10")) baseScore += 5;
-  if (q3.includes("Yes")) baseScore += 5;
-  if (q6.includes("VC") || q6.includes("Angel")) baseScore += 15;
-  else if (q6.includes("Grants") || q6.includes("Revenue")) baseScore += 10;
-  if (q5.includes("Founder profile") || q5.includes("Pitch deck")) baseScore -= 5;
-  if (q8.includes("This week")) baseScore += 5;
-
-  const readinessScore = Math.min(92, Math.max(38, baseScore + Math.floor(Math.random() * 12)));
-
-  // Subscores derived from readinessScore with variance
-  const subscores = {
-    founderCredibility: Math.min(95, readinessScore + Math.floor(Math.random() * 10 - 3)),
-    startupClarity: Math.min(94, readinessScore + Math.floor(Math.random() * 12 - 5)),
-    tractionProof: Math.min(90, readinessScore + Math.floor(Math.random() * 14 - 8)),
-    marketFit: Math.min(93, readinessScore + Math.floor(Math.random() * 10 - 2)),
-    applicationReadiness: Math.min(88, readinessScore + Math.floor(Math.random() * 16 - 10)),
-    opportunityFit: Math.min(91, readinessScore + Math.floor(Math.random() * 10 - 3)),
-  };
-
-  const verdicts = [
-    "Promising but under positioned",
-    "Strong founder signal, weak application story",
-    "Clear idea, unclear proof",
-    "Good startup, wrong application strategy",
-    "Not ready to apply yet, but fixable",
-  ];
-  const verdict = verdicts[Math.floor(Math.random() * verdicts.length)];
-
-  const weaknesses: import("./assessment-types").Weakness[] = [
-    {
-      title: "Website does not explain who this is for",
-      whyItHurts: "Programs scan your homepage in under 8 seconds. If the target customer is not clear, they assume you do not know either.",
-      quickHint: "Add one sentence on your homepage explaining exactly who benefits and how.",
-    },
-    {
-      title: "Traction story is under specified",
-      whyItHurts: "Accelerators and investors need proof the market wants what you are building. Vague metrics signal risk.",
-      quickHint: "Lead with the most impressive metric: users, revenue, waitlist, or pilot engagement. Be specific.",
-    },
-    {
-      title: "Founder profile lacks domain signal",
-      whyItHurts: "Selection committees invest in founders who have unfair advantages. Your background should scream why you are the one.",
-      quickHint: "Highlight one past win, relevant expertise, or unique insight that makes you the obvious founder for this problem.",
-    },
-  ];
-
-  const founderAssessment = `Your founder profile shows genuine intent, but the narrative is fragmented. Selection committees look for clarity of purpose, relevant experience, and proof of execution. Strengthening your LinkedIn headline and founder bio with one sharp positioning statement would significantly improve first impressions.`;
-
-  const startupAssessment = `The startup idea has merit, but the story is not yet tight enough for competitive applications. The problem is interesting, but the solution framing and differentiation need sharpening. Focus on making the "why now" and "why you" sections impossible to ignore.`;
-
-  const websiteAssessment = state.websiteUrl
-    ? `We reviewed the submitted website. The positioning is ${readinessScore > 60 ? "decent" : "underdeveloped"}. Key gaps: unclear target audience, weak call to action, and minimal proof points. A focused rewrite of the above-the-fold copy would improve conversion and program perception.`
-    : `No website was submitted for analysis. Most accelerators check your site before interviews. Adding a clear homepage that explains the problem, solution, and traction in under 30 seconds is strongly recommended.`;
-
-  return {
-    readinessScore,
-    verdict,
-    subscores,
-    weaknesses,
-    founderAssessment,
-    startupAssessment,
-    websiteAssessment,
-    missingProofPoints: [
-      "Specific traction metric (users, revenue, or pilots)",
-      "Clear target customer definition",
-      "Competitive differentiation statement",
-      "Team credibility proof point",
-      "Go-to-market timeline",
-    ],
-    opportunityCategories: [
-      "Pre-seed accelerators",
-      "Government innovation grants",
-      "B2B SaaS startup programs",
-      "Student founder fellowships",
-      "Revenue-based financing",
-    ],
-    lockedMatchesPreview: [
-      { name: "Y Combinator W26", reason: "Stage fit is strong, but traction proof needs tightening" },
-      { name: "Antler India", reason: "Founder background matches, idea framing needs sharpening" },
-      { name: "Google for Startups", reason: "Good technical fit, application story could be stronger" },
-    ],
-  };
 }

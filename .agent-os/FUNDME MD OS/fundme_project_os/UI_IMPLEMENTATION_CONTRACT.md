@@ -2,7 +2,7 @@
 
 Status: Canonical visual and interaction authority for engineering
 Owner: Aakash Puri + Engineering
-Version: 1.0
+Version: 1.1
 Date: 2026-07-23
 
 ## Authority order
@@ -89,12 +89,26 @@ Homepage assessment CTA
 | Listening | Orange-accent mentor presence and explicit stop action |
 | Transcribing | Preserve typed draft while the adapter finalizes transcript |
 | Transcript ready | Transcript appears in the same composer for editing/submission |
-| Processing | Short truthful deterministic question/report work only |
-| Responding | Mentor response receives restrained visual emphasis; no audio autoplay |
 | Failed | Specific recoverable message and typed fallback |
 | Unavailable | Explain browser limitation; typed flow remains complete |
 
 Browser speech is behind a small adapter. It is a Preview capability, not the final transcription architecture.
+
+## Assessment processing states
+
+The shared session uses only states backed by real application behavior:
+
+- `preparing` — intake is editable
+- `validating` — submitted intake failed or is being checked synchronously
+- `questioning` — a deterministic mentor question is active
+- `ready` — review or mentor evidence is ready for the next explicit action
+- `assessing` — the result route is applying `fundme-demo-rubric@1` locally
+- `partial` — a report exists with skipped or missing mentor evidence
+- `complete` — all five deterministic mentor questions were answered
+- `failed` — a real assessment operation failed
+- `recoverable` — stored state was rejected or unavailable and the user can safely resume
+
+No percentage, queue, assistant-response, parser, upload, or AI progress may be shown unless that operation exists.
 
 ## Loading and error states
 
@@ -105,10 +119,21 @@ Browser speech is behind a small adapter. It is a Preview capability, not the fi
 - Share/clipboard/email failure: keep the report intact and offer retry or manual copy.
 - Route guard: recover to the earliest valid assessment step without losing valid state.
 
+## Recovery behavior
+
+- Browser back/forward uses the four stable routes while one session remains authoritative.
+- Refresh reloads a structurally validated current-version session, including accepted artifact metadata and a generated report.
+- Corrupt, oversized, or malformed same-version storage is removed and replaced with a clearly labelled recoverable intake; it is never partially reinterpreted.
+- Compatible legacy onboarding context maps founder name/role, startup name/website/description, profile link, and file-name metadata, then performs a full assessment remount.
+- Restart explicitly clears browser-local assessment state; storage failure falls back to a labelled in-memory restart.
+- Microphone denial/unavailability preserves typed text and leaves the typed composer usable.
+- Deck and attachment parsing is unavailable in this Preview; metadata remains visible and the assessment continues without a fabricated parsing step.
+
 ## Report hierarchy
 
 1. Verdict and Funding Readiness Score.
 2. Evidence coverage, confidence, strongest and weakest dimensions.
+   The report labels itself `complete` or `partial` and states traction as `missing`, `none`, `positive`, or `contradictory`.
 3. Ten-dimension breakdown with score, explanation, evidence used, and missing evidence.
 4. The Grill: red flags, contradictions, unsupported claims, and weak proof.
 5. Founder review.
@@ -130,7 +155,7 @@ Browser speech is behind a small adapter. It is a Preview capability, not the fi
 - central mentor presence
 - one composer for voice and text
 - attachment action
-- listening, transcribing, processing, and responding states
+- listening and transcribing states, plus a truthful local assessment boundary
 - conversation-history access
 - contextual progress/evidence display
 

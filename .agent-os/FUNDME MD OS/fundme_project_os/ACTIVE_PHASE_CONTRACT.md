@@ -1,6 +1,6 @@
 # Active Phase Contract
 
-Status: **Approved; execution in progress**
+Status: **Approved; bounded remediation implemented, verification and independent review pending**
 
 This file is the active-contract selector, not a duplicate implementation contract.
 

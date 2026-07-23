@@ -58,13 +58,19 @@ A founder moves from the existing FundMe homepage through a minimal startup inta
 - Every score/finding refers to submitted evidence or an explicit missing-evidence state; no deck, website, traction, revenue, market, founder, or investor fact is invented.
 - The report includes rubric version, deterministic dimension scores, evidence coverage, findings, actions, generated timestamp, and complete/partial state.
 - Early-access email and referral code are local Preview data; the UI states that neither is durably stored or a waitlist position.
+- A success state is rendered only after the browser-local storage write returns successfully; quota, security, and unavailable-storage failures retain the email for retry and explicitly state that it was not saved.
+- Current-version persisted data is accepted only after bounded structural validation of all required nested session, artifact, conversation, answer, report, processing, and early-access fields.
+- Invalid JSON, oversized data, and malformed same-version data are removed rather than partially reinterpreted, and recovery returns to a labelled intake state.
+- Traction classification is one of `missing`, `none`, `positive`, or `contradictory`; negated and explicit-zero claims never create positive strengths.
+- A contradiction requires conflicting current claims. Historical negative context followed by an explicit current positive claim is not contradictory.
 
 ## Design contract
 
 - Authority: follow [UI_IMPLEMENTATION_CONTRACT.md](./UI_IMPLEMENTATION_CONTRACT.md).
 - Desktop: centered editorial assessment shell with stage progress; mentor conversation plus contextual evidence rail; report optimized for scan and print.
 - Mobile: one-column 390px flow, collapsible history/evidence, sticky primary actions only where they do not hide content, and no horizontal overflow.
-- Voice states: idle, requesting permission, listening, transcribing, transcript ready, processing, responding, failed, and unavailable; typed fallback always visible.
+- Voice states: idle, requesting permission, listening, transcribing, transcript ready, failed, and unavailable; typed fallback always visible and preserved.
+- Assessment states: preparing, validating, questioning, ready, assessing, partial, complete, failed, and recoverable. No unsupported progress state or percentage is displayed.
 - Edge states: invalid/missing input, rejected file, persistence unavailable, microphone denied/unavailable, empty/skipped answer, missing deck, share unavailable, clipboard failure, invalid early-access email, and explicit restart.
 
 ## Tests
@@ -76,6 +82,26 @@ A founder moves from the existing FundMe homepage through a minimal startup inta
 - strong, weak, contradictory, no-deck, and microphone-denied scenarios
 - refresh, back/edit, restart, download, share, early-access, console, network, and no-Production-dependency checks
 - repeat the complete browser flow on one branch Preview
+- explicit traction regressions for positive, negated, zero, missing, temporally updated, and genuinely conflicting claims
+- same-version corruption, nested-shape, enum, oversized-content, clearing, and storage-unavailable recovery
+- confirmed early-access persistence success, exception/unavailable failure, retained retry data, and no pre-confirmation success
+
+## Recovery contract
+
+- Back/forward navigation retains one session across the four approved routes.
+- Refresh restores only structurally valid state; invalid state is removed with a visible recoverable message.
+- Explicit restart clears valid local state or performs a labelled in-memory restart when storage is unavailable.
+- Accepted file metadata survives refresh; bytes are never persisted or uploaded.
+- Microphone denial and unavailability preserve the typed draft and keep typed submission available.
+- Parser failure is represented by the fixed `received-unparsed` or `not-provided` deck boundary and never blocks report generation.
+
+## Report completeness contract
+
+- `complete` means all five deterministic mentor questions were answered without skips.
+- `partial` means one or more mentor questions were skipped or unanswered; the result stays useful but labels its missing evidence.
+- Deck review is `not-provided` or `received-unparsed`; detailed deck sections are never rendered as analyzed.
+- Missing founder profile/fit, startup market/traction/funding proof, and insufficient coverage remain explicit findings or missing-evidence entries.
+- Download/share serialization includes completion, traction state, findings, founder/startup summaries, deck boundary, dimensions, and actions.
 
 ## Evidence
 
