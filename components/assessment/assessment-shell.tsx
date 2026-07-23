@@ -6,12 +6,11 @@ import { RotateCcw } from "lucide-react";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { Button } from "@/components/ui/button";
-import type { GrillStage } from "@/lib/assessment/types";
+type AssessmentShellStage = "intake" | "analyzing" | "result";
 
-const STEPS: Array<{ stage: GrillStage; label: string }> = [
+const STEPS: Array<{ stage: AssessmentShellStage; label: string }> = [
   { stage: "intake", label: "Context" },
-  { stage: "review", label: "Review" },
-  { stage: "mentor", label: "Mentor" },
+  { stage: "analyzing", label: "Analysis" },
   { stage: "result", label: "Result" },
 ];
 
@@ -19,7 +18,7 @@ export function AssessmentShell({
   activeStage,
   children,
 }: {
-  activeStage: GrillStage;
+  activeStage: AssessmentShellStage;
   children: React.ReactNode;
 }) {
   const { restart } = useAssessment();
@@ -48,7 +47,7 @@ export function AssessmentShell({
       </header>
 
       <div className="mx-auto w-full max-w-[1240px] px-4 pb-20 pt-6 sm:px-6 sm:pt-8 xl:px-8">
-        <nav aria-label="Assessment progress" className="mb-8 grid grid-cols-4 gap-2">
+        <nav aria-label="Assessment progress" className="mb-8 grid grid-cols-3 gap-2">
           {STEPS.map((step, index) => (
             <div key={step.stage} className="min-w-0">
               <div className={`h-1 rounded-full ${index <= currentIndex ? "bg-[#ff6b3d]" : "bg-black/10"}`} />

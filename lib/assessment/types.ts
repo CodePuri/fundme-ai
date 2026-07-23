@@ -3,6 +3,7 @@ export const DEMO_RUBRIC_VERSION = "fundme-demo-rubric@1" as const;
 
 export type AssessmentRoute =
   | "/assessment"
+  | "/assessment/analyzing"
   | "/assessment/review"
   | "/assessment/mentor"
   | "/assessment/result";
@@ -41,6 +42,7 @@ export type StartupInput = {
   founderRole: string;
   description: string;
   profileText: string;
+  linkedInUrl?: string;
 };
 
 export type ArtifactMetadata = {

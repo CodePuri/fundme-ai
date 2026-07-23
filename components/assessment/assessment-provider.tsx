@@ -134,14 +134,22 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const submitIntake = useCallback((): IntakeValidation => {
-    const validation = validateIntake(session.input);
+    const validation = validateIntake(session.input, session.artifacts);
     if (validation.valid) {
-      setSession((current) => ({ ...current, stage: "review", processingState: "ready", report: null, updatedAt: now() }));
+      const timestamp = now();
+      setSession((current) => ({
+        ...current,
+        stage: "result",
+        processingState: "assessing",
+        reviewedAt: timestamp,
+        report: null,
+        updatedAt: timestamp,
+      }));
     } else {
       setSession((current) => ({ ...current, processingState: "validating", updatedAt: now() }));
     }
     return validation;
-  }, [session.input]);
+  }, [session.artifacts, session.input]);
 
   const editIntake = useCallback(() => {
     setSession((current) => ({ ...current, stage: "intake", processingState: "preparing", updatedAt: now() }));

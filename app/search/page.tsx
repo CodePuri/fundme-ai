@@ -25,6 +25,19 @@ export default function SearchPage() {
           </Suspense>
         }
       >
+        <section aria-label="Opportunity categories" className="mb-7 rounded-[20px] border border-black/8 bg-white/70 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8d8578]">Explore by opportunity type</p>
+              <p className="mt-1 text-sm text-[#4f4942]">The current public data is program-led; broader categories are Preview signposts, not live matching.</p>
+            </div>
+            <div className="flex flex-wrap gap-2 text-xs font-semibold">
+              {["Investors", "Accelerators", "Incubators", "Grants/programs"].map((category) => (
+                <span className="rounded-full border border-black/8 bg-[#f6f1ea] px-3 py-1.5" key={category}>{category}</span>
+              ))}
+            </div>
+          </div>
+        </section>
         <Suspense
           fallback={
             <div className="editorial-panel rounded-[24px] px-4 py-10 text-sm text-[#6d665e]">
@@ -43,7 +56,7 @@ export default function SearchPage() {
         <PublicAuthController
           fallbackIntent={{
             action: "browse",
-            destination: "/onboarding",
+            destination: "/assessment",
           }}
         />
       </Suspense>

@@ -20,6 +20,7 @@ export const CLERK_PUBLIC_ROUTE_PATTERNS = [
   "/explore/(.*)",
   "/assessment",
   "/assessment/(.*)",
+  "/app/preview",
   "/api/onboarding",
   "/api/onboarding/(.*)",
   "/robots.txt",
@@ -27,11 +28,10 @@ export const CLERK_PUBLIC_ROUTE_PATTERNS = [
 ];
 
 export function isClerkIndependentPublicPath(pathname: string): boolean {
+  const isRouteOrChild = (base: string) => pathname === base || pathname.startsWith(`${base}/`);
   return pathname === "/"
-    || pathname === "/assessment"
-    || pathname.startsWith("/assessment/")
-    || pathname === "/search"
-    || pathname.startsWith("/search/")
-    || pathname === "/explore"
-    || pathname.startsWith("/explore/");
+    || isRouteOrChild("/assessment")
+    || isRouteOrChild("/search")
+    || isRouteOrChild("/explore")
+    || pathname === "/app/preview";
 }

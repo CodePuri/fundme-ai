@@ -60,3 +60,9 @@ New entries may supersede earlier decisions but must not silently rewrite them.
 **Decision:** Supersede D-005. FundMe engineering does not depend on Yasha, an external designer, Figma files, or frame approval. Visual authority follows verified Production design, implemented components/tokens, Aakash-supplied references, `UI_IMPLEMENTATION_CONTRACT.md`, and the supplied mentor interaction reference in that order. Aakash approved the Phase 1 functional Grill structure and email-only early access.
 
 **Consequence:** `PHASE_1_UI_BASELINE_AND_FLOW.md` is authorized for immediate execution. Optional future design work may be evaluated through a new decision but cannot block this phase or silently override the accepted FundMe visual language.
+
+## 2026-07-23 — D-010: Value before authentication
+
+**Decision:** Supersede the mentor-first and inline-email portions of D-009 for the free assessment. Phase 1 is a compact commercial funnel: minimal founder/startup sources, truthful deterministic analysis, diagnosis and opportunity teaser, then configured Clerk Google authentication or an explicitly browser-local Preview-profile handoff. The free phase has no conversational mentor. A limited `/app/preview` workspace may expose only the saved local assessment, deterministic fixture matches, public Explore, and locked optimization actions.
+
+**Consequence:** `/assessment/review` and `/assessment/mentor` are compatibility recovery routes, not primary product steps. Fixture opportunities must remain labelled Preview data; no live matching, Production persistence, payment, or fake Google identity is permitted. The supplied SERA interaction reference is reserved for a later optimization workspace contract.

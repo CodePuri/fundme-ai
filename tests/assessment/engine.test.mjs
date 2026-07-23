@@ -21,6 +21,7 @@ function session({ answers = {}, artifacts = [], description } = {}) {
       founderRole: "Founder and former procurement lead",
       startupName: "SignalStack",
       websiteUrl: "https://signalstack.example",
+      linkedInUrl: "https://www.linkedin.com/in/asha-rao",
       description: description ?? "SignalStack helps procurement teams replace manual vendor reviews with a focused evidence workflow.",
       profileText: "Ten years leading procurement operations and two years researching this workflow.",
     },
@@ -65,6 +66,22 @@ test("scores specific, evidenced answers above vague answers", async () => {
   }), generatedAt);
 
   assert.ok(strong.readinessScore > weak.readinessScore);
+  assert.ok(weak.findings.some((finding) => finding.type === "missing-evidence"));
+});
+
+test("scores a strong minimal-intake fixture above a weak one without inventing mentor answers", async () => {
+  const { assessSession } = await loadEngine();
+  const strong = assessSession(session({
+    description: "SignalStack helps procurement teams replace two-day vendor reviews with a twenty-minute evidence workflow.",
+  }), generatedAt);
+  const weakSession = session({ description: "We make business better." });
+  weakSession.input.profileText = "";
+  weakSession.input.websiteUrl = "";
+  weakSession.input.linkedInUrl = "";
+  const weak = assessSession(weakSession, generatedAt);
+
+  assert.ok(strong.readinessScore >= weak.readinessScore + 5);
+  assert.equal(strong.completionState, "partial");
   assert.ok(weak.findings.some((finding) => finding.type === "missing-evidence"));
 });
 

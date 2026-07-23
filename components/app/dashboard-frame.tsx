@@ -8,6 +8,7 @@ import { Bell, X } from "lucide-react";
 import { ONBOARDING_STEP_KEY, useDemo } from "@/components/app/demo-provider";
 import { Sidebar } from "@/components/app/sidebar";
 import { NavSearch } from "@/components/startup-programs/nav-search";
+import { BrandLockup } from "@/components/ui/brand-lockup";
 import { buildAuthEntryHref } from "@/lib/auth-intent";
 
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string }> = [
@@ -32,7 +33,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
   const { state, hasHydrated, dismissResumeBanner, markTrackerVisited } = useDemo();
 
   useEffect(() => {
-    if (!hasHydrated || state.isAuthenticated || pathname === "/search") {
+    if (!hasHydrated || state.isAuthenticated || pathname === "/search" || pathname === "/app/preview") {
       return;
     }
 
@@ -70,6 +71,23 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
     hasHydrated && typeof window !== "undefined" ? window.localStorage.getItem(ONBOARDING_STEP_KEY) : null;
   const showResumeBanner =
     hasHydrated && !state.resumeBannerDismissed && (resumeStep === "2" || resumeStep === "3");
+
+  if (pathname === "/app/preview") {
+    return (
+      <div className="min-h-screen bg-[#f6f1ea] text-[#171513]" data-theme="public">
+        <header className="sticky top-0 z-30 border-b border-black/8 bg-[#f6f1ea]/95 backdrop-blur">
+          <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
+            <Link aria-label="FundMe home" href="/"><BrandLockup size="sm" /></Link>
+            <div className="flex items-center gap-2">
+              <Link className="hidden text-xs font-semibold text-[#6f685f] hover:text-[#171513] sm:block" href="/assessment/result">Saved diagnosis</Link>
+              <Link className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold hover:border-black/20" href="/search">Explore</Link>
+            </div>
+          </div>
+        </header>
+        <main className="mx-auto max-w-[1180px] px-4 py-7 sm:px-6 sm:py-10">{children}</main>
+      </div>
+    );
+  }
 
   if (!hasHydrated || !state.isAuthenticated) {
     return <div className="min-h-screen bg-[var(--bg)]" data-theme="app" />;

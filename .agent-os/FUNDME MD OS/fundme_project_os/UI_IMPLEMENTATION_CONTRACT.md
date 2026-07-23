@@ -2,7 +2,7 @@
 
 Status: Canonical visual and interaction authority for engineering
 Owner: Aakash Puri + Engineering
-Version: 1.1
+Version: 1.2
 Date: 2026-07-23
 
 ## Authority order
@@ -38,61 +38,49 @@ The Phase 1 experience extends the existing visual language. It does not invent 
 ## Components adapted
 
 - Homepage CTA links: destination changes to the assessment entry; layout and styling remain unchanged.
-- Existing assessment provider: replaced with one versioned, deterministic Grill session and explicit local Preview repository boundary.
-- File selection: compact intake and mentor attachments with visible file type/size errors and persisted metadata.
-- Assessment report surfaces: retain existing card/ring affordances only where they display the accepted evidence-grounded report contract; remove paywall and fabricated/random findings.
+- Existing assessment provider: one versioned deterministic browser-local session and explicit Preview boundary.
+- File selection: compact founder-profile/deck attachments with visible type/size errors and persisted metadata only.
+- Assessment report surfaces: compact card/ring affordances show the accepted evidence-grounded diagnosis, opportunity teaser, and post-value conversion without paywall or fabricated findings.
 
 ## New components
 
-- `AssessmentShell`: brand, local Preview label, four-stage progress, responsive content frame, and restart control.
-- `IntakeGrid`: maximum four primary input cards plus optional secondary evidence.
-- `SubmissionReview`: source-labelled founder/startup/file summary with edit and continue actions.
-- `MentorPresence`: central FundMe mentor/orb state without audio autoplay or assistant branding.
-- `MentorComposer`: one typed/voice draft with microphone and attachment actions.
-- `ConversationHistory`: deterministic mentor questions, founder answers, skips, and status events.
-- `EvidenceContext`: submitted, attached, missing, and pending-analysis summary.
-- `FundingReadinessReport`: verdict, score, evidence coverage, dimensions, Grill, founder/startup/deck reviews, and prioritized actions.
-- `ReportActions`: text download, copy, native share, and fallback states.
-- `OptimizationEarlyAccess`: email-only local Preview form, privacy notice, success/failure state, and clearly non-durable referral stub.
+- `AssessmentShell`: brand, local Preview label, three-stage progress, responsive frame, and restart control.
+- `IntakeGrid`: one-screen founder, LinkedIn/profile source, website, deck, and fallback-description intake.
+- `AnalysisProgress`: supported local evidence/scoring stages without fake extraction or percentages.
+- `FundingReadinessReport`: compact score hero, dimensions, evidence basis, paired gaps/actions, founder/startup/deck boundaries, opportunity fixtures, export/share, and auth handoff.
+- `PreviewDashboard`: saved local score, key weakness, next action, limited fixture matches, free links, and explicitly locked optimization.
 
 ## Route map
 
 ```text
 Homepage assessment CTA
 → /assessment
-→ /assessment/review
-→ /assessment/mentor
+→ /assessment/analyzing
 → /assessment/result
+→ configured Clerk Google or browser-local Preview-profile handoff
+→ /app/preview
+→ /search
 ```
 
-`/assessment/result` owns short truthful analysis progress before revealing the report. Download/share and early access live within the result experience rather than creating unnecessary routes. Old assessment subroutes may redirect to the nearest valid approved route; they do not remain separate question flows.
+Legacy review/mentor/question routes recover to intake; they do not remain primary steps. Download/share lives on the result. The conversion handoff appears only after diagnosis and match-teaser value is visible.
 
 ## Desktop structure
 
-- Intake/review: centered maximum-width editorial surface with a compact progress header and two-column input/review grid where space permits.
-- Mentor: dominant conversation column and narrow evidence/progress rail; history remains directly accessible.
-- Result: strong verdict/score opening, then evidence coverage, dimension grid, Grill, founder/startup/deck sections, action ladder, export, and early access.
+- Intake: centered editorial surface with a three-step header and two-column source grid where space permits.
+- Analysis: concise editorial explanation plus supported local stage list.
+- Result: above-fold score/verdict, dense two-column dimensions, paired gaps/actions, compact founder/startup/deck review, fixture opportunity teaser, then conversion.
+- Preview workspace: no sidebar; compact score summary, four categories, limited match list, free links, and locked optimization.
 
 ## Mobile structure
 
 - One-column reading order at 390px.
 - No persistent sidebar, dashboard rail, or horizontal carousel.
-- Evidence and history become collapsible sections without losing state.
+- Profile evidence uses progressive disclosure without hiding required fields.
 - Controls remain at least 44px where practical, labels remain visible, and fixed actions must not obscure content or safe-area space.
 
-## Voice and mentor states
+## Mentor/SERA boundary
 
-| State | UI behavior |
-|---|---|
-| Idle | Typed composer and microphone action available |
-| Requesting permission | Clear permission status; draft remains editable |
-| Listening | Orange-accent mentor presence and explicit stop action |
-| Transcribing | Preserve typed draft while the adapter finalizes transcript |
-| Transcript ready | Transcript appears in the same composer for editing/submission |
-| Failed | Specific recoverable message and typed fallback |
-| Unavailable | Explain browser limitation; typed flow remains complete |
-
-Browser speech is behind a small adapter. It is a Preview capability, not the final transcription architecture.
+The free assessment has no conversational mentor, voice state, chat composer, sidebar, or SERA workspace. Existing mentor/speech code remains historical scaffolding only and is not reachable from the primary flow. The supplied SERA interaction reference may inform a later optimization workspace after its own contract; it cannot authorize Phase 1 behavior.
 
 ## Assessment processing states
 
@@ -100,8 +88,7 @@ The shared session uses only states backed by real application behavior:
 
 - `preparing` — intake is editable
 - `validating` — submitted intake failed or is being checked synchronously
-- `questioning` — a deterministic mentor question is active
-- `ready` — review or mentor evidence is ready for the next explicit action
+- `questioning` and `ready` — retained for compatibility with structurally valid historical local sessions; not displayed by the primary commercial funnel
 - `assessing` — the result route is applying `fundme-demo-rubric@1` locally
 - `partial` — a report exists with skipped or missing mentor evidence
 - `complete` — all five deterministic mentor questions were answered
@@ -113,21 +100,20 @@ No percentage, queue, assistant-response, parser, upload, or AI progress may be 
 ## Loading and error states
 
 - Hydration/persistence: neutral shell; never flash fabricated default content.
-- Analysis: only show structuring evidence, checking contradictions, scoring the rubric, and preparing actions when those steps run.
+- Analysis: only show organizing submitted evidence, recording metadata/boundaries, checking gaps, scoring the rubric, and selecting deterministic Preview categories.
 - Upload: validating, accepted, and rejected states; no parsing claim.
 - Persistence unavailable: explicit in-memory warning; never imply durable save.
-- Share/clipboard/email failure: keep the report intact and offer retry or manual copy.
+- Share/clipboard failure: keep the report intact and offer download fallback.
 - Route guard: recover to the earliest valid assessment step without losing valid state.
 
 ## Recovery behavior
 
-- Browser back/forward uses the four stable routes while one session remains authoritative.
+- Browser back/forward uses the three stable funnel routes while one session remains authoritative.
 - Refresh reloads a structurally validated current-version session, including accepted artifact metadata and a generated report.
 - Corrupt, oversized, or malformed same-version storage is removed and replaced with a clearly labelled recoverable intake; it is never partially reinterpreted.
 - Compatible legacy onboarding context maps founder name/role, startup name/website/description, profile link, and file-name metadata, then performs a full assessment remount.
 - Restart explicitly clears browser-local assessment state; storage failure falls back to a labelled in-memory restart.
-- Microphone denial/unavailability preserves typed text and leaves the typed composer usable.
-- Deck and attachment parsing is unavailable in this Preview; metadata remains visible and the assessment continues without a fabricated parsing step.
+- Deck/profile parsing and website fetching are unavailable in this Preview; submitted metadata remains visible and the assessment continues without a fabricated parsing step.
 
 ## Report hierarchy
 
@@ -135,29 +121,31 @@ No percentage, queue, assistant-response, parser, upload, or AI progress may be 
 2. Evidence coverage, confidence, strongest and weakest dimensions.
    The report labels itself `complete` or `partial` and states traction as `missing`, `none`, `positive`, or `contradictory`.
 3. Ten-dimension breakdown with score, explanation, evidence used, and missing evidence.
-4. The Grill: red flags, contradictions, unsupported claims, and weak proof.
+4. Paired `What is missing` / `How to improve it` actions.
 5. Founder review.
 6. Startup review.
 7. Pitch-deck review with an explicit no-extraction boundary.
-8. Fix now, Fix next, Improve later.
-9. Download, copy, and share.
-10. Optimization early access and referral Preview stub.
+8. Deterministic opportunity fixtures across four categories.
+9. Download, copy/share, and post-value authentication handoff.
+10. Minimal saved-assessment Preview workspace with locked optimization.
 
 ## Explicit departures from Production
 
 - Assessment CTAs enter `/assessment` rather than legacy onboarding.
 - Assessment uses isolated local Preview persistence and deterministic evidence scoring.
-- The mentor interaction and report are new, but their visual primitives come from the current site.
+- The analysis, diagnosis, auth handoff, and minimal Preview workspace are new, but their visual primitives come from the current site.
 - No Production identity, database, file storage, or AI service participates.
 
-## `index.html` ideas retained
+## `index.html` ideas reserved
 
 - central mentor presence
 - one composer for voice and text
 - attachment action
-- listening and transcribing states, plus a truthful local assessment boundary
+- listening and transcribing states
 - conversation-history access
-- contextual progress/evidence display
+- contextual recommendations and drafts
+
+These are later optimization-workspace references only and are not implemented in Phase 1.
 
 ## `index.html` ideas rejected
 

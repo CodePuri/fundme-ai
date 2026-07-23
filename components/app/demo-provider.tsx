@@ -258,7 +258,13 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
+    let saved: string | null = null;
+    try {
+      saved = window.localStorage.getItem(STORAGE_KEY);
+    } catch {
+      setHasHydrated(true);
+      return;
+    }
 
     if (!saved) {
       setHasHydrated(true);
@@ -268,7 +274,11 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     try {
       setState(hydrateState(JSON.parse(saved) as Partial<DemoState>));
     } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
+      try {
+        window.localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // Storage can be unavailable in privacy-restricted browser contexts.
+      }
     } finally {
       setHasHydrated(true);
     }
@@ -278,15 +288,23 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
     if (!hasHydrated) {
       return;
     }
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // Keep the Preview identity usable for this tab without claiming persistence.
+    }
   }, [hasHydrated, state]);
 
   useEffect(() => {
     function handleDemoReset(event: KeyboardEvent) {
       if (event.shiftKey && event.key.toLowerCase() === "r") {
-        window.localStorage.removeItem(STORAGE_KEY);
-        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
-        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        try {
+          window.localStorage.removeItem(STORAGE_KEY);
+          window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+          window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        } catch {
+          // A reset still returns to the public route when storage is unavailable.
+        }
         window.location.href = "/";
       }
     }

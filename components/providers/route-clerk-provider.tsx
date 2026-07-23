@@ -7,7 +7,8 @@ import { isClerkIndependentPublicPath } from "@/lib/assessment/public-routes";
 
 export function RouteClerkProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  if (isClerkIndependentPublicPath(pathname)) return children;
+  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  if (!clerkConfigured && isClerkIndependentPublicPath(pathname)) return children;
 
   return (
     <ClerkProvider

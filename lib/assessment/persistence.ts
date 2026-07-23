@@ -64,7 +64,8 @@ function validInput(value: unknown): boolean {
     && boundedString(value.founderName, 120)
     && boundedString(value.founderRole, 120)
     && boundedString(value.description, 280)
-    && boundedString(value.profileText, 20_000);
+    && boundedString(value.profileText, 20_000)
+    && (value.linkedInUrl === undefined || boundedString(value.linkedInUrl, 2_048));
 }
 
 function validArtifact(value: unknown): boolean {
@@ -184,7 +185,15 @@ export function createInitialSession(now = new Date().toISOString(), warning: st
     mode: "demo",
     stage: "intake",
     processingState: warning ? "recoverable" : "preparing",
-    input: { startupName: "", websiteUrl: "", founderName: "", founderRole: "", description: "", profileText: "" },
+    input: {
+      startupName: "",
+      websiteUrl: "",
+      founderName: "",
+      founderRole: "",
+      description: "",
+      profileText: "",
+      linkedInUrl: "",
+    },
     artifacts: [],
     conversation: [],
     answers: {},

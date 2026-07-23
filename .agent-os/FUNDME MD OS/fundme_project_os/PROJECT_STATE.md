@@ -1,6 +1,6 @@
 # FundMe Project State
 
-Status: Phase 1 functional Grill stub remediation implemented; verification and independent review pending
+Status: Phase 1 commercial-funnel rebuild implemented and locally verified; independent review and branch Preview pending
 Last verified: 2026-07-23 Asia/Kolkata
 Evidence root: `/Users/totem/Desktop/Projects/Fundme_Canonicalization/20260723-012638`
 
@@ -66,11 +66,11 @@ See [implementation-capability-matrix.md](/Users/totem/Desktop/Projects/Fundme_C
 
 The obsolete external designer/Figma gate is superseded by D-009. [UI_IMPLEMENTATION_CONTRACT.md](./UI_IMPLEMENTATION_CONTRACT.md) now governs engineering from the verified Production design, implemented components/tokens, accepted homepage/onboarding patterns, and explicitly supplied references. Optional future design input is not a blocker.
 
-The uncommitted Phase 1 candidate now implements the four-route local Preview flow, structurally validated session recovery, negation-aware deterministic traction classification, complete/partial report states, confirmed browser-local early-access persistence, and truthful assessment processing states. This remains a candidate until focused/build/browser acceptance and a fresh independent review pass.
+The uncommitted Phase 1 candidate now implements the approved value-before-auth commercial funnel: one-screen founder/startup intake, truthful local analysis, compact evidence-grounded diagnosis, deterministic opportunity fixtures, conditional Clerk/Preview-profile handoff, and a minimal browser-local Preview workspace. Legacy mentor/review routes recover to intake; the free assessment contains no chat or long questionnaire. Structurally validated recovery, negation-aware deterministic traction classification, download/share, and exact route boundaries remain intact. Local focused tests, changed-scope lint, optimized build, desktop, 390px mobile, reduced-motion, console, and network checks pass. Independent review and branch Preview proof remain pending.
 
 ## Current phase and blockers
 
-Current phase: **Phase 1 — functional Grill Preview implementation**. Aakash approved the route structure, intake, deterministic mentor/report, email-only early access, local Preview persistence, and removal of the external design dependency.
+Current phase: **Phase 1 — commercial funding-fit funnel Preview**. Aakash superseded the mentor-first/email-first free flow with value before authentication: minimal intake, deterministic diagnosis, opportunity teaser, conditional Google/Preview-profile handoff, and a compact saved-assessment workspace. SERA-style conversation, optimization, payments, live matching, and Production services remain later phases.
 
 Blocking later implementation:
 
@@ -84,7 +84,7 @@ Blocking later implementation:
 
 Active contract: [PHASE_1_UI_BASELINE_AND_FLOW.md](./PHASE_1_UI_BASELINE_AND_FLOW.md).
 
-Exact next action: complete the remediation acceptance matrix and independent review; only after PASS, commit and push `product/v1-grill`, verify its branch Preview, and prove Production remains unchanged. The next product contract after acceptance is the intelligence foundation.
+Exact next action: obtain one bounded independent code/security review; after PASS, create the explicit Preview checkpoint commit, push only `product/v1-grill`, verify the updated branch Preview across the full commercial funnel, and prove Production remains unchanged. Stop for Aakash's visible review. The next product contract after acceptance is the intelligence foundation.
 
 ## Rollback baseline
 

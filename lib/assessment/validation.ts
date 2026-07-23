@@ -8,7 +8,7 @@ import type {
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const PROFILE_EXTENSIONS = new Set(["pdf", "doc", "docx", "txt"]);
 
-export type IntakeErrors = Partial<Record<keyof StartupInput | "startupIdentity", string>>;
+export type IntakeErrors = Partial<Record<keyof StartupInput | "startupIdentity" | "fundingSource", string>>;
 
 export type IntakeValidation = {
   valid: boolean;
@@ -36,24 +36,38 @@ function isValidWebsite(value: string): boolean {
   }
 }
 
-export function validateIntake(input: StartupInput): IntakeValidation {
+function isValidLinkedInProfile(value: string): boolean {
+  if (!value.trim()) return true;
+  try {
+    const url = new URL(normalizeWebsite(value));
+    const hostname = url.hostname.toLowerCase().replace(/^www\./, "");
+    return hostname === "linkedin.com" && /^\/in\/[^/]+\/?$/i.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+export function validateIntake(
+  input: StartupInput,
+  artifacts: GrillSession["artifacts"] = [],
+): IntakeValidation {
   const errors: IntakeErrors = {};
 
-  if (!input.startupName.trim() && !input.websiteUrl.trim()) {
-    errors.startupIdentity = "Add a startup name or website.";
-  }
   if (input.websiteUrl.trim() && !isValidWebsite(input.websiteUrl)) {
     errors.websiteUrl = "Enter a valid website address.";
+  }
+  if (input.linkedInUrl?.trim() && !isValidLinkedInProfile(input.linkedInUrl)) {
+    errors.linkedInUrl = "Paste a full LinkedIn profile URL, such as linkedin.com/in/founder.";
   }
   if (input.founderName.trim().length < 2) {
     errors.founderName = "Enter the founder's name.";
   }
-  if (input.founderRole.trim().length < 2) {
-    errors.founderRole = "Enter the founder's role.";
-  }
   const descriptionLength = input.description.trim().length;
-  if (descriptionLength < 20) {
-    errors.description = "Describe the startup in at least 20 characters.";
+  const hasDeck = artifacts.some(
+    (artifact) => artifact.kind === "pitch-deck" && artifact.status === "attached",
+  );
+  if (!input.websiteUrl.trim() && !hasDeck && descriptionLength < 20) {
+    errors.fundingSource = "Add a startup website, pitch deck, or one-line description.";
   } else if (descriptionLength > 280) {
     errors.description = "Keep the startup description under 280 characters.";
   }
@@ -88,8 +102,10 @@ export function validateFile(
 }
 
 export function earliestValidRoute(session: GrillSession): AssessmentRoute {
-  if (!validateIntake(session.input).valid) return "/assessment";
-  if (!session.reviewedAt) return "/assessment/review";
+  if (!validateIntake(session.input, session.artifacts).valid) return "/assessment";
   if (session.report) return "/assessment/result";
-  return "/assessment/mentor";
+  if (session.stage === "result" && session.processingState === "assessing" && session.reviewedAt) {
+    return "/assessment/analyzing";
+  }
+  return "/assessment";
 }

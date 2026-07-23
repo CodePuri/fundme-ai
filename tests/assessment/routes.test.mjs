@@ -34,10 +34,12 @@ test("Clerk-independent public paths include homepage destinations without prefi
     "/",
     "/assessment",
     "/assessment/review",
+    "/assessment/analyzing",
     "/search",
     "/search/startups",
     "/explore",
     "/explore/programs",
+    "/app/preview",
   ]) {
     assert.equal(isClerkIndependentPublicPath(pathname), true, pathname);
   }
@@ -47,6 +49,7 @@ test("Clerk-independent public paths include homepage destinations without prefi
     "/searching",
     "/explorer",
     "/app/tracker",
+    "/app/previewevil",
     "/onboarding",
     "/sign-in",
   ]) {
@@ -80,6 +83,8 @@ test("the installed Clerk matcher keeps public routes slash-bounded", async () =
     "/explore/programs",
     "/assessment",
     "/assessment/review",
+    "/assessment/analyzing",
+    "/app/preview",
     "/api/onboarding",
     "/robots.txt",
     "/sitemap.xml",
@@ -89,6 +94,7 @@ test("the installed Clerk matcher keeps public routes slash-bounded", async () =
 
   for (const pathname of [
     "/app/tracker",
+    "/app/previewevil",
     "/searching",
     "/explorer",
     "/assessmentevil",
@@ -102,10 +108,10 @@ test("the installed Clerk matcher keeps public routes slash-bounded", async () =
   }
 });
 
-test("legacy assessment pages are redirects without mock scoring or paywalls", async () => {
-  for (const [name, destination] of [["questions", "mentor"], ["analyzing", "result"], ["report", "result"]]) {
+test("legacy mentor routes recover into the compact intake while report remains compatible", async () => {
+  for (const [name, destination] of [["questions", ""], ["review", ""], ["mentor", ""], ["report", "result"]]) {
     const source = await readFile(new URL(`app/assessment/${name}/page.tsx`, root), "utf8");
-    assert.match(source, new RegExp(`redirect\\(\"/assessment/${destination}\"\\)`));
+    assert.match(source, new RegExp(`redirect\\(\"/assessment${destination ? `/${destination}` : ""}\"\\)`));
     assert.doesNotMatch(source, /Math\.random|paywall|creditsRemaining|generateMockReport/);
   }
 });
@@ -126,4 +132,13 @@ test("assessment intake reads homepage context through the guarded storage adapt
   assert.match(source, /getBrowserStorage\(window\)/);
   assert.match(source, /readStorageItem\(/);
   assert.doesNotMatch(source, /window\.localStorage\.getItem\(/);
+});
+
+test("Explore assessment entry routes to the compact intake", async () => {
+  const [shell, page] = await Promise.all([
+    readFile(new URL("components/startup-programs/search-shell.tsx", root), "utf8"),
+    readFile(new URL("app/search/page.tsx", root), "utf8"),
+  ]);
+  assert.match(shell, /href="\/assessment"/);
+  assert.doesNotMatch(`${shell}\n${page}`, /destination:\s*"\/onboarding"|href="\/onboarding"/);
 });

@@ -383,11 +383,22 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   );
   const description = session.input.description.trim();
   const profile = session.input.profileText.trim();
+  const linkedInUrl = session.input.linkedInUrl?.trim() ?? "";
+  const founderProfileArtifact = session.artifacts.find(
+    (artifact) => artifact.kind === "founder-profile" && artifact.status === "attached",
+  );
+  const hasFounderProfileEvidence = Boolean(profile || linkedInUrl || founderProfileArtifact);
+  const founderProfileEvidenceValue = profile
+    || (linkedInUrl ? "Founder-submitted LinkedIn profile URL; contents not fetched" : "")
+    || (founderProfileArtifact ? `${founderProfileArtifact.name}; contents not parsed` : "Not supplied");
+  const website = session.input.websiteUrl.trim();
 
   const evidence: EvidenceReference[] = [
-    { id: "startup-description", label: "Startup description", value: description, state: "submitted" },
-    { id: "founder-role", label: "Founder role", value: session.input.founderRole.trim(), state: "submitted" },
-    { id: "founder-profile", label: "Founder profile", value: profile || "Not supplied", state: profile ? "submitted" : "missing" },
+    { id: "startup-description", label: "Startup description", value: description || "Not supplied", state: description ? "submitted" : "missing" },
+    { id: "startup-website", label: "Startup website", value: website || "Not supplied", state: website ? "submitted" : "missing" },
+    { id: "founder-name", label: "Founder name", value: session.input.founderName.trim(), state: "submitted" },
+    { id: "founder-role", label: "Founder role", value: session.input.founderRole.trim() || "Not supplied", state: session.input.founderRole.trim() ? "submitted" : "missing" },
+    { id: "founder-profile", label: "Founder profile", value: founderProfileEvidenceValue, state: hasFounderProfileEvidence ? "submitted" : "missing" },
     { id: "stage-answer", label: "Product stage", value: stage || "Not answered", state: stage ? "submitted" : "missing" },
     { id: "traction-answer", label: "Traction", value: traction || "Not answered", state: traction ? "submitted" : "missing" },
     { id: "founder-fit-answer", label: "Founder-market fit", value: founderFit || "Not answered", state: founderFit ? "submitted" : "missing" },
@@ -399,10 +410,14 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   const dimensions: DimensionScore[] = [
     dimension(
       "founder-credibility",
-      evidenceScore(`${session.input.founderRole} ${profile}`, 28),
-      profile ? "The submitted role and profile establish a reviewable credibility signal." : "The founder role is present, but profile evidence is limited.",
-      ["founder-role", ...(profile ? ["founder-profile"] : [])],
-      profile ? [] : ["Founder profile or relevant operating history"],
+      evidenceScore(`${session.input.founderName} ${session.input.founderRole} ${profile}`, 26) + (linkedInUrl || founderProfileArtifact ? 4 : 0),
+      profile
+        ? "The submitted founder text establishes a reviewable credibility signal."
+        : hasFounderProfileEvidence
+          ? "Founder profile metadata was supplied, but its contents were not fetched or parsed."
+          : "The founder name is present, but operating-history evidence is limited.",
+      ["founder-name", ...(session.input.founderRole.trim() ? ["founder-role"] : []), ...(hasFounderProfileEvidence ? ["founder-profile"] : [])],
+      hasFounderProfileEvidence ? [] : ["Founder profile or relevant operating history"],
     ),
     dimension(
       "founder-market-fit",
@@ -414,22 +429,22 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     dimension(
       "problem-clarity",
       evidenceScore(description, 32),
-      "This score uses only the submitted one-line startup description.",
-      ["startup-description"],
+      description ? "This score uses only the submitted one-line startup description." : "No startup description was supplied; a website address or deck file is not treated as extracted problem evidence.",
+      description ? ["startup-description"] : [],
       ["A quantified customer pain signal"],
     ),
     dimension(
       "solution-clarity",
       evidenceScore(description, 30),
-      "The submitted description identifies the proposed product outcome, but not a verified product walkthrough.",
-      ["startup-description"],
+      description ? "The submitted description identifies the proposed product outcome, but not a verified product walkthrough." : "No solution description was supplied, and this Preview does not infer one from a URL or unparsed deck.",
+      description ? ["startup-description"] : [],
       ["Product workflow or usage evidence"],
     ),
     dimension(
       "market-clarity",
       evidenceScore(`${description} ${traction}`, 20),
       "Market clarity is inferred only from named users and submitted traction context.",
-      ["startup-description", ...(traction ? ["traction-answer"] : [])],
+      [...(description ? ["startup-description"] : []), ...(traction ? ["traction-answer"] : [])],
       ["Market size and reachable segment evidence"],
     ),
     dimension(
@@ -478,6 +493,7 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   const findings: Finding[] = [];
   if (tractionClassification.state === "missing") findings.push(missingFinding("missing-traction", "traction-proof", "No traction information was submitted.", "Add one verifiable traction metric with a date."));
   if (tractionClassification.state === "none") findings.push(missingFinding("no-current-traction", "traction-proof", "The founder explicitly reported no current traction.", "Define the first measurable traction milestone and its target date."));
+  if (!description) findings.push(missingFinding("missing-startup-description", "problem-clarity", "No startup description was submitted, and the Preview did not extract claims from the website or deck.", "Add one sentence naming the customer, problem, and product approach."));
   if (!founderFit) findings.push(missingFinding("missing-founder-fit", "founder-market-fit", "Founder-market fit is unsupported.", "Explain the team's relevant experience, access, or insight."));
   if (!differentiation) findings.push(missingFinding("missing-differentiation", "differentiation", "The current alternative and switching reason are missing.", "Name the buyer's current workaround and why they would switch."));
   if (!fundingOutcome) findings.push(missingFinding("missing-funding-outcome", "funding-narrative", "The round is not connected to a measurable milestone.", "State the raise, runway, use of funds, and target milestone."));
@@ -569,7 +585,11 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     founderReview: {
       credibility: dimensions[0].explanation,
       founderMarketFit: dimensions[1].explanation,
-      profilePositioning: profile ? "A founder profile was submitted and used as text evidence." : "Add a founder profile to strengthen positioning evidence.",
+      profilePositioning: profile
+        ? "Pasted founder profile text was used as submitted evidence."
+        : hasFounderProfileEvidence
+          ? "Founder profile metadata was recorded, but its contents were not fetched or parsed."
+          : "Add a founder profile to strengthen positioning evidence.",
     },
     startupReview: {
       problem: dimensions[2].explanation,
