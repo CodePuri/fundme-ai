@@ -24,7 +24,7 @@ import type { IntakeErrors } from "@/lib/assessment/validation";
 
 function FieldError({ children }: { children?: string }) {
   if (!children) return null;
-  return <p className="mt-2 text-xs font-medium text-[#b33f20]" role="alert">{children}</p>;
+  return <p className="mt-2 text-[13px] font-medium text-[var(--status-critical)]" role="alert">{children}</p>;
 }
 
 function UploadButton({
@@ -72,14 +72,14 @@ function AttachedFile({
   onRemove: (id: string) => void;
 }) {
   return (
-    <div className="mt-3 flex min-w-0 items-center justify-between gap-3 rounded-xl bg-[#f6f1ea] px-3 py-2.5 text-sm">
+    <div className="mt-3 flex min-w-0 items-center justify-between gap-3 rounded-xl bg-[var(--surface-elevated)] px-3 py-2.5 text-sm">
       <span className="flex min-w-0 items-center gap-2">
         <Check className="size-3.5 shrink-0 text-[#2f7d57]" />
         <span className="truncate">{name}</span>
       </span>
       <button
         aria-label={`Remove ${name}`}
-        className="grid size-9 shrink-0 place-items-center rounded-full transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]"
+        className="grid size-11 shrink-0 place-items-center rounded-full transition-colors hover:bg-black/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]"
         onClick={() => onRemove(id)}
         type="button"
       >
@@ -111,19 +111,19 @@ export function IntakeGrid() {
   const needsDescription = !session.input.websiteUrl.trim() && !deck;
 
   return (
-    <div className="mx-auto max-w-[980px]">
-      <header className="mx-auto max-w-[700px] text-center">
+    <div className="mx-auto max-w-[1040px]">
+      <header className="mx-auto max-w-[720px] text-center">
         <p className="eyebrow">Free funding-fit diagnosis</p>
-        <h1 className="instrument-serif mt-3 text-balance text-[42px] leading-[0.98] tracking-[-0.035em] sm:text-[58px]">
+        <h1 className="type-page-title mt-3">
           See what investors will question first.
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-[15px] leading-6 text-[var(--text-muted)]">
-          Add the founder and any sources you already have. No account required.
+        <p className="type-body-lg mx-auto mt-3 max-w-[62ch] text-[var(--text-secondary)]">
+          Add the founder and the sources you already have. No account required.
         </p>
       </header>
 
-      <section className="mt-7 rounded-[28px] border border-[var(--border)] bg-white p-4 shadow-[0_24px_70px_rgba(17,17,17,0.06)] sm:p-7">
-        <label className="mx-auto block max-w-xl text-sm font-semibold" htmlFor="founder-name">
+      <section className="premium-card mt-7 p-4 sm:p-6">
+        <label className="mx-auto block max-w-xl text-[15px] font-semibold" htmlFor="founder-name">
           <span className="flex items-center gap-2"><UserRound className="size-4 text-[#ff6b3d]" />Founder name</span>
           <Input
             id="founder-name"
@@ -138,17 +138,17 @@ export function IntakeGrid() {
         </label>
 
         <div className="mt-6 flex items-center gap-3">
-          <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#756d63]">Optional sources</span>
+          <span className="text-[13px] font-semibold text-[var(--text-secondary)]">Optional sources</span>
           <span className="h-px flex-1 bg-black/8" />
         </div>
 
-        <div className="mt-3 grid gap-3 md:grid-cols-3">
-          <article className="rounded-[20px] border border-black/8 bg-[#fbf8f4] p-4">
+        <div className="mt-3 grid items-start gap-3 md:grid-cols-3">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#fff0e8] text-[#bd4e28]"><Linkedin className="size-4.5" /></span>
-              <div className="min-w-0"><h2 className="text-sm font-semibold">Founder profile</h2><p className="mt-0.5 text-xs text-[#8b8276]">URL, export or text</p></div>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#bd4e28]/15 bg-white text-[#a64626]"><Linkedin className="size-4.5" /></span>
+              <div className="min-w-0"><h2 className="text-[16px] font-semibold">Founder profile</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">URL, export, or text</p></div>
             </div>
-            <label className="mt-4 block text-xs font-semibold" htmlFor="linkedin-url">
+            <label className="mt-4 block text-[13px] font-semibold" htmlFor="linkedin-url">
               Profile URL
               <Input
                 id="linkedin-url"
@@ -162,13 +162,13 @@ export function IntakeGrid() {
               />
               <FieldError>{errors.linkedInUrl}</FieldError>
             </label>
-            <details className="mt-3 rounded-xl border border-black/8 bg-white px-3 py-2.5">
-              <summary className="cursor-pointer rounded-md text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]">More profile options</summary>
+            <details className="mt-3 rounded-xl border border-[var(--border)] bg-white px-3 py-2.5">
+              <summary className="flex min-h-11 cursor-pointer items-center rounded-md text-[13px] font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">More profile options</summary>
               <div className="mt-3">
                 <UploadButton accept=".pdf,.doc,.docx,.txt,application/pdf" kind="founder-profile" label="Upload profile" />
                 {founderProfile ? <AttachedFile id={founderProfile.id} name={founderProfile.name} onRemove={removeArtifact} /> : null}
               </div>
-              <label className="mt-3 block text-xs font-semibold" htmlFor="profile-text">
+              <label className="mt-3 block text-[13px] font-semibold" htmlFor="profile-text">
                 Paste relevant experience
                 <Textarea
                   id="profile-text"
@@ -181,18 +181,18 @@ export function IntakeGrid() {
                 />
               </label>
             </details>
-            <details className="mt-2 px-1 text-[11px] leading-4 text-[#8b8276]">
-              <summary className="cursor-pointer rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]">How profile sources work</summary>
+            <details className="mt-2 px-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+              <summary className="flex min-h-11 cursor-pointer items-center rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">How profile sources work</summary>
               <p className="mt-2">Use a public URL, export or pasted text. FundMe does not scrape LinkedIn.</p>
             </details>
           </article>
 
-          <article className="rounded-[20px] border border-black/8 bg-[#fbf8f4] p-4">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#eef4fb] text-[#3971a8]"><Globe2 className="size-4.5" /></span>
-              <div><h2 className="text-sm font-semibold">Startup website</h2><p className="mt-0.5 text-xs text-[#8b8276]">Your clearest public source</p></div>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#315f8b]/15 bg-white text-[var(--status-information)]"><Globe2 className="size-4.5" /></span>
+              <div><h2 className="text-[16px] font-semibold">Startup website</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">Your clearest public source</p></div>
             </div>
-            <label className="mt-4 block text-xs font-semibold" htmlFor="startup-website">
+            <label className="mt-4 block text-[13px] font-semibold" htmlFor="startup-website">
               Website
               <Input
                 id="startup-website"
@@ -206,29 +206,29 @@ export function IntakeGrid() {
               />
               <FieldError>{errors.websiteUrl}</FieldError>
             </label>
-            <p className="mt-3 flex items-start gap-2 text-[11px] leading-4 text-[#8b8276]"><LockKeyhole className="mt-0.5 size-3.5 shrink-0" />Only the address you submit is used in this Preview.</p>
+            <p className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-[var(--text-secondary)]"><LockKeyhole className="mt-0.5 size-3.5 shrink-0" />Only the address you submit is used.</p>
           </article>
 
-          <article className="rounded-[20px] border border-black/8 bg-[#fbf8f4] p-4">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
             <div className="flex items-center gap-3">
-              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#f3eefb] text-[#7452a3]"><FileText className="size-4.5" /></span>
-              <div><h2 className="text-sm font-semibold">Pitch deck</h2><p className="mt-0.5 text-xs text-[#8b8276]">PDF · up to 10 MB</p></div>
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#7452a3]/15 bg-white text-[#65448f]"><FileText className="size-4.5" /></span>
+              <div><h2 className="text-[16px] font-semibold">Pitch deck</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">PDF · up to 10 MB</p></div>
             </div>
             <div className="mt-4">
               <UploadButton accept=".pdf,application/pdf" kind="pitch-deck" label="Upload pitch deck" />
               {deck ? <AttachedFile id={deck.id} name={deck.name} onRemove={removeArtifact} /> : null}
             </div>
-            <details className="mt-3 px-1 text-[11px] leading-4 text-[#8b8276]">
-              <summary className="cursor-pointer rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]">Deck review scope</summary>
+            <details className="mt-3 px-1 text-[13px] leading-5 text-[var(--text-secondary)]">
+              <summary className="flex min-h-11 cursor-pointer items-center rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">Deck review scope</summary>
               <p className="mt-2">This Preview records the file, but does not claim slide-level analysis.</p>
             </details>
           </article>
         </div>
 
         {needsDescription ? (
-          <label className="mt-4 block rounded-[18px] border border-dashed border-[#ff6b3d]/35 bg-[#fffaf6] p-4 text-sm font-semibold" htmlFor="startup-description">
+          <label className="mt-4 block rounded-[var(--radius-card)] border border-dashed border-[#bd4e28]/40 bg-[#fffaf6] p-4 text-[15px] font-semibold" htmlFor="startup-description">
             One-line startup description
-            <span className="ml-2 font-normal text-[#8b8276]">required without a website or deck</span>
+            <span className="ml-2 font-normal text-[var(--text-secondary)]">required without a website or deck</span>
             <Textarea
               id="startup-description"
               className="mt-2 min-h-20 bg-white"
@@ -240,7 +240,7 @@ export function IntakeGrid() {
             />
             <span className="mt-2 flex items-start justify-between gap-4">
               <FieldError>{errors.description ?? errors.fundingSource}</FieldError>
-              <span className="ml-auto text-xs font-normal text-[#8b8276]">{session.input.description.length}/280</span>
+              <span className="ml-auto text-[13px] font-normal text-[var(--text-secondary)]">{session.input.description.length}/280</span>
             </span>
           </label>
         ) : null}
@@ -252,7 +252,7 @@ export function IntakeGrid() {
         ) : null}
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-black/8 pt-5 sm:flex-row">
-          <p className="flex items-center gap-2 text-xs text-[#777066]"><LockKeyhole className="size-3.5 text-[#2f7d57]" />Private to this Preview. No account required.</p>
+          <p className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]"><LockKeyhole className="size-3.5 text-[var(--status-positive)]" />Private to this Preview. No account required.</p>
           <Button className="min-h-12 w-full px-6 sm:w-auto" onClick={analyze} size="lg">
             Analyze my funding fit
             <ArrowRight className="size-4" />

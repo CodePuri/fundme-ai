@@ -38,14 +38,14 @@ function ScoreRing({ score }: { score: number }) {
   return (
     <div
       aria-label={`Funding readiness score ${score} out of 100`}
-      className="relative grid size-[116px] shrink-0 place-items-center rounded-full"
+      className="relative grid size-[132px] shrink-0 place-items-center rounded-full"
       role="img"
-      style={{ background: `conic-gradient(#ff6b3d ${score * 3.6}deg, #eee7de 0deg)` }}
+      style={{ background: `conic-gradient(#ff6b3d ${score * 3.6}deg, #e9e1d7 0deg)` }}
     >
-      <div className="grid size-[94px] place-items-center rounded-full bg-white text-center">
+      <div className="grid size-[108px] place-items-center rounded-full bg-white text-center">
         <div>
-          <strong className="instrument-serif text-[42px] font-normal leading-none tabular-nums">{score}</strong>
-          <span className="text-[11px] text-[#8b8276]">/100</span>
+          <strong className="type-score">{score}</strong>
+          <span className="ml-1 text-[13px] font-medium text-[var(--text-secondary)]">/100</span>
         </div>
       </div>
     </div>
@@ -66,25 +66,25 @@ function DimensionRow({
   evidenceLabels: string[];
 }) {
   return (
-    <details className="group border-b border-black/8 py-3.5 last:border-b-0">
-      <summary className="cursor-pointer list-none rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]">
+    <details className="group border-b border-[var(--border)] py-4 last:border-b-0">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">
         <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-4">
-              <h3 className="truncate text-sm font-semibold">{dimension.label}</h3>
-              <span className="font-mono text-sm font-semibold">{dimension.score}</span>
+              <h3 className="min-w-0 text-[15px] font-semibold">{dimension.label}</h3>
+              <span className="text-[15px] font-semibold tabular-nums">{dimension.score}</span>
             </div>
             <div aria-hidden="true" className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#eee7de]">
               <div className={`h-full rounded-full ${scoreTone(dimension.score)}`} style={{ width: `${dimension.score}%` }} />
             </div>
           </div>
-          <span className="grid size-8 shrink-0 place-items-center rounded-full border border-black/8 text-[#8b8276] transition-transform group-open:rotate-45 motion-reduce:transition-none">+</span>
+          <span aria-hidden="true" className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--border)] text-[var(--text-secondary)] transition-transform group-open:rotate-45 motion-reduce:transition-none">+</span>
         </div>
       </summary>
-      <div className="mt-3 rounded-xl bg-[#faf7f2] p-3 text-xs leading-5 text-[#6f685f]">
+      <div className="mt-3 rounded-xl bg-[var(--surface-elevated)] p-4 text-[13px] leading-5 text-[var(--text-secondary)]">
         <p>{dimension.explanation}</p>
-        <p className="mt-2 flex items-start gap-2 text-[#7a7167]">
-          {evidenceLabels.length ? <Check className="mt-0.5 size-3.5 shrink-0 text-[#2f7d57]" /> : <ShieldAlert className="mt-0.5 size-3.5 shrink-0 text-[#bd4e28]" />}
+        <p className="mt-2 flex items-start gap-2 text-[var(--text-secondary)]">
+          {evidenceLabels.length ? <Check aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-[var(--status-positive)]" /> : <ShieldAlert aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-[var(--status-critical)]" />}
           {evidenceLabels.length ? `Evidence: ${evidenceLabels.join(", ")}` : `Missing: ${dimension.missingEvidence[0] ?? "Supporting evidence"}`}
         </p>
       </div>
@@ -114,18 +114,16 @@ function CategoryIcon({ label }: { label: string }) {
   return <BadgeIndianRupee className={className} />;
 }
 
-function compactMatchReason(category: string): string {
-  if (category.includes("Accelerator")) return "Cohort support for an early team.";
-  if (category.includes("Incubator")) return "Operator support from idea to MVP.";
-  if (category.includes("Grant")) return "A possible non-dilutive funding path.";
-  return "A stage-aligned capital path.";
+function opportunityReasonSummary(reason: string): string {
+  const [firstSentence] = reason.split(/(?<=\.)\s+/);
+  return firstSentence ?? reason;
 }
 
 const MATCH_TONES = [
-  "border-[#ff6b3d]/20 bg-[#fff9f5]",
-  "border-[#4f7dac]/20 bg-[#f6f9fc]",
-  "border-[#76539f]/20 bg-[#faf8fd]",
-  "border-[#2f7d57]/20 bg-[#f5faf7]",
+  "border-t-[#ff6b3d]",
+  "border-t-[#315f8b]",
+  "border-t-[#65448f]",
+  "border-t-[#246b48]",
 ];
 
 export function FundingReadinessReport() {
@@ -204,7 +202,7 @@ export function FundingReadinessReport() {
     return (
       <div className="mx-auto max-w-xl rounded-[24px] border border-[var(--border)] bg-white p-8 text-center">
         <p className="font-semibold">Recovering your assessment…</p>
-        <p className="mt-2 text-sm text-[#8b8276]">You’ll return to the earliest valid step.</p>
+        <p className="mt-2 text-[15px] text-[var(--text-secondary)]">You’ll return to the earliest valid step.</p>
       </div>
     );
   }
@@ -250,13 +248,13 @@ export function FundingReadinessReport() {
   return (
     <>
       <div aria-hidden={authOpen ? true : undefined} className="mx-auto max-w-[1080px]" inert={authOpen}>
-        <section className="overflow-hidden rounded-[28px] border border-[var(--border)] bg-white shadow-[0_24px_70px_rgba(17,17,17,0.06)]">
-          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[116px_minmax(0,1fr)_252px] lg:items-center">
+        <section className="premium-card overflow-hidden">
+          <div className="grid gap-6 p-5 sm:p-7 lg:grid-cols-[132px_minmax(0,1fr)_260px] lg:items-center">
             <ScoreRing score={report.readinessScore} />
             <div className="min-w-0">
-              <p className="eyebrow break-words">Funding Readiness Score · {displayName}</p>
-              <h1 className="instrument-serif mt-2 text-balance text-[40px] leading-[0.98] tracking-[-0.03em] sm:text-[50px]">{report.verdict}</h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-[#6f685f]">{report.conciseVerdict}</p>
+              <p className="type-metadata break-words font-semibold text-[var(--text-secondary)]">{displayName} · Funding readiness</p>
+              <h1 className="instrument-serif mt-2 max-w-[18ch] text-balance text-[40px] leading-[1.04] tracking-[-0.025em] sm:text-[50px]">{report.verdict}</h1>
+              <p className="type-body mt-3 max-w-[65ch] text-[var(--text-secondary)]">{report.conciseVerdict}</p>
               <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                 <Button ref={authTriggerRef} className="min-h-12 px-5" onClick={() => setAuthOpen(true)} size="lg">
                   Save assessment &amp; see matches
@@ -266,38 +264,38 @@ export function FundingReadinessReport() {
               </div>
             </div>
             <dl className="grid grid-cols-2 gap-2 lg:grid-cols-1">
-              <div className="rounded-[14px] bg-[#f3fbf6] p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#2f7d57]">Strongest signal</dt>
-                <dd className="mt-1 text-sm font-semibold">{strongest?.label ?? "Unavailable"}</dd>
+              <div className="rounded-[14px] border border-[#246b48]/20 bg-[#f4faf6] p-3">
+                <dt className="flex items-center gap-2 text-[13px] font-semibold text-[var(--status-positive)]"><ShieldCheck aria-hidden="true" className="size-3.5" />Strongest signal</dt>
+                <dd className="mt-1 text-[15px] font-semibold">{strongest?.label ?? "Unavailable"}</dd>
               </div>
-              <div className="rounded-[14px] bg-[#fff4ed] p-3">
-                <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#bd4e28]">Biggest risk</dt>
-                <dd className="mt-1 text-sm font-semibold">{weakest?.label ?? "Unavailable"}</dd>
+              <div className="rounded-[14px] border border-[#a33b1d]/20 bg-[#fff6f1] p-3">
+                <dt className="flex items-center gap-2 text-[13px] font-semibold text-[var(--status-critical)]"><ShieldAlert aria-hidden="true" className="size-3.5" />Biggest risk</dt>
+                <dd className="mt-1 text-[15px] font-semibold">{weakest?.label ?? "Unavailable"}</dd>
               </div>
-              <div className="col-span-2 rounded-[14px] bg-[#f6f1ea] p-3 lg:col-span-1">
-                <dt className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[0.12em] text-[#756d63]"><span>Evidence coverage</span><span>{report.evidenceCoverage}%</span></dt>
+              <div className="col-span-2 rounded-[14px] border border-[var(--border)] bg-[var(--surface-elevated)] p-3 lg:col-span-1">
+                <dt className="flex items-center justify-between gap-3 text-[13px] font-semibold text-[var(--text-secondary)]"><span>Evidence coverage</span><span className="tabular-nums">{report.evidenceCoverage}%</span></dt>
                 <dd className="mt-2 h-1.5 overflow-hidden rounded-full bg-white"><span className="block h-full rounded-full bg-[#ff6b3d]" style={{ width: `${report.evidenceCoverage}%` }} /></dd>
               </div>
             </dl>
           </div>
-          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] bg-[#faf7f2] px-5 py-3 text-[11px] text-[#8b8276] sm:px-7">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-3 text-[13px] text-[var(--text-secondary)] sm:px-7">
             <span>{report.completionState === "complete" ? "Complete assessment" : "Partial assessment"} · {report.confidence} confidence</span>
             <div className="flex items-center gap-3">
-              <button className="inline-flex min-h-10 items-center gap-1.5 rounded-md font-semibold hover:text-[#171513] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]" onClick={share} type="button"><Share2 className="size-3.5" />Share</button>
+              <button className="inline-flex min-h-11 items-center gap-1.5 rounded-md px-1 font-semibold hover:text-[#171513] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]" onClick={share} type="button"><Share2 className="size-3.5" />Share</button>
               {shareStatus ? <span role="status">{shareStatus}</span> : null}
             </div>
           </div>
         </section>
 
-        <details className="mx-auto mt-3 max-w-3xl rounded-xl px-3 py-2 text-[11px] leading-5 text-[#8b8276]">
-          <summary className="cursor-pointer rounded-md text-center font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]">Preview methodology</summary>
+        <details className="mx-auto mt-3 max-w-3xl rounded-xl px-3 py-2 text-[13px] leading-5 text-[var(--text-secondary)]">
+          <summary className="flex min-h-11 cursor-pointer items-center justify-center rounded-md text-center font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">Preview methodology</summary>
           <p className="mt-2 text-center">Based on founder-supplied text and attachment metadata. Deck contents and opportunity examples are not independently verified.</p>
         </details>
 
-        <section className="mt-5 rounded-[24px] border border-[var(--border)] bg-white px-5 py-1 sm:px-7">
-          <div className="border-b border-black/8 py-4">
-            <p className="eyebrow">Ten funding signals</p>
-            <h2 className="mt-1 text-lg font-semibold">What your evidence supports</h2>
+        <section className="premium-card mt-5 px-5 py-1 sm:px-7">
+          <div className="border-b border-[var(--border)] py-5">
+            <p className="eyebrow">Funding signals</p>
+            <h2 className="type-section-title mt-1">What your evidence supports</h2>
           </div>
           <div className="grid gap-x-8 md:grid-cols-2">
             {report.dimensions.map((dimension) => (
@@ -310,24 +308,24 @@ export function FundingReadinessReport() {
           </div>
         </section>
 
-        <section className="mt-5 overflow-hidden rounded-[24px] border border-[var(--border)] bg-white">
-          <div className="grid border-b border-black/8 bg-[#faf7f2] px-5 py-3 text-xs font-bold uppercase tracking-[0.12em] text-[#756d63] sm:grid-cols-2 sm:px-7">
+        <section className="premium-card mt-5 overflow-hidden">
+          <div className="grid border-b border-[var(--border)] bg-[var(--surface-elevated)] px-5 py-3 text-[13px] font-semibold text-[var(--text-secondary)] sm:grid-cols-2 sm:px-7">
             <span>Missing proof</span>
             <span className="hidden sm:block">Best next move</span>
           </div>
           {missingItems.length ? missingItems.map((finding, index) => (
-            <article className="grid gap-2 border-b border-black/8 px-5 py-3.5 last:border-b-0 sm:grid-cols-2 sm:gap-8 sm:px-7" key={finding.id}>
+            <article className="grid gap-3 border-b border-[var(--border)] px-5 py-4 last:border-b-0 sm:grid-cols-2 sm:gap-8 sm:px-7" key={finding.id}>
               <div className="flex gap-3">
-                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[#fff0e8] text-xs font-semibold text-[#bd4e28]">{index + 1}</span>
-                <p className="text-sm leading-5">{finding.explanation}</p>
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#fff0e8] text-[13px] font-semibold text-[var(--status-critical)]">{index + 1}</span>
+                <p className="text-[15px] leading-6">{finding.explanation}</p>
               </div>
-              <div className="flex gap-2 text-sm leading-5 text-[#5f584f]">
+              <div className="flex gap-2 text-[15px] leading-6 text-[var(--text-secondary)]">
                 <ArrowRight className="mt-1 hidden size-3.5 shrink-0 text-[#ff6b3d] sm:block" />
-                <div><span className="mb-1 block text-[10px] font-bold uppercase tracking-[0.12em] text-[#8b8276] sm:hidden">Best next move</span>{finding.action}</div>
+                <div><span className="mb-1 block text-[13px] font-semibold text-[var(--text-secondary)] sm:hidden">Best next move</span>{finding.action}</div>
               </div>
             </article>
           )) : (
-            <p className="px-5 py-5 text-sm text-[#6f685f]">No missing-evidence items were generated.</p>
+            <p className="px-5 py-5 text-[15px] text-[var(--text-secondary)]">No missing-evidence items were generated.</p>
           )}
         </section>
 
@@ -338,53 +336,53 @@ export function FundingReadinessReport() {
             { icon: FileText, label: "Pitch deck", value: deck ? "File received" : "Not provided" },
           ].map(({ icon: Icon, label, value }) => (
             <div className="flex items-center gap-3 rounded-[16px] border border-[var(--border)] bg-white p-3" key={label}>
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#f6f1ea]"><Icon className="size-4 text-[#6f685f]" /></span>
-              <div><p className="text-xs font-semibold">{label}</p><p className="mt-0.5 text-[11px] text-[#8b8276]">{value}</p></div>
+              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[var(--surface-elevated)]"><Icon className="size-4 text-[var(--text-secondary)]" /></span>
+              <div><p className="text-[13px] font-semibold">{label}</p><p className="mt-0.5 text-[13px] text-[var(--text-secondary)]">{value}</p></div>
             </div>
           ))}
         </section>
 
-        <section className="mt-5 rounded-[28px] border border-[#ff6b3d]/20 bg-[#fffaf6] p-5 sm:p-7">
+        <section className="premium-card mt-5 p-5 sm:p-7">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <p className="eyebrow">FundMe opportunity preview</p>
-              <h2 className="mt-2 text-2xl font-semibold sm:text-3xl">{PREVIEW_OPPORTUNITY_COUNT} Preview opportunities across four paths</h2>
+              <p className="eyebrow">Opportunity preview</p>
+              <h2 className="type-section-title mt-2">{PREVIEW_OPPORTUNITY_COUNT} paths across four categories</h2>
             </div>
-            <span className="w-fit rounded-full border border-[#ff6b3d]/25 bg-white px-3 py-1.5 text-[10px] font-semibold text-[#a64626]">Illustrative sample</span>
+            <span className="w-fit rounded-full border border-[#ff6b3d]/25 bg-[#fff8f4] px-3 py-1.5 text-[13px] font-semibold text-[#963b1a]">Preview sample</span>
           </div>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {PREVIEW_MATCH_CATEGORIES.map((category) => (
-              <div className="flex items-center gap-3 rounded-[15px] border border-black/8 bg-white p-3" key={category.label}>
-                <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-[#fff0e8] text-[#bd4e28]"><CategoryIcon label={category.label} /></span>
-                <div><p className="text-xs font-semibold">{category.label.replace(" and VC firms", "")}</p><p className="mt-0.5 text-[11px] text-[#8b8276]">{category.count} examples</p></div>
+              <div className="flex items-center gap-3 rounded-[15px] border border-[var(--border)] bg-[var(--surface-elevated)] p-3" key={category.label}>
+                <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-[var(--border)] bg-white text-[#a64626]"><CategoryIcon label={category.label} /></span>
+                <div><p className="text-[13px] font-semibold">{category.label.replace(" and VC firms", "")}</p><p className="mt-0.5 text-[13px] text-[var(--text-secondary)]">{category.count} examples</p></div>
               </div>
             ))}
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             {matches.slice(0, 4).map((match, index) => (
-              <article className={`rounded-[18px] border p-4 ${MATCH_TONES[index % MATCH_TONES.length]}`} key={match.id}>
+              <article className={`flex min-h-[220px] flex-col rounded-[18px] border border-[var(--border)] border-t-[3px] bg-white p-5 ${MATCH_TONES[index % MATCH_TONES.length]}`} key={match.id}>
                 <div className="flex items-start gap-3">
-                  <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white shadow-sm"><CategoryIcon label={match.category} /></span>
+                  <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)]"><CategoryIcon label={match.category} /></span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-[#8b8276]">{match.category}</p>
-                    <h3 className="mt-1 font-semibold">{match.name}</h3>
+                    <p className="type-metadata text-[var(--text-secondary)]">{match.category}</p>
+                    <h3 className="type-card-title mt-1">{match.name}</h3>
                   </div>
-                  <span className="rounded-full bg-white px-2 py-1 text-[9px] font-semibold text-[#6f685f]">Preview example</span>
                 </div>
-                <p className="mt-3 text-xs leading-5 text-[#6f685f]">{compactMatchReason(match.category)}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] text-[#6f685f]">
-                  <span className="rounded-full bg-white/80 px-2 py-1">{match.stage}</span>
-                  <span className="rounded-full bg-white/80 px-2 py-1">{match.geography}</span>
-                  <span className="rounded-full bg-white/80 px-2 py-1">{match.value}</span>
+                <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]">{opportunityReasonSummary(match.reason)}</p>
+                <div className="mt-4 grid gap-1 text-[13px] text-[var(--text-secondary)]">
+                  <span><strong className="font-semibold text-[var(--text-primary)]">Stage:</strong> {match.stage}</span>
+                  <span><strong className="font-semibold text-[var(--text-primary)]">Location:</strong> {match.geography}</span>
+                  <span><strong className="font-semibold text-[var(--text-primary)]">Value:</strong> {match.value}</span>
                 </div>
+                <Link className="mt-auto inline-flex min-h-11 items-end gap-1.5 pt-4 text-[13px] font-semibold text-[#963b1a] hover:text-[#6f2712]" href="/search">Explore category <ArrowRight className="size-3.5" /></Link>
               </article>
             ))}
           </div>
 
           <div className="mt-5 flex flex-col items-center justify-between gap-3 rounded-[18px] bg-[#171513] p-4 text-white sm:flex-row">
-            <div><p className="text-sm font-semibold">See every funding path in one workspace.</p><p className="mt-1 text-xs text-white/55">Save this diagnosis to continue.</p></div>
+            <div><p className="text-[15px] font-semibold">See every funding path in one workspace.</p><p className="mt-1 text-[13px] text-white/75">Save this diagnosis to continue.</p></div>
             <Button className="min-h-11 shrink-0 border-white bg-white text-[#171513] hover:border-white hover:bg-[#f6f1ea]" onClick={() => setAuthOpen(true)}>
               Unlock Preview paths
               <ArrowRight className="size-4" />
@@ -392,9 +390,9 @@ export function FundingReadinessReport() {
           </div>
         </section>
 
-        <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-xs">
-          <Link className="font-semibold text-[#6f685f] hover:text-[#171513]" href="/assessment">Start another assessment</Link>
-          <Link className="font-semibold text-[#6f685f] hover:text-[#171513]" href="/search">Explore public programs</Link>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-4 text-[13px]">
+          <Link className="min-h-11 rounded-md py-3 font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]" href="/assessment">Start another assessment</Link>
+          <Link className="min-h-11 rounded-md py-3 font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]" href="/search">Explore public programs</Link>
         </div>
       </div>
 
@@ -405,21 +403,21 @@ export function FundingReadinessReport() {
             aria-describedby="auth-handoff-description"
             aria-labelledby="auth-handoff-title"
             aria-modal="true"
-            className="w-full max-w-md rounded-t-[28px] bg-white p-5 shadow-2xl sm:rounded-[28px] sm:p-7"
+            className="w-full max-w-md rounded-t-[24px] bg-white p-5 shadow-2xl sm:rounded-[24px] sm:p-7"
             role="dialog"
           >
             <div className="flex items-start justify-between gap-5">
               <div>
-                <span className="grid size-10 place-items-center rounded-xl bg-[#fff0e8] text-[#bd4e28]"><Sparkles className="size-4.5" /></span>
-                <h2 className="instrument-serif mt-3 text-4xl" id="auth-handoff-title">Save your assessment</h2>
+                <span className="grid size-10 place-items-center rounded-xl bg-[#fff0e8] text-[var(--status-critical)]"><Sparkles aria-hidden="true" className="size-4.5" /></span>
+                <h2 className="type-section-title mt-3" id="auth-handoff-title">Save your assessment</h2>
               </div>
-              <button aria-label="Close authentication handoff" className="grid size-11 place-items-center rounded-full border border-black/8 hover:bg-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff6b3d]" onClick={closeAuth} type="button"><X className="size-4" /></button>
+              <button aria-label="Close authentication handoff" className="grid size-11 place-items-center rounded-full border border-black/8 hover:bg-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]" onClick={closeAuth} type="button"><X className="size-4" /></button>
             </div>
-            <p className="mt-3 text-sm leading-6 text-[#6f685f]" id="auth-handoff-description">
+            <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]" id="auth-handoff-description">
               Keep this result and open your Preview matches.
             </p>
             {session.persistenceWarning ? (
-              <p className="mt-3 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950" role="alert">
+              <p className="mt-3 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-[13px] leading-5 text-amber-950" role="alert">
                 Browser persistence was not confirmed. Keep this tab open or download the report.
               </p>
             ) : null}
@@ -434,7 +432,7 @@ export function FundingReadinessReport() {
                 <ArrowRight className="size-4" />
               </Link>
             ) : (
-              <div className="mt-5 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-xs leading-5 text-amber-950">
+              <div className="mt-5 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-[13px] leading-5 text-amber-950">
                 <p className="flex items-start gap-2 font-semibold"><AlertCircle className="mt-0.5 size-3.5 shrink-0" />Google sign-in isn’t configured for this Preview.</p>
               </div>
             )}
@@ -443,7 +441,7 @@ export function FundingReadinessReport() {
               Continue with Preview profile
               <ArrowRight className="size-4" />
             </Button>
-            <p className="mt-4 flex items-start gap-2 text-[11px] leading-5 text-[#8b8276]"><ShieldCheck className="mt-0.5 size-3.5 shrink-0 text-[#2f7d57]" />Your assessment is not shared or published.</p>
+            <p className="mt-4 flex items-start gap-2 text-[13px] leading-5 text-[var(--text-secondary)]"><ShieldCheck aria-hidden="true" className="mt-0.5 size-3.5 shrink-0 text-[var(--status-positive)]" />Your assessment is not shared or published.</p>
           </section>
         </div>
       ) : null}

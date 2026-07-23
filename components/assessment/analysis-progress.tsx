@@ -67,24 +67,23 @@ export function AnalysisProgress() {
   const progress = Math.round(((activeIndex + 1) / stages.length) * 100);
 
   return (
-    <div className="mx-auto flex min-h-[62vh] max-w-[760px] flex-col items-center justify-center py-8 text-center">
-      <div className="relative grid size-32 place-items-center rounded-full bg-white shadow-[0_24px_70px_rgba(17,17,17,0.08)]">
-        <span className="absolute inset-2 rounded-full border border-[#ff6b3d]/20" />
-        <span className="absolute inset-5 rounded-full bg-[#fff4ed]" />
+    <div className="mx-auto flex min-h-[58vh] max-w-[720px] flex-col items-center justify-center py-8 text-center">
+      <div className="relative grid size-24 place-items-center rounded-full border border-[var(--border)] bg-white shadow-[0_18px_54px_rgba(36,29,22,0.07)]">
+        <span className="absolute inset-3 rounded-full bg-[#fff4ed]" />
         <LoaderCircle className="relative size-8 animate-spin text-[#ff6b3d] motion-reduce:animate-none" />
       </div>
       <p className="eyebrow mt-7">Analyzing your funding fit</p>
-      <h1 className="instrument-serif mt-3 text-[42px] leading-none tracking-[-0.035em] sm:text-6xl">
+      <h1 className="type-page-title mt-3" aria-live="polite">
         {stages[activeIndex]}
       </h1>
-      <p className="mt-4 max-w-lg text-sm leading-6 text-[var(--text-muted)]">
-        We use only the evidence you supplied and make missing proof visible.
+      <p className="type-body mt-3 max-w-[62ch] text-[var(--text-secondary)]">
+        We use only your evidence and make missing proof visible.
       </p>
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
+      <div className="mt-6 flex flex-wrap justify-center gap-4">
         {sources.map(({ available, icon: Icon, label }) => (
-          <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${available ? "border-[#2f7d57]/20 bg-[#f3fbf6] text-[#2f7d57]" : "border-black/8 bg-white text-[#8b8276]"}`} key={label}>
+          <span className={`inline-flex min-h-11 items-center gap-2 rounded-xl border bg-white px-3 text-[13px] font-semibold ${available ? "border-[#246b48]/25 text-[var(--status-positive)]" : "border-[var(--border)] text-[var(--text-secondary)]"}`} key={label}>
             <Icon className="size-3.5" />
-            {label}
+            {label} {available ? "added" : "not added"}
           </span>
         ))}
       </div>
@@ -99,7 +98,7 @@ export function AnalysisProgress() {
         >
           <div className="h-full rounded-full bg-[#ff6b3d] transition-[width] duration-300 motion-reduce:transition-none" style={{ width: `${progress}%` }} />
         </div>
-        <p aria-live="polite" className="mt-3 text-xs font-medium text-[#8b8276]">{progress}%</p>
+        <p className="mt-3 text-[13px] font-medium text-[var(--text-secondary)]">{progress}%</p>
       </div>
     </div>
   );

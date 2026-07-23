@@ -39,13 +39,13 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
   ]);
 
   for (const phrase of [
-    "Funding Readiness Score",
+    "Funding readiness",
     "Strongest signal",
     "Biggest risk",
     "Evidence coverage",
     "Missing proof",
     "Best next move",
-    "Preview opportunities",
+    "Opportunity preview",
     "Investors and VC firms",
     "Accelerators",
     "Incubators",
@@ -53,12 +53,13 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
   ]) {
     assert.match(`${report}\n${fixtures}`, new RegExp(phrase));
   }
-  assert.match(report, /Preview example/);
+  assert.match(report, /Preview sample/);
+  assert.doesNotMatch(report, /Preview example/);
   assert.match(report, /Preview methodology/);
   assert.match(report, /<details/);
   const dimensionSummary = report.match(/<summary className="cursor-pointer list-none[\s\S]*?<\/summary>/)?.[0] ?? "";
   assert.doesNotMatch(dimensionSummary, /dimension\.explanation/);
-  assert.match(report, /compactMatchReason\(match\.category\)/);
+  assert.match(report, /opportunityReasonSummary\(match\.reason\)/);
   assert.doesNotMatch(report, /\{match\.previewSignal\} · \{match\.sourceStatus\}/);
   assert.doesNotMatch(report, /live verified|verified matches/i);
   assert.doesNotMatch(report, /Deterministic Preview fixtures/);
@@ -75,7 +76,10 @@ test("the Preview dashboard is premium, compact, and groups the locked workspace
   assert.match(sourceText, /Optimize/);
   assert.match(sourceText, /Reach/);
   assert.match(sourceText, /Manage/);
-  assert.match(sourceText, /Preview example/);
+  assert.match(sourceText, /Preview examples · not live recommendations/);
+  assert.doesNotMatch(sourceText, /Preview example<\/span>/);
+  assert.match(sourceText, /type-score/);
+  assert.match(sourceText, /Review unlock options/);
   assert.doesNotMatch(sourceText, /Tab-local Preview workspace/);
   assert.doesNotMatch(sourceText, /deterministic fixtures/);
   assert.doesNotMatch(sourceText, /Browser persistence/);

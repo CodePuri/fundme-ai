@@ -33,11 +33,14 @@ export function AssessmentShell({
 
   return (
     <main className="min-h-screen bg-[var(--bg)] text-[var(--text-primary)]" data-theme="public">
-      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[#f6f1ea]/92 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1240px] items-center justify-between gap-4 px-4 py-3 sm:px-6 xl:px-8">
+      <a className="sr-only z-50 rounded-md bg-white px-4 py-3 font-semibold focus:not-sr-only focus:fixed focus:left-4 focus:top-4" href="#assessment-content">
+        Skip to assessment
+      </a>
+      <header className="sticky top-0 z-40 border-b border-[var(--border)] bg-[#f7f3ed]/94 backdrop-blur-xl">
+        <div className="mx-auto flex h-[68px] max-w-[var(--content-max)] items-center justify-between gap-4 px-4 sm:h-[76px] sm:px-6 lg:px-10">
           <Link aria-label="FundMe home" href="/"><BrandLockup size="sm" /></Link>
           <div className="flex items-center gap-2">
-            <span className="hidden text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--text-muted)] sm:inline">Preview assessment</span>
+            <span className="hidden text-[13px] font-medium text-[var(--text-secondary)] sm:inline">Preview assessment</span>
             <Button aria-label="Restart assessment" onClick={handleRestart} size="sm" variant="ghost">
               <RotateCcw className="size-3.5" />
               <span className="hidden sm:inline">Restart</span>
@@ -46,12 +49,12 @@ export function AssessmentShell({
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-[1240px] px-4 pb-20 pt-6 sm:px-6 sm:pt-8 xl:px-8">
-        <nav aria-label="Assessment progress" className="mb-8 grid grid-cols-3 gap-2">
+      <div className="mx-auto w-full max-w-[var(--content-max)] px-4 pb-20 pt-5 sm:px-6 sm:pt-7 lg:px-10" id="assessment-content">
+        <nav aria-label="Assessment progress" className="mb-7 grid grid-cols-3 gap-2">
           {STEPS.map((step, index) => (
             <div key={step.stage} className="min-w-0">
               <div className={`h-1 rounded-full ${index <= currentIndex ? "bg-[#ff6b3d]" : "bg-black/10"}`} />
-              <span className={`mt-2 block truncate text-[10px] font-bold uppercase tracking-[0.12em] ${index === currentIndex ? "text-[#171513]" : "text-[#8b8276]"}`}>
+              <span className={`mt-2 block truncate text-[13px] font-medium ${index === currentIndex ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"}`}>
                 {step.label}
               </span>
             </div>

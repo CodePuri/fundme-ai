@@ -75,17 +75,20 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
   if (pathname === "/app/preview") {
     return (
       <div className="min-h-screen bg-[#f6f1ea] text-[#171513]" data-theme="public">
-        <header className="sticky top-0 z-30 border-b border-black/8 bg-[#f6f1ea]/95 backdrop-blur">
-          <div className="mx-auto flex max-w-[1180px] items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <a className="sr-only z-50 rounded-md bg-white px-4 py-3 font-semibold focus:not-sr-only focus:fixed focus:left-4 focus:top-4" href="#preview-content">
+          Skip to Preview dashboard
+        </a>
+        <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[#f7f3ed]/95 backdrop-blur">
+          <div className="mx-auto flex h-[68px] max-w-[var(--content-max)] items-center justify-between gap-4 px-4 sm:h-[76px] sm:px-6 lg:px-10">
             <Link aria-label="FundMe home" href="/"><BrandLockup size="sm" /></Link>
             <div className="flex items-center gap-2">
-              <Link className="hidden text-xs font-semibold text-[#6f685f] hover:text-[#171513] sm:block" href="/assessment/result">Assessment</Link>
-              <Link className="rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-semibold hover:border-black/20" href="/search">Explore</Link>
+              <Link className="hidden min-h-11 items-center rounded-md px-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:flex" href="/assessment/result">Assessment</Link>
+              <Link className="inline-flex min-h-11 items-center rounded-full border border-[var(--border)] bg-white px-4 text-[13px] font-semibold hover:border-[var(--border-strong)]" href="/search">Explore</Link>
               <span aria-label="Preview profile" className="grid size-10 place-items-center rounded-full bg-[#171513] text-white"><CircleUserRound className="size-4" /></span>
             </div>
           </div>
         </header>
-        <main className="mx-auto max-w-[1180px] px-4 py-7 sm:px-6 sm:py-10">{children}</main>
+        <main className="mx-auto max-w-[var(--content-max)] px-4 py-7 sm:px-6 sm:py-9 lg:px-10" id="preview-content">{children}</main>
       </div>
     );
   }

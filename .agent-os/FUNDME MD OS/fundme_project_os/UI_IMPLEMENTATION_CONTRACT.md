@@ -2,7 +2,7 @@
 
 Status: Canonical visual and interaction authority for engineering
 Owner: Aakash Puri + Engineering
-Version: 1.2
+Version: 1.3
 Date: 2026-07-23
 
 ## Authority order
@@ -23,6 +23,10 @@ FundMe should feel like a precise founder mentor: calm, editorial, credible, dir
 
 The Phase 1 experience extends the existing visual language. It does not invent a replacement design system.
 
+The accepted functional structure is visually governed by a compact premium system: Geist Sans for all operational UI and data, Instrument Serif for at most one major verdict per screen, semantic contrast tokens, an 8px spacing rhythm, restrained surfaces, and information-dense cards. Cormorant and Playfair are not used in the assessment, result, or Preview-dashboard surfaces.
+
+Astryx is a read-only consistency benchmark. Its packages, reset, themes, and StyleX foundation are not installed; see `ASTRYX_ADOPTION_DECISION.md`.
+
 ## Production patterns reused
 
 - warm cream page background (`--bg`, `#f6f1ea`)
@@ -30,8 +34,8 @@ The Phase 1 experience extends the existing visual language. It does not invent 
 - near-black primary text and controls
 - orange action accent (`--button-primary-bg`, `#ff6b3d`)
 - restrained green/amber/blue semantic accents
-- Geist Sans body typography with the existing Instrument Serif/Cormorant editorial accents where already appropriate
-- rounded cards and pills, fine low-contrast borders, soft shadows, generous whitespace
+- Geist Sans for navigation, controls, data, score numerals, headings, cards, and body copy; Instrument Serif only for the diagnosis verdict
+- restrained 18px cards, limited pills, clear borders, subtle hierarchy shadows, and compact whitespace
 - existing responsive page frame, focus ring, reduced-motion handling, and print styles
 - `BrandLockup`, `Button`, `Input`, and `Textarea` behavior and styling
 
@@ -47,8 +51,8 @@ The Phase 1 experience extends the existing visual language. It does not invent 
 - `AssessmentShell`: brand, local Preview label, three-stage progress, responsive frame, and restart control.
 - `IntakeGrid`: one-screen founder, LinkedIn/profile source, website, deck, and fallback-description intake.
 - `AnalysisProgress`: supported local evidence/scoring stages without fake extraction or percentages.
-- `FundingReadinessReport`: compact score hero, dimensions, evidence basis, paired gaps/actions, founder/startup/deck boundaries, opportunity fixtures, export/share, and auth handoff.
-- `PreviewDashboard`: saved local score, key weakness, next action, limited fixture matches, free links, and explicitly locked optimization.
+- `FundingReadinessReport`: above-fold score/verdict/risk/coverage/actions, compact dimensions, paired gaps/actions, source boundaries, credible opportunity fixtures, export/share, and auth handoff.
+- `PreviewDashboard`: one coherent saved-assessment summary, compact category navigation, limited opportunity fixtures, and one aspirational Optimize / Reach / Manage conversion section.
 
 ## Route map
 
@@ -66,10 +70,10 @@ Legacy review/mentor/question routes recover to intake; they do not remain prima
 
 ## Desktop structure
 
-- Intake: centered editorial surface with a three-step header and two-column source grid where space permits.
-- Analysis: concise editorial explanation plus supported local stage list.
+- Intake: compact header, one short benefit statement, founder field, and three equal source cards.
+- Analysis: one centered visual focus, one real status line, available-source indicators, and one progress bar.
 - Result: above-fold score/verdict, dense two-column dimensions, paired gaps/actions, compact founder/startup/deck review, fixture opportunity teaser, then conversion.
-- Preview workspace: no sidebar; compact score summary, four categories, limited match list, free links, and locked optimization.
+- Preview workspace: no sidebar; coherent score summary, four compact category links, four neutral opportunity cards, and one shared early-access conversion section.
 
 ## Mobile structure
 
@@ -171,6 +175,9 @@ These are later optimization-workspace references only and are not implemented i
 - reduced motion removes decorative movement without hiding content
 - mentor/analysis status uses polite live regions
 - report remains readable and printable without motion
+- normal text and controls meet WCAG AA contrast targets
+- customer-facing text is at least 13px and controls are at least 44px on mobile
+- layouts remain usable at 200% text enlargement without horizontal overflow
 
 ## Acceptance rule
 
