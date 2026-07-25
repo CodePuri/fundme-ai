@@ -117,6 +117,7 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
                 </div>
               </div>
               <button
+                aria-label={`Remove ${file}`}
                 className="flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)] transition-colors"
                 onClick={(e) => {
                   e.stopPropagation();
