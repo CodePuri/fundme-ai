@@ -63,7 +63,7 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
   return (
     <div className={`flex flex-col gap-4 ${className}`}>
       <div
-        className={`relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-[16px] border-2 border-dashed transition-colors ${
+        className={`relative flex min-h-[200px] cursor-pointer flex-col items-center justify-center rounded-[16px] border-2 border-dashed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--surface)] ${
           isDragging
             ? "border-[var(--text-primary)] bg-[var(--surface-elevated)] opacity-90"
             : "border-[var(--border-strong)] bg-[var(--surface-elevated)] hover:bg-[var(--surface)]"
@@ -73,6 +73,14 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
         onDragLeave={handleDrag}
         onDragOver={handleDrag}
         onDrop={handleDrop}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            inputRef.current?.click();
+          }
+        }}
+        role="button"
+        tabIndex={0}
       >
         <input
           multiple
@@ -117,7 +125,8 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
                 </div>
               </div>
               <button
-                className="flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)] transition-colors"
+                aria-label={`Remove ${file}`}
+                className="flex size-7 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] hover:bg-[var(--surface)] hover:text-[var(--text-primary)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-1 focus-visible:ring-offset-[var(--surface-elevated)]"
                 onClick={(e) => {
                   e.stopPropagation();
                   removeFile(file);
