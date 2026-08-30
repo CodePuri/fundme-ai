@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useEffect, useState, useRef } from "react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import {
   ArrowRight,
   BadgeIndianRupee,
@@ -10,7 +10,9 @@ import {
   FilePenLine,
   Landmark,
   LockKeyhole,
+  LogOut,
   Mail,
+  RefreshCw,
   Rocket,
   Rows3,
   ShieldCheck,
@@ -18,28 +20,20 @@ import {
   UserRound,
 } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import { useDemo } from "@/components/app/demo-provider";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { Button } from "@/components/ui/button";
 import { getPreviewMatches, PREVIEW_MATCH_CATEGORIES } from "@/lib/assessment/preview-matches";
-
-function ClerkIdentityBridge() {
-  const { isLoaded, isSignedIn } = useUser();
-  const { state, signIn } = useDemo();
-
-  useEffect(() => {
-    if (isLoaded && isSignedIn && !state.isAuthenticated) signIn();
-  }, [isLoaded, isSignedIn, signIn, state.isAuthenticated]);
-
-  return null;
-}
+import type { FundingReadinessReport } from "@/lib/assessment/types";
 
 function CategoryIcon({ label }: { label: string }) {
-  if (label.includes("Accelerator")) return <Rocket className="size-4" />;
-  if (label.includes("Incubator")) return <Building2 className="size-4" />;
-  if (label.includes("Grant")) return <Landmark className="size-4" />;
-  return <BadgeIndianRupee className="size-4" />;
+  const className = "size-4";
+  if (label.includes("Accelerator")) return <Rocket className={className} />;
+  if (label.includes("Incubator")) return <Building2 className={className} />;
+  if (label.includes("Grant")) return <Landmark className={className} />;
+  return <BadgeIndianRupee className={className} />;
 }
 
 function opportunityReasonSummary(reason: string): string {
@@ -76,19 +70,123 @@ const MATCH_TONES = [
 ];
 
 export function PreviewDashboard() {
-  const { state, hasHydrated } = useDemo();
+  const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
+  const { signOut } = useClerk();
+  const { state, signIn, hasHydrated: demoHydrated } = useDemo();
   const { session } = useAssessment();
+  const searchParams = useSearchParams();
   const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-  const report = session.report;
 
-  if (!hasHydrated) {
-    return <div className="premium-card p-8 text-[15px] text-[var(--text-secondary)]">Opening your Preview workspace…</div>;
+  const [serverAssessment, setServerAssessment] = useState<any>(null);
+  const [serverFounder, setServerFounder] = useState<any>(null);
+  const [serverStartup, setServerStartup] = useState<any>(null);
+  const [loadingServer, setLoadingServer] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
+  const claimedRef = useRef(false);
+
+  // Auto-sync Clerk sign-in state to Demo state
+  useEffect(() => {
+    if (clerkLoaded && isSignedIn && !state.isAuthenticated) {
+      signIn();
+    }
+  }, [clerkLoaded, isSignedIn, signIn, state.isAuthenticated]);
+
+  // Load from server on Clerk authentication
+  useEffect(() => {
+    if (!clerkLoaded || !isSignedIn || claimedRef.current) return;
+
+    claimedRef.current = true;
+    const urlClaimToken = searchParams.get("claim_token");
+    let localClaimToken: string | null = null;
+    try {
+      localClaimToken = window.localStorage.getItem("fundme-claim-token");
+    } catch {}
+
+    const claimToken = urlClaimToken || localClaimToken || session.claimToken;
+
+    async function syncAndFetch() {
+      setLoadingServer(true);
+      try {
+        // 1. If we have a claim token or local session, save/claim to server
+        if (claimToken || (session.report && session.input.founderName)) {
+          setSaveStatus("Saving assessment to your account...");
+          await fetch("/api/assessment/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              claimToken: claimToken || undefined,
+              session: session.report ? session : undefined,
+            }),
+          });
+          try {
+            window.localStorage.removeItem("fundme-claim-token");
+          } catch {}
+          setSaveStatus(null);
+        }
+
+        // 2. Fetch latest saved assessment from server
+        const res = await fetch("/api/assessment/latest");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.hasAssessment) {
+            setServerAssessment(data.assessment);
+            setServerFounder(data.founder);
+            setServerStartup(data.startup);
+          }
+        }
+      } catch (err) {
+        console.warn("Error syncing or loading assessment from server:", err);
+      } finally {
+        setLoadingServer(false);
+      }
+    }
+
+    syncAndFetch();
+  }, [clerkLoaded, isSignedIn, searchParams, session]);
+
+  if (!demoHydrated || (isSignedIn && loadingServer && !serverAssessment)) {
+    return <div className="premium-card p-8 text-[15px] text-[var(--text-secondary)]">Opening your saved assessment workspace…</div>;
   }
 
-  if (!state.isAuthenticated) {
+  // Determine active report and names
+  const report: FundingReadinessReport | null = serverAssessment ? {
+    rubricVersion: serverAssessment.rubric_version || "fundme-demo-rubric@1",
+    generatedAt: serverAssessment.created_at,
+    readinessScore: serverAssessment.readiness_score,
+    verdict: serverAssessment.verdict,
+    conciseVerdict: serverAssessment.concise_verdict || serverAssessment.verdict,
+    evidenceCoverage: serverAssessment.evidence_coverage,
+    confidence: serverAssessment.confidence,
+    completionState: serverAssessment.completion_state,
+    tractionState: serverAssessment.traction_state,
+    strongestDimension: serverAssessment.strongest_dimension,
+    weakestDimension: serverAssessment.weakest_dimension,
+    dimensions: serverAssessment.dimensions || [],
+    evidence: serverAssessment.evidence || [],
+    findings: serverAssessment.findings || [],
+    founderReview: serverAssessment.founder_review || { credibility: "", founderMarketFit: "", profilePositioning: "" },
+    startupReview: serverAssessment.startup_review || { problem: "", solution: "", market: "", differentiation: "", traction: "", fundingNarrative: "" },
+    deckReview: serverAssessment.deck_review || { status: "not-provided", summary: "", findings: [] },
+    actions: serverAssessment.actions || [],
+  } : session.report;
+
+  const founderName = serverFounder?.name
+    || serverAssessment?.founder_name
+    || user?.fullName
+    || user?.firstName
+    || session.input.founderName.trim()
+    || "Founder";
+
+  const startupName = serverStartup?.startup_name
+    || serverAssessment?.startup_name
+    || session.input.startupName.trim()
+    || "Your startup";
+
+  const isAuthenticated = state.isAuthenticated || isSignedIn;
+
+  if (!isAuthenticated && !serverAssessment) {
     return (
       <section className="premium-card mx-auto max-w-xl p-6 text-center sm:p-8">
-        {clerkConfigured ? <ClerkIdentityBridge /> : null}
         <LockKeyhole className="mx-auto size-6 text-[#ff6b3d]" />
         <h1 className="type-section-title mt-3">Save this assessment first.</h1>
         <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]">Return to your result to continue into the Preview workspace.</p>
@@ -113,8 +211,6 @@ export function PreviewDashboard() {
   const matches = getPreviewMatches();
   const weakest = report.dimensions.find((dimension) => dimension.id === report.weakestDimension);
   const nextAction = report.actions[0];
-  const founderName = session.input.founderName.trim() || "Founder";
-  const startupName = session.input.startupName.trim() || "Your startup";
 
   return (
     <div className="mx-auto max-w-[1080px]">
@@ -126,8 +222,30 @@ export function PreviewDashboard() {
             <p className="truncate text-[13px] text-[var(--text-secondary)]">{startupName}</p>
           </div>
         </div>
-        <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#246b48]/20 bg-[#f3fbf6] px-3 py-1.5 text-[13px] font-semibold text-[var(--status-positive)]"><ShieldCheck aria-hidden="true" className="size-3.5" />Saved assessment</span>
+        <div className="flex items-center gap-3">
+          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#246b48]/20 bg-[#f3fbf6] px-3 py-1.5 text-[13px] font-semibold text-[var(--status-positive)]">
+            <ShieldCheck aria-hidden="true" className="size-3.5" />
+            {serverAssessment ? "Saved to account" : "Saved assessment"}
+          </span>
+          {isSignedIn ? (
+            <button
+              onClick={() => signOut({ redirectUrl: "/" })}
+              className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-[var(--border)] bg-white px-3 text-[13px] font-medium text-[var(--text-secondary)] hover:bg-black/5"
+              type="button"
+            >
+              <LogOut className="size-3.5" />
+              Sign out
+            </button>
+          ) : null}
+        </div>
       </header>
+
+      {saveStatus ? (
+        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 flex items-center gap-2">
+          <RefreshCw className="size-4 animate-spin" />
+          {saveStatus}
+        </div>
+      ) : null}
 
       <section className="premium-card mt-5 grid overflow-hidden md:grid-cols-[170px_minmax(0,1fr)_240px]">
         <div className="flex items-center gap-4 border-b border-[var(--border)] p-5 md:block md:border-b-0 md:border-r">

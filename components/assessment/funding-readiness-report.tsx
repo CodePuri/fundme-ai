@@ -426,7 +426,12 @@ export function FundingReadinessReport() {
               <Link
                 ref={googleButtonRef}
                 className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] px-5 text-sm font-medium text-[var(--button-primary-text)] transition-colors hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2"
-                href="/sign-in?redirect_url=%2Fapp%2Fpreview"
+                href={session.claimToken ? `/sign-in?redirect_url=${encodeURIComponent(`/app/preview?claim_token=${session.claimToken}`)}` : "/sign-in?redirect_url=%2Fapp%2Fpreview"}
+                onClick={() => {
+                  if (session.claimToken) {
+                    try { window.localStorage.setItem("fundme-claim-token", session.claimToken); } catch {}
+                  }
+                }}
               >
                 Continue with Google
                 <ArrowRight className="size-4" />

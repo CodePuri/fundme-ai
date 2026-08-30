@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 
@@ -61,6 +62,7 @@ function eventId(prefix: string, timestamp: string): string {
 export function AssessmentProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<GrillSession>(() => createInitialSession());
   const [hasHydrated, setHasHydrated] = useState(false);
+  const fileMapRef = useRef<Map<string, File>>(new Map());
 
   useEffect(() => {
     const hydrationTimer = window.setTimeout(() => {
@@ -104,6 +106,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     const validation = validateFile(file, kind);
     if (!validation.valid) return validation.error;
     const timestamp = now();
+    fileMapRef.current.set(kind, file);
     setSession((current) => ({
       ...current,
       artifacts: [
@@ -125,13 +128,17 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const removeArtifact = useCallback((id: string) => {
+    const artifactToRemove = session.artifacts.find((a) => a.id === id);
+    if (artifactToRemove) {
+      fileMapRef.current.delete(artifactToRemove.kind);
+    }
     setSession((current) => ({
       ...current,
       artifacts: current.artifacts.filter((artifact) => artifact.id !== id),
       report: null,
       updatedAt: now(),
     }));
-  }, []);
+  }, [session.artifacts]);
 
   const submitIntake = useCallback((): IntakeValidation => {
     const validation = validateIntake(session.input, session.artifacts);
@@ -183,24 +190,24 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         answers,
         processingState: resolvedCount >= 5 ? "ready" : "questioning",
         conversation: [
-        ...current.conversation,
-        ...(current.conversation.some((event) => event.questionId === question.id && event.kind === "question") ? [] : [{
-          id: eventId(`mentor-${question.id}`, timestamp),
-          role: "mentor" as const,
-          kind: "question" as const,
-          questionId: question.id,
-          content: question.prompt,
-          createdAt: timestamp,
-        }]),
-        {
-          id: eventId(`founder-${question.id}`, timestamp),
-          role: "founder",
-          kind: "answer",
-          questionId: question.id,
-          content: trimmed,
-          source,
-          createdAt: timestamp,
-        },
+          ...current.conversation,
+          ...(current.conversation.some((event) => event.questionId === question.id && event.kind === "question") ? [] : [{
+            id: eventId(`mentor-${question.id}`, timestamp),
+            role: "mentor" as const,
+            kind: "question" as const,
+            questionId: question.id,
+            content: question.prompt,
+            createdAt: timestamp,
+          }]),
+          {
+            id: eventId(`founder-${question.id}`, timestamp),
+            role: "founder",
+            kind: "answer",
+            questionId: question.id,
+            content: trimmed,
+            source,
+            createdAt: timestamp,
+          },
         ],
         report: null,
         updatedAt: timestamp,
@@ -217,20 +224,20 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       const skippedQuestionIds = [...current.skippedQuestionIds, question.id];
       const resolvedCount = Object.keys(current.answers).length + skippedQuestionIds.length;
       return {
-      ...current,
-      skippedQuestionIds,
-      processingState: resolvedCount >= 5 ? "ready" : "questioning",
-      conversation: [...current.conversation, {
-        id: eventId(`skip-${question.id}`, timestamp),
-        role: "system",
-        kind: "skip",
-        questionId: question.id,
-        content: `Skipped: ${question.prompt}`,
-        createdAt: timestamp,
-      }],
-      report: null,
-      updatedAt: timestamp,
-    };
+        ...current,
+        skippedQuestionIds,
+        processingState: resolvedCount >= 5 ? "ready" : "questioning",
+        conversation: [...current.conversation, {
+          id: eventId(`skip-${question.id}`, timestamp),
+          role: "system",
+          kind: "skip",
+          questionId: question.id,
+          content: `Skipped: ${question.prompt}`,
+          createdAt: timestamp,
+        }],
+        report: null,
+        updatedAt: timestamp,
+      };
     });
   }, [session]);
 
@@ -244,8 +251,57 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     }));
   }, []);
 
-  const generateReport = useCallback(() => {
+  const generateReport = useCallback(async () => {
     const timestamp = now();
+
+    // 1. Try real server-side analysis with ingestion & PDF parsing
+    if (typeof window !== "undefined" && typeof fetch === "function") {
+      try {
+        const formData = new FormData();
+        formData.append("founderName", session.input.founderName || "");
+        formData.append("founderRole", session.input.founderRole || "");
+        formData.append("startupName", session.input.startupName || "");
+        formData.append("websiteUrl", session.input.websiteUrl || "");
+        formData.append("linkedInUrl", session.input.linkedInUrl || "");
+        formData.append("description", session.input.description || "");
+        formData.append("profileText", session.input.profileText || "");
+        formData.append("answers", JSON.stringify(session.answers));
+
+        const deckFile = fileMapRef.current.get("pitch-deck");
+        if (deckFile) formData.append("pitchDeck", deckFile);
+
+        const profileFile = fileMapRef.current.get("founder-profile");
+        if (profileFile) formData.append("founderProfile", profileFile);
+
+        const res = await fetch("/api/assessment/analyze", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.report) {
+            if (data.claimToken) {
+              try { window.localStorage.setItem("fundme-claim-token", data.claimToken); } catch {}
+            }
+            setSession((current) => ({
+              ...current,
+              ...(data.session || {}),
+              stage: "result",
+              processingState: data.report.completionState,
+              report: data.report,
+              claimToken: data.claimToken || current.claimToken,
+              updatedAt: timestamp,
+            }));
+            return;
+          }
+        }
+      } catch (err) {
+        console.warn("Server analysis fallback to local assessment engine:", err);
+      }
+    }
+
+    // 2. Deterministic local engine fallback
     setSession((current) => {
       const report = assessSession(current, timestamp);
       return {
@@ -256,7 +312,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         updatedAt: timestamp,
       };
     });
-  }, []);
+  }, [session.answers, session.input]);
 
   const setEarlyAccessDraft = useCallback((email: string) => {
     setSession((current) => ({
@@ -275,6 +331,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
   }, [session]);
 
   const restart = useCallback(() => {
+    fileMapRef.current.clear();
     try {
       clearSession(window.localStorage);
       setSession(createInitialSession());

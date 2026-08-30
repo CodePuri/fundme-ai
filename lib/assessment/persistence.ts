@@ -136,7 +136,7 @@ function validReport(value: unknown): boolean {
   const startupReview = value.startupReview;
   const startupValid = record(startupReview) && ["problem", "solution", "market", "differentiation", "traction", "fundingNarrative"]
     .every((key) => boundedString(startupReview[key], 3_000));
-  const deckValid = record(value.deckReview) && new Set(["not-provided", "received-unparsed"]).has(String(value.deckReview.status))
+  const deckValid = record(value.deckReview) && new Set(["not-provided", "received-unparsed", "parsed"]).has(String(value.deckReview.status))
     && boundedString(value.deckReview.summary, 3_000) && stringArray(value.deckReview.findings, 20, 1_000);
 
   return value.rubricVersion === "fundme-demo-rubric@1"

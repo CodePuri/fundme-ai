@@ -378,24 +378,35 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   const founderFit = answer(session, "founder-fit");
   const differentiation = answer(session, "differentiation");
   const fundingOutcome = answer(session, "funding-outcome");
-  const hasDeck = session.artifacts.some(
+  
+  const deckArtifact = session.artifacts.find(
     (artifact) => artifact.kind === "pitch-deck" && artifact.status === "attached",
   );
+  const hasDeck = Boolean(deckArtifact);
+  const isDeckParsed = Boolean(deckArtifact?.extractedText || (deckArtifact?.detectedSections && deckArtifact.detectedSections.length > 0));
+  
   const description = session.input.description.trim();
   const profile = session.input.profileText.trim();
   const linkedInUrl = session.input.linkedInUrl?.trim() ?? "";
   const founderProfileArtifact = session.artifacts.find(
     (artifact) => artifact.kind === "founder-profile" && artifact.status === "attached",
   );
+  const isResumeParsed = Boolean(founderProfileArtifact?.extractedText);
   const hasFounderProfileEvidence = Boolean(profile || linkedInUrl || founderProfileArtifact);
   const founderProfileEvidenceValue = profile
+    || (isResumeParsed ? `Parsed resume: ${founderProfileArtifact!.name}` : "")
     || (linkedInUrl ? "Founder-submitted LinkedIn profile URL; contents not fetched" : "")
     || (founderProfileArtifact ? `${founderProfileArtifact.name}; contents not parsed` : "Not supplied");
+  
   const website = session.input.websiteUrl.trim();
+  const websiteExtractedText = session.input.extractedWebsiteText?.trim() || "";
+  const websiteTitle = session.input.websiteTitle?.trim() || "";
+  const websiteDescription = session.input.websiteDescription?.trim() || "";
+  const hasWebsiteContent = Boolean(websiteExtractedText || websiteTitle || websiteDescription);
 
   const evidence: EvidenceReference[] = [
     { id: "startup-description", label: "Startup description", value: description || "Not supplied", state: description ? "submitted" : "missing" },
-    { id: "startup-website", label: "Startup website", value: website || "Not supplied", state: website ? "submitted" : "missing" },
+    { id: "startup-website", label: "Startup website", value: website ? (hasWebsiteContent ? `${website} (extracted: ${websiteTitle || websiteDescription || "live content"})` : website) : "Not supplied", state: website ? "submitted" : "missing" },
     { id: "founder-name", label: "Founder name", value: session.input.founderName.trim(), state: "submitted" },
     { id: "founder-role", label: "Founder role", value: session.input.founderRole.trim() || "Not supplied", state: session.input.founderRole.trim() ? "submitted" : "missing" },
     { id: "founder-profile", label: "Founder profile", value: founderProfileEvidenceValue, state: hasFounderProfileEvidence ? "submitted" : "missing" },
@@ -404,14 +415,47 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     { id: "founder-fit-answer", label: "Founder-market fit", value: founderFit || "Not answered", state: founderFit ? "submitted" : "missing" },
     { id: "differentiation-answer", label: "Differentiation", value: differentiation || "Not answered", state: differentiation ? "submitted" : "missing" },
     { id: "funding-answer", label: "Funding outcome", value: fundingOutcome || "Not answered", state: fundingOutcome ? "submitted" : "missing" },
-    { id: "pitch-deck", label: "Pitch deck", value: hasDeck ? "Attached; contents not parsed" : "Not supplied", state: hasDeck ? "attached" : "missing" },
+    { id: "pitch-deck", label: "Pitch deck", value: isDeckParsed ? `Parsed ${deckArtifact!.pageCount || 1} slides (${deckArtifact!.name})` : (hasDeck ? "Attached; contents not parsed" : "Not supplied"), state: hasDeck ? (isDeckParsed ? "submitted" : "attached") : "missing" },
   ];
+
+  // Scoring pitch deck
+  let deckScore = 30;
+  let deckExplanation = "No deck was supplied, so deck contents were not assessed.";
+  let deckMissing: string[] = ["Pitch deck"];
+  let deckStatus: "not-provided" | "received-unparsed" | "parsed" = "not-provided";
+  let deckSummary = "No pitch deck was provided, so no deck analysis was performed.";
+  const deckFindings: string[] = [];
+
+  if (isDeckParsed && deckArtifact) {
+    deckStatus = "parsed";
+    const detected = deckArtifact.detectedSections || [];
+    const sectionCount = detected.length;
+    deckScore = Math.min(88, 52 + sectionCount * 5 + ((deckArtifact.pageCount || 1) >= 6 && (deckArtifact.pageCount || 1) <= 20 ? 8 : 2));
+    deckExplanation = `Parsed ${deckArtifact.pageCount || 1} slides from ${deckArtifact.name}. Detected core sections: ${detected.join(", ") || "General content"}.`;
+    deckMissing = ["problem", "solution", "traction", "team", "funding-ask"]
+      .filter((s) => !detected.includes(s))
+      .map((s) => `Explicit ${s.replace("-", " ")} slide`);
+    deckSummary = `The pitch deck (${deckArtifact.name}) was parsed into ${deckArtifact.pageCount || 1} slides with ${detected.length} core sections identified.`;
+    if (detected.includes("traction")) deckFindings.push("Deck includes dedicated traction and metrics data.");
+    if (detected.includes("problem") && detected.includes("solution")) deckFindings.push("Clear problem-solution narrative structure detected.");
+    if (!detected.includes("funding-ask")) deckFindings.push("Missing explicit round size, runway, and milestone slide.");
+  } else if (hasDeck) {
+    deckStatus = "received-unparsed";
+    deckScore = 45;
+    deckExplanation = "A deck was attached, but this Preview does not parse or evaluate its contents.";
+    deckMissing = ["Parsed slide evidence and narrative review"];
+    deckSummary = "The pitch deck was received as attachment metadata. Its contents were not parsed or analyzed in this Preview.";
+  }
+
+  // Founder credibility score
+  const founderText = `${session.input.founderName} ${session.input.founderRole} ${profile} ${isResumeParsed ? founderProfileArtifact?.extractedText || "" : ""}`;
+  const founderCredibilityScore = evidenceScore(founderText, 26) + (linkedInUrl || founderProfileArtifact ? 4 : 0);
 
   const dimensions: DimensionScore[] = [
     dimension(
       "founder-credibility",
-      evidenceScore(`${session.input.founderName} ${session.input.founderRole} ${profile}`, 26) + (linkedInUrl || founderProfileArtifact ? 4 : 0),
-      profile
+      founderCredibilityScore,
+      profile || isResumeParsed
         ? "The submitted founder text establishes a reviewable credibility signal."
         : hasFounderProfileEvidence
           ? "Founder profile metadata was supplied, but its contents were not fetched or parsed."
@@ -428,16 +472,24 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     ),
     dimension(
       "problem-clarity",
-      evidenceScore(description, 32),
-      description ? "This score uses only the submitted one-line startup description." : "No startup description was supplied; a website address or deck file is not treated as extracted problem evidence.",
-      description ? ["startup-description"] : [],
+      evidenceScore(description || (hasWebsiteContent ? `${websiteTitle} ${websiteDescription}` : ""), 32),
+      description
+        ? "This score uses only the submitted one-line startup description."
+        : (hasWebsiteContent
+          ? "Problem signals extracted from the submitted startup website."
+          : "No startup description was supplied; a website address or deck file is not treated as extracted problem evidence."),
+      description ? ["startup-description"] : (hasWebsiteContent ? ["startup-website"] : []),
       ["A quantified customer pain signal"],
     ),
     dimension(
       "solution-clarity",
-      evidenceScore(description, 30),
-      description ? "The submitted description identifies the proposed product outcome, but not a verified product walkthrough." : "No solution description was supplied, and this Preview does not infer one from a URL or unparsed deck.",
-      description ? ["startup-description"] : [],
+      evidenceScore(description || (hasWebsiteContent ? websiteDescription : ""), 30),
+      description
+        ? "The submitted description identifies the proposed product outcome, but not a verified product walkthrough."
+        : (hasWebsiteContent
+          ? "Solution signals extracted from the submitted startup website."
+          : "No solution description was supplied, and this Preview does not infer one from a URL or unparsed deck."),
+      description ? ["startup-description"] : (hasWebsiteContent ? ["startup-website"] : []),
       ["Product workflow or usage evidence"],
     ),
     dimension(
@@ -483,17 +535,17 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     ),
     dimension(
       "pitch-deck-readiness",
-      hasDeck ? 45 : 30,
-      hasDeck ? "A deck was attached, but this Preview does not parse or evaluate its contents." : "No deck was supplied, so deck contents were not assessed.",
+      deckScore,
+      deckExplanation,
       hasDeck ? ["pitch-deck"] : [],
-      hasDeck ? ["Parsed slide evidence and narrative review"] : ["Pitch deck"],
+      deckMissing,
     ),
   ];
 
   const findings: Finding[] = [];
   if (tractionClassification.state === "missing") findings.push(missingFinding("missing-traction", "traction-proof", "No traction information was submitted.", "Add one verifiable traction metric with a date."));
   if (tractionClassification.state === "none") findings.push(missingFinding("no-current-traction", "traction-proof", "The founder explicitly reported no current traction.", "Define the first measurable traction milestone and its target date."));
-  if (!description) findings.push(missingFinding("missing-startup-description", "problem-clarity", "No startup description was submitted, and the Preview did not extract claims from the website or deck.", "Add one sentence naming the customer, problem, and product approach."));
+  if (!description && !hasWebsiteContent) findings.push(missingFinding("missing-startup-description", "problem-clarity", "No startup description was submitted, and the Preview did not extract claims from the website or deck.", "Add one sentence naming the customer, problem, and product approach."));
   if (!founderFit) findings.push(missingFinding("missing-founder-fit", "founder-market-fit", "Founder-market fit is unsupported.", "Explain the team's relevant experience, access, or insight."));
   if (!differentiation) findings.push(missingFinding("missing-differentiation", "differentiation", "The current alternative and switching reason are missing.", "Name the buyer's current workaround and why they would switch."));
   if (!fundingOutcome) findings.push(missingFinding("missing-funding-outcome", "funding-narrative", "The round is not connected to a measurable milestone.", "State the raise, runway, use of funds, and target milestone."));
@@ -585,7 +637,7 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     founderReview: {
       credibility: dimensions[0].explanation,
       founderMarketFit: dimensions[1].explanation,
-      profilePositioning: profile
+      profilePositioning: profile || isResumeParsed
         ? "Pasted founder profile text was used as submitted evidence."
         : hasFounderProfileEvidence
           ? "Founder profile metadata was recorded, but its contents were not fetched or parsed."
@@ -600,11 +652,9 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
       fundingNarrative: dimensions[8].explanation,
     },
     deckReview: {
-      status: hasDeck ? "received-unparsed" : "not-provided",
-      summary: hasDeck
-        ? "The pitch deck was received as attachment metadata. Its contents were not parsed or analyzed in this Preview."
-        : "No pitch deck was provided, so no deck analysis was performed.",
-      findings: [],
+      status: deckStatus,
+      summary: deckSummary,
+      findings: deckFindings,
     },
     actions: [
       ...findings.filter((finding) => finding.severity === "high").slice(0, 1).map((finding) => ({ horizon: "fix-now" as const, title: "Resolve conflicting evidence", detail: finding.action })),

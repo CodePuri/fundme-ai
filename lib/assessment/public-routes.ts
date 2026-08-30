@@ -23,6 +23,10 @@ export const CLERK_PUBLIC_ROUTE_PATTERNS = [
   "/app/preview",
   "/api/onboarding",
   "/api/onboarding/(.*)",
+  "/api/assessment/analyze",
+  "/api/assessment/analyze/(.*)",
+  "/api/assessment/save",
+  "/api/assessment/latest",
   "/robots.txt",
   "/sitemap.xml",
 ];

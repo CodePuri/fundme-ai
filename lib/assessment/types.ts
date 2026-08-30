@@ -43,6 +43,10 @@ export type StartupInput = {
   description: string;
   profileText: string;
   linkedInUrl?: string;
+  websiteTitle?: string;
+  websiteDescription?: string;
+  extractedWebsiteText?: string;
+  productSignals?: string[];
 };
 
 export type ArtifactMetadata = {
@@ -53,6 +57,9 @@ export type ArtifactMetadata = {
   type: string;
   status: ArtifactStatus;
   attachedAt: string;
+  extractedText?: string;
+  pageCount?: number;
+  detectedSections?: string[];
 };
 
 export type MentorAnswer = {
@@ -145,7 +152,7 @@ export type FundingReadinessReport = {
     fundingNarrative: string;
   };
   deckReview: {
-    status: "not-provided" | "received-unparsed";
+    status: "not-provided" | "received-unparsed" | "parsed";
     summary: string;
     findings: string[];
   };
@@ -174,6 +181,7 @@ export type GrillSession = {
   earlyAccess: EarlyAccessState;
   persistenceWarning: string | null;
   updatedAt: string;
+  claimToken?: string;
 };
 
 export type MentorQuestion = {
