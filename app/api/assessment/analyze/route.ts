@@ -5,6 +5,7 @@ import { parsePdfBuffer } from "@/lib/ingestion/pdf";
 import { ingestFounderProfile } from "@/lib/ingestion/founder";
 import { buildStructuredEvidence } from "@/lib/assessment/evidence-model";
 import { assessSession } from "@/lib/assessment/engine";
+import { synthesizeAssessmentWithAi } from "@/lib/assessment/ai-provider";
 import { saveAssessmentToDatabase } from "@/lib/assessment/database";
 import type { ArtifactMetadata, GrillSession, MentorAnswer, MentorQuestionId } from "@/lib/assessment/types";
 
@@ -185,7 +186,8 @@ export async function POST(req: Request) {
       updatedAt: timestamp,
     };
 
-    const report = assessSession(session, timestamp);
+    const deterministicReport = assessSession(session, timestamp);
+    const { report, aiMetadata } = await synthesizeAssessmentWithAi(evidenceRecord, deterministicReport);
     session.report = report;
     session.processingState = report.completionState;
 
@@ -210,6 +212,7 @@ export async function POST(req: Request) {
       ok: true,
       claimToken,
       report,
+      aiMetadata,
       evidenceRecord,
       session,
     });
