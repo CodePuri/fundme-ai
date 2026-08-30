@@ -15,7 +15,7 @@ export function trackClientEvent(
     trackPostHogEvent(eventName, properties);
 
     // 2. Google Analytics 4 (Acquisition / Conversion Events)
-    if (["assessment_completed", "signup_completed", "assessment_shared"].includes(eventName)) {
+    if (["assessment_started", "assessment_completed", "result_viewed", "signup_completed", "assessment_shared"].includes(eventName)) {
       trackGA4Event(eventName, properties);
     }
 

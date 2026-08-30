@@ -3,6 +3,8 @@ import { getSupabaseAdmin } from "../assessment/database.ts";
 export type FunnelEventName =
   | "assessment_started"
   | "assessment_completed"
+  | "result_viewed"
+  | "save_cta_clicked"
   | "assessment_saved"
   | "assessment_shared"
   | "shared_assessment_viewed"
@@ -10,6 +12,8 @@ export type FunnelEventName =
   | "signup_started"
   | "signup_completed"
   | "personalized_explore_viewed";
+
+export type AnalyticsEventName = FunnelEventName;
 
 export type AnalyticsPayload = {
   eventName: FunnelEventName;

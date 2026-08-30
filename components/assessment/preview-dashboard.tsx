@@ -74,13 +74,43 @@ const MATCH_TONES = [
   "border-t-[#246b48]",
 ];
 
-export function PreviewDashboard() {
-  const { isLoaded: clerkLoaded, isSignedIn, user } = useUser();
+function ClerkUserSync({
+  onSync,
+}: {
+  onSync: (auth: { clerkLoaded: boolean; isSignedIn: boolean; user: any; signOut: any }) => void;
+}) {
+  const { isLoaded, isSignedIn, user } = useUser();
   const { signOut } = useClerk();
+
+  useEffect(() => {
+    onSync({ clerkLoaded: isLoaded, isSignedIn: Boolean(isSignedIn), user, signOut });
+  }, [isLoaded, isSignedIn, user, signOut, onSync]);
+
+  return null;
+}
+
+export function PreviewDashboard() {
+  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+  const [clerkAuth, setClerkAuth] = useState<{
+    clerkLoaded: boolean;
+    isSignedIn: boolean;
+    user: any;
+    signOut: any;
+  }>({
+    clerkLoaded: !clerkConfigured,
+    isSignedIn: false,
+    user: null,
+    signOut: () => {},
+  });
+
+  const handleClerkSync = (auth: any) => {
+    setClerkAuth(auth);
+  };
+
+  const { clerkLoaded, isSignedIn, user, signOut } = clerkAuth;
   const { state, signIn, hasHydrated: demoHydrated } = useDemo();
   const { session } = useAssessment();
   const searchParams = useSearchParams();
-  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   const [serverAssessment, setServerAssessment] = useState<any>(null);
   const [serverFounder, setServerFounder] = useState<any>(null);
@@ -282,7 +312,9 @@ export function PreviewDashboard() {
   const nextAction = report.actions[0];
 
   return (
-    <div className="mx-auto max-w-[1080px]">
+    <div className="mx-auto max-w-[1080px] space-y-6">
+      {clerkConfigured ? <ClerkUserSync onSync={handleClerkSync} /> : null}
+
       <header className="flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
           <span className="grid size-11 shrink-0 place-items-center rounded-full bg-[#171513] text-white"><UserRound className="size-4.5" /></span>
@@ -310,13 +342,14 @@ export function PreviewDashboard() {
       </header>
 
       {saveStatus ? (
-        <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 flex items-center gap-2">
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900 flex items-center gap-2">
           <RefreshCw className="size-4 animate-spin" />
           {saveStatus}
         </div>
       ) : null}
 
-      <section className="premium-card mt-5 grid overflow-hidden md:grid-cols-[170px_minmax(0,1fr)_240px]">
+      {/* 1. Core Diagnosis Status */}
+      <section className="premium-card grid overflow-hidden md:grid-cols-[170px_minmax(0,1fr)_240px]">
         <div className="flex items-center gap-4 border-b border-[var(--border)] p-5 md:block md:border-b-0 md:border-r">
           <div>
             <span className="type-score">{report.readinessScore}</span>
@@ -337,8 +370,40 @@ export function PreviewDashboard() {
           <Link className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#171513] px-4 text-sm font-semibold text-white hover:bg-[#302d29]" href="/assessment/result">View assessment <ArrowRight className="size-3.5" /></Link>
         </div>
       </section>
-      {/* Public Share & Referral Waitlist Loop */}
-      <section className="mt-6 grid gap-4 md:grid-cols-2">
+
+      {/* 2. Top 3 Highest-Leverage Fixes Checklist */}
+      <section className="premium-card p-5 sm:p-6">
+        <div className="flex items-center justify-between border-b border-[var(--border)] pb-3.5">
+          <div>
+            <p className="eyebrow">Priority Fixes</p>
+            <h2 className="text-[16px] font-semibold text-[var(--text-primary)]">What to improve before talking to investors</h2>
+          </div>
+          <Link href="/assessment/result" className="text-xs font-semibold text-[#a64626] hover:underline">
+            Full diagnostic report →
+          </Link>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {report.actions.slice(0, 3).map((action, idx) => (
+            <div key={idx} className="flex flex-col justify-between rounded-xl border border-[var(--border)] bg-[var(--surface-elevated)] p-4">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="grid size-6 place-items-center rounded-full bg-[#171513] text-xs font-bold text-white">
+                    {idx + 1}
+                  </span>
+                  <span className="rounded-full bg-white border border-black/8 px-2 py-0.5 text-[10px] font-semibold text-[var(--text-secondary)] capitalize">
+                    {action.horizon.replace("-", " ")}
+                  </span>
+                </div>
+                <h3 className="mt-2.5 text-[13px] font-semibold text-[var(--text-primary)]">{action.title}</h3>
+                <p className="mt-1 text-[12px] leading-relaxed text-[var(--text-secondary)]">{action.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. Public Share & Referral Waitlist Loop */}
+      <section className="grid gap-4 md:grid-cols-2">
         {/* Public Share Card */}
         <div className="premium-card flex flex-col justify-between p-5">
           <div>

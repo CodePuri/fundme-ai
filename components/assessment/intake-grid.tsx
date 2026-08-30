@@ -126,41 +126,75 @@ export function IntakeGrid() {
 
   return (
     <div className="mx-auto max-w-[1040px]">
-      <header className="mx-auto max-w-[720px] text-center">
+      <header className="mx-auto max-w-[760px] text-center">
         <p className="eyebrow">Free funding-fit diagnosis</p>
-        <h1 className="type-page-title mt-3">
+        <h1 className="type-page-title mt-3 text-balance">
           See what investors will question first.
         </h1>
         <p className="type-body-lg mx-auto mt-3 max-w-[62ch] text-[var(--text-secondary)]">
-          Add the founder and the sources you already have. No account required.
+          Find what investors will question before you pitch them. Add the founder context and sources you already have. No account required.
         </p>
+
+        {/* Value Highlights */}
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-1 font-medium text-[var(--text-secondary)] shadow-xs">
+            <span className="size-1.5 rounded-full bg-[#ff6b3d]" />
+            Readiness score (0–100)
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-1 font-medium text-[var(--text-secondary)] shadow-xs">
+            <span className="size-1.5 rounded-full bg-[#246b48]" />
+            Strongest &amp; weakest signals
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-1 font-medium text-[var(--text-secondary)] shadow-xs">
+            <span className="size-1.5 rounded-full bg-[#a33b1d]" />
+            Contradictions &amp; missing proof
+          </span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-black/8 bg-white/80 px-3 py-1 font-medium text-[var(--text-secondary)] shadow-xs">
+            <span className="size-1.5 rounded-full bg-[#315f8b]" />
+            3 priority fixes
+          </span>
+        </div>
       </header>
 
-      <section className="premium-card mt-7 p-4 sm:p-6">
-        <label className="mx-auto block max-w-xl text-[15px] font-semibold" htmlFor="founder-name">
-          <span className="flex items-center gap-2"><UserRound className="size-4 text-[#ff6b3d]" />Founder name</span>
-          <Input
-            id="founder-name"
-            className="mt-2 min-h-12"
-            autoComplete="name"
-            name="founder-name"
-            value={session.input.founderName}
-            onChange={(event) => updateInput("founderName", event.target.value)}
-            placeholder="e.g. Asha Rao…"
-          />
-          <FieldError>{errors.founderName}</FieldError>
-        </label>
+      <section className="premium-card mt-8 p-5 sm:p-7">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className="block text-[14px] font-semibold" htmlFor="founder-name">
+            <span className="flex items-center gap-2"><UserRound className="size-4 text-[#ff6b3d]" />Founder name <span className="text-[var(--status-critical)]">*</span></span>
+            <Input
+              id="founder-name"
+              className="mt-2 min-h-12 bg-white"
+              autoComplete="name"
+              name="founder-name"
+              value={session.input.founderName}
+              onChange={(event) => updateInput("founderName", event.target.value)}
+              placeholder="e.g. Asha Rao"
+            />
+            <FieldError>{errors.founderName}</FieldError>
+          </label>
+
+          <label className="block text-[14px] font-semibold" htmlFor="startup-name">
+            <span className="flex items-center gap-2"><Globe2 className="size-4 text-[#315f8b]" />Startup name</span>
+            <Input
+              id="startup-name"
+              className="mt-2 min-h-12 bg-white"
+              name="startup-name"
+              value={session.input.startupName}
+              onChange={(event) => updateInput("startupName", event.target.value)}
+              placeholder="e.g. PayPilot AI (optional, inferred from website/deck)"
+            />
+          </label>
+        </div>
 
         <div className="mt-6 flex items-center gap-3">
-          <span className="text-[13px] font-semibold text-[var(--text-secondary)]">Optional sources</span>
+          <span className="text-[13px] font-semibold tracking-wide uppercase text-[var(--text-tertiary)]">Optional sources</span>
           <span className="h-px flex-1 bg-black/8" />
         </div>
 
         <div className="mt-3 grid items-start gap-3 md:grid-cols-3">
-          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5 transition-shadow hover:shadow-xs">
             <div className="flex items-center gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#bd4e28]/15 bg-white text-[#a64626]"><Linkedin className="size-4.5" /></span>
-              <div className="min-w-0"><h2 className="text-[16px] font-semibold">Founder profile</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">URL, export, or text</p></div>
+              <div className="min-w-0"><h2 className="text-[15px] font-semibold">Founder profile</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">URL, export, or text</p></div>
             </div>
             <label className="mt-4 block text-[13px] font-semibold" htmlFor="linkedin-url">
               Profile URL
@@ -191,23 +225,23 @@ export function IntakeGrid() {
                   name="founder-profile-text"
                   value={session.input.profileText}
                   onChange={(event) => updateInput("profileText", event.target.value)}
-                  placeholder="Domain experience, outcomes or profile text…"
+                  placeholder="Domain experience, past startups, or profile text…"
                 />
               </label>
             </details>
-            <details className="mt-2 px-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-              <summary className="flex min-h-11 cursor-pointer items-center rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">How profile sources work</summary>
-              <p className="mt-2">Use a public URL, export or pasted text. FundMe does not scrape LinkedIn.</p>
+            <details className="mt-2 px-1 text-[12px] leading-5 text-[var(--text-secondary)]">
+              <summary className="flex min-h-9 cursor-pointer items-center rounded-md font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">How profile sources work</summary>
+              <p className="mt-1">Evaluates founder background, domain authority, and founder-market fit. Uses public URL or submitted text.</p>
             </details>
           </article>
 
-          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5 transition-shadow hover:shadow-xs">
             <div className="flex items-center gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#315f8b]/15 bg-white text-[var(--status-information)]"><Globe2 className="size-4.5" /></span>
-              <div><h2 className="text-[16px] font-semibold">Startup website</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">Your clearest public source</p></div>
+              <div><h2 className="text-[15px] font-semibold">Startup website</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">Your clearest public source</p></div>
             </div>
             <label className="mt-4 block text-[13px] font-semibold" htmlFor="startup-website">
-              Website
+              Website URL
               <Input
                 id="startup-website"
                 className="mt-2 min-h-11 bg-white"
@@ -220,27 +254,26 @@ export function IntakeGrid() {
               />
               <FieldError>{errors.websiteUrl}</FieldError>
             </label>
-            <p className="mt-3 flex items-start gap-2 text-[13px] leading-5 text-[var(--text-secondary)]"><LockKeyhole className="mt-0.5 size-3.5 shrink-0" />Only the address you submit is used.</p>
+            <p className="mt-3 flex items-start gap-2 text-[12px] leading-relaxed text-[var(--text-secondary)]"><LockKeyhole className="mt-0.5 size-3.5 shrink-0 text-[#246b48]" />Analyzes positioning, customer value proposition &amp; product signals.</p>
           </article>
 
-          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5">
+          <article className="h-full rounded-[var(--radius-card)] border border-[var(--border)] bg-[var(--surface-elevated)] p-5 transition-shadow hover:shadow-xs">
             <div className="flex items-center gap-3">
               <span className="grid size-10 shrink-0 place-items-center rounded-xl border border-[#7452a3]/15 bg-white text-[#65448f]"><FileText className="size-4.5" /></span>
-              <div><h2 className="text-[16px] font-semibold">Pitch deck</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">PDF · up to 10 MB</p></div>
+              <div><h2 className="text-[15px] font-semibold">Pitch deck</h2><p className="type-metadata mt-0.5 text-[var(--text-secondary)]">PDF · up to 10 MB</p></div>
             </div>
             <div className="mt-4">
               <UploadButton accept=".pdf,application/pdf" kind="pitch-deck" label="Upload pitch deck" />
               {deck ? <AttachedFile id={deck.id} name={deck.name} onRemove={removeArtifact} /> : null}
             </div>
-            <details className="mt-3 px-1 text-[13px] leading-5 text-[var(--text-secondary)]">
-              <summary className="flex min-h-11 cursor-pointer items-center rounded-md font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">Deck review scope</summary>
-              <p className="mt-2">This Preview records the file, but does not claim slide-level analysis.</p>
-            </details>
+            <p className="mt-3 text-[12px] leading-relaxed text-[var(--text-secondary)]">
+              Extracts narrative flow, traction claims, market framing &amp; missing slides.
+            </p>
           </article>
         </div>
 
         {needsDescription ? (
-          <label className="mt-4 block rounded-[var(--radius-card)] border border-dashed border-[#bd4e28]/40 bg-[#fffaf6] p-4 text-[15px] font-semibold" htmlFor="startup-description">
+          <label className="mt-4 block rounded-[var(--radius-card)] border border-dashed border-[#bd4e28]/40 bg-[#fffaf6] p-4 text-[14px] font-semibold" htmlFor="startup-description">
             One-line startup description
             <span className="ml-2 font-normal text-[var(--text-secondary)]">required without a website or deck</span>
             <Textarea
@@ -250,7 +283,7 @@ export function IntakeGrid() {
               name="startup-description"
               value={session.input.description}
               onChange={(event) => updateInput("description", event.target.value)}
-              placeholder="We help [customer] solve [problem] with [approach]."
+              placeholder="We help [target customer] solve [specific problem] by [unique approach]."
             />
             <span className="mt-2 flex items-start justify-between gap-4">
               <FieldError>{errors.description ?? errors.fundingSource}</FieldError>
@@ -267,7 +300,7 @@ export function IntakeGrid() {
 
         <div className="mt-6 flex flex-col items-center justify-between gap-3 border-t border-black/8 pt-5 sm:flex-row">
           <p className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)]"><LockKeyhole className="size-3.5 text-[var(--status-positive)]" />Private to this Preview. No account required.</p>
-          <Button className="min-h-12 w-full px-6 sm:w-auto" onClick={analyze} size="lg">
+          <Button className="min-h-12 w-full px-7 sm:w-auto text-[15px] font-semibold" onClick={analyze} size="lg">
             Analyze my funding fit
             <ArrowRight className="size-4" />
           </Button>

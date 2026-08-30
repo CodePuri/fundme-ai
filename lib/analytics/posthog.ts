@@ -4,7 +4,9 @@ import { sanitizeAnalyticsProperties, type AnalyticsEventName } from "./events";
 export function initPostHog() {
   if (typeof window === "undefined") return;
 
-  const key = process.env.NEXT_PUBLIC_POSTHOG_KEY;
+  const key =
+    process.env.NEXT_PUBLIC_POSTHOG_KEY ||
+    process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   const host = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
   if (!key) {
