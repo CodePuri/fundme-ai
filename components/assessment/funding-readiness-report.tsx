@@ -278,7 +278,7 @@ export function FundingReadinessReport() {
               </p>
               <div className="mt-5 flex flex-wrap gap-2.5">
                 <Button ref={authTriggerRef} className="min-h-12 px-6 text-sm font-semibold shadow-xs" onClick={() => handleSaveClick("hero")} size="lg">
-                  Save assessment &amp; see matches
+                  Save my assessment
                   <ArrowRight className="size-4" />
                 </Button>
                 <Button className="min-h-12" onClick={download} variant="secondary">
@@ -487,7 +487,7 @@ export function FundingReadinessReport() {
               <p className="mt-1 text-[13px] text-white/75">Preserve your score, get a public share link, and monitor progress.</p>
             </div>
             <Button className="min-h-11 shrink-0 border-white bg-white text-[#171513] hover:border-white hover:bg-[#f6f1ea] font-semibold" onClick={() => handleSaveClick("bottom")}>
-              Save assessment &amp; see matches
+              Save my assessment
               <ArrowRight className="size-4" />
             </Button>
           </div>

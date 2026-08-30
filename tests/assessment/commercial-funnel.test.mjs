@@ -28,7 +28,7 @@ test("the commercial funnel is value-first and removes mentor/chat from the free
   assert.match(analyzing, /role="progressbar"/);
   assert.doesNotMatch(analyzing, /stages\.map/);
   assert.doesNotMatch(analyzing, /fundme-demo-rubric/);
-  assert.match(report, /Save assessment &amp; see matches|Save assessment & see matches/);
+  assert.match(report, /Save my assessment|Save assessment/);
   assert.doesNotMatch(report, /Early access-email|Save Preview interest/);
 });
 
