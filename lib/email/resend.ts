@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { renderAssessmentSavedEmail, type AssessmentEmailProps } from "./templates/assessment-saved";
+import { renderAssessmentSavedEmail, type AssessmentEmailProps } from "./templates/assessment-saved.ts";
 
 export async function sendAssessmentSavedEmail(
   toEmail: string,
