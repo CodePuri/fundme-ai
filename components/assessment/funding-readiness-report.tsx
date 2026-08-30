@@ -339,7 +339,9 @@ export function FundingReadinessReport() {
             The Uncomfortable Truth
           </div>
           <p className="mt-2.5 text-[15px] sm:text-[16px] font-medium leading-relaxed text-[#2c1d18]">
-            {report.startupReview?.fundingNarrative || report.conciseVerdict || "Your story has ambition, but an investor’s first pass will scrutinize the gap between current claims and independently verifiable customer evidence."}
+            {report.startupReview?.fundingNarrative && !report.startupReview.fundingNarrative.toLowerCase().includes("no funding outcome")
+              ? report.startupReview.fundingNarrative
+              : report.conciseVerdict || "Your story has ambition, but an investor’s first pass will scrutinize the gap between current claims and independently verifiable customer evidence."}
           </p>
           <p className="mt-2 text-xs text-[#825345]">
             Based entirely on your submitted founder profile, website copy, and deck evidence.
