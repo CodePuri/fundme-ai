@@ -62,6 +62,8 @@ function eventId(prefix: string, timestamp: string): string {
 export function AssessmentProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<GrillSession>(() => createInitialSession());
   const [hasHydrated, setHasHydrated] = useState(false);
+  const sessionRef = useRef(session);
+  sessionRef.current = session;
   const fileMapRef = useRef<Map<string, File>>(new Map());
 
   useEffect(() => {
@@ -253,21 +255,22 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
 
   const generateReport = useCallback(async () => {
     const timestamp = now();
+    const currentSession = sessionRef.current;
 
     // 1. Try real server-side analysis with ingestion & PDF parsing
     if (typeof window !== "undefined" && typeof fetch === "function") {
       try {
         const formData = new FormData();
-        formData.append("founderName", session.input.founderName || "");
-        formData.append("founderRole", session.input.founderRole || "");
-        formData.append("startupName", session.input.startupName || "");
-        formData.append("websiteUrl", session.input.websiteUrl || "");
-        formData.append("linkedInUrl", session.input.linkedInUrl || "");
-        formData.append("description", session.input.description || "");
-        formData.append("profileText", session.input.profileText || "");
+        formData.append("founderName", currentSession.input.founderName || "");
+        formData.append("founderRole", currentSession.input.founderRole || "");
+        formData.append("startupName", currentSession.input.startupName || "");
+        formData.append("websiteUrl", currentSession.input.websiteUrl || "");
+        formData.append("linkedInUrl", currentSession.input.linkedInUrl || "");
+        formData.append("description", currentSession.input.description || "");
+        formData.append("profileText", currentSession.input.profileText || "");
         const refCode = typeof window !== "undefined" ? (window.sessionStorage.getItem("fundme-referral-code") || window.localStorage.getItem("fundme-referral-code") || "") : "";
         if (refCode) formData.append("referralCode", refCode);
-        formData.append("answers", JSON.stringify(session.answers));
+        formData.append("answers", JSON.stringify(currentSession.answers));
 
         const deckFile = fileMapRef.current.get("pitch-deck");
         if (deckFile) formData.append("pitchDeck", deckFile);
@@ -314,7 +317,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         updatedAt: timestamp,
       };
     });
-  }, [session.answers, session.input]);
+  }, []);
 
   const setEarlyAccessDraft = useCallback((email: string) => {
     setSession((current) => ({

@@ -46,12 +46,13 @@ export function AnalysisProgress() {
     },
   ], [session.artifacts, session.input]);
 
-  // 1. Validation and initial redirection guards
+  // 1. Validation and generation flow
   useEffect(() => {
     if (!hasHydrated) return;
-    if (session.report && !isCompleted) {
+    if (session.report) {
       setIsCompleted(true);
       setProgressPercent(100);
+      setActiveIndex(stages.length - 1);
       const timer = window.setTimeout(() => {
         router.replace("/assessment/result");
       }, 400);
@@ -61,22 +62,20 @@ export function AnalysisProgress() {
       router.replace("/assessment");
       return;
     }
-  }, [hasHydrated, isCompleted, router, session.artifacts, session.input, session.report]);
+    if (!startedRef.current) {
+      startedRef.current = true;
+      generateReport().catch((err) => console.warn("Analysis progress error:", err));
+    }
+  }, [generateReport, hasHydrated, router, session.artifacts, session.input, session.report, stages.length]);
 
-  // 2. Start generation immediately on mount
+  // 2. Progress pacing animation
   useEffect(() => {
-    if (!hasHydrated || startedRef.current || session.report) return;
-    startedRef.current = true;
-
-    // Trigger real backend analysis
-    generateReport().catch((err) => console.warn("Analysis progress error:", err));
-
-    // Progress pacing
+    if (!hasHydrated || session.report) return;
     const stageInterval = window.setInterval(() => {
       setActiveIndex((prev) => {
         const next = prev + 1;
-        if (next < stages.length) {
-          setProgressPercent(Math.min(90, Math.round(((next + 1) / (stages.length + 1)) * 100)));
+        if (next < stages.length - 1) {
+          setProgressPercent(Math.min(90, Math.round(((next + 1) / stages.length) * 100)));
           return next;
         }
         return prev;
@@ -86,20 +85,7 @@ export function AnalysisProgress() {
     return () => {
       window.clearInterval(stageInterval);
     };
-  }, [generateReport, hasHydrated, session.report, stages.length]);
-
-  // 3. When session.report becomes available, complete smoothly
-  useEffect(() => {
-    if (session.report && !isCompleted) {
-      setIsCompleted(true);
-      setProgressPercent(100);
-      setActiveIndex(stages.length - 1);
-      const navTimer = window.setTimeout(() => {
-        router.replace("/assessment/result");
-      }, 500);
-      return () => window.clearTimeout(navTimer);
-    }
-  }, [isCompleted, router, session.report, stages.length]);
+  }, [hasHydrated, session.report, stages.length]);
 
   const progress = progressPercent;
 
