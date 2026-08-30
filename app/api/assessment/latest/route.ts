@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { getLatestAssessmentForUser, getSupabaseAdmin } from "@/lib/assessment/database";
+import { getLatestAssessmentForUser, getAssessmentByClaimToken } from "@/lib/assessment/database";
 
 export async function GET(req: Request) {
   try {
@@ -28,19 +28,14 @@ export async function GET(req: Request) {
 
     // 2. If claimToken provided for an unauthenticated / pending session
     if (claimToken) {
-      const supabase = getSupabaseAdmin();
-      const { data: assessment } = await supabase
-        .from("assessments")
-        .select("*")
-        .eq("claim_token", claimToken)
-        .maybeSingle();
+      const assessment = await getAssessmentByClaimToken(claimToken, userId || null);
 
       if (!assessment) {
         return NextResponse.json({ ok: false, hasAssessment: false, error: "Assessment not found" }, { status: 404 });
       }
 
-      // Security Guard: If already claimed by another user, deny unauthenticated access
-      if (assessment.claim_status === "claimed" && assessment.clerk_user_id !== userId) {
+      // Security Guard: If already claimed by another user, deny access
+      if (assessment.claim_status === "claimed" && assessment.clerk_user_id && assessment.clerk_user_id !== userId) {
         return NextResponse.json({ ok: false, hasAssessment: false, error: "Access denied. Assessment belongs to another account." }, { status: 403 });
       }
 

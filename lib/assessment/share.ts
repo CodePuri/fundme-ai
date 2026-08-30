@@ -85,7 +85,7 @@ export async function shareReport(input: ShareInput): Promise<"shared" | "copied
       await input.share({ title: input.title, text: input.text, url: input.url });
       return "shared";
     } catch {
-      // Rejected and unsupported native shares use clipboard fallback.
+      // Fallback to clipboard
     }
   }
   await input.writeText(input.url || input.text);
