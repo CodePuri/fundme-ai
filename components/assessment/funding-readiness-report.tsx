@@ -33,6 +33,7 @@ import {
 import { serializeReport, shareReport } from "@/lib/assessment/share";
 import type { DimensionScore } from "@/lib/assessment/types";
 import { earliestValidRoute } from "@/lib/assessment/validation";
+import { trackClientEvent } from "@/lib/analytics/client";
 
 export function ScoreRing({ score }: { score: number }) {
   return (
