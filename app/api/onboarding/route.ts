@@ -34,17 +34,10 @@ export async function GET() {
       return NextResponse.json({ submitted: false });
     }
 
-    return NextResponse.json({ 
-      submitted: !!data, 
-      debug_url: process.env.SUPABASE_URL 
-    });
+    return NextResponse.json({ submitted: Boolean(data) });
   } catch (e: any) {
     console.warn("Exception during GET submission check:", e?.message);
-    return NextResponse.json({ 
-      submitted: false, 
-      debug_url: process.env.SUPABASE_URL,
-      debug_key_length: process.env.SUPABASE_SERVICE_ROLE_KEY?.length 
-    });
+    return NextResponse.json({ submitted: false });
   }
 }
 
@@ -116,7 +109,7 @@ export async function POST(req: Request) {
       deck_file_type: body.filesMetadata?.[0]?.type ?? null,
       source_route: body.sourceRoute ?? "/onboarding",
       status: "early_access_waitlist",
-      phone_data: body.phoneData ?? null, // Storing in metadata until schema columns are added
+      phone_data: body.phoneData ?? null,
     };
 
     const baseNotes = body.notes ? body.notes.trim() : "";
@@ -147,13 +140,12 @@ export async function POST(req: Request) {
       .select("id")
       .maybeSingle();
 
-    if (error) {
-      console.warn("Supabase persistence error:", error.message);
-      // Fallback for paused Supabase projects to allow UI progression
+    if (error || !data) {
+      console.error("Supabase persistence error:", error?.message);
       return NextResponse.json({
-        success: true,
-        submissionId: "mock-" + userId,
-      });
+        success: false,
+        error: error?.message || "Failed to persist submission",
+      }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -161,11 +153,10 @@ export async function POST(req: Request) {
       submissionId: data.id,
     });
   } catch (e: any) {
-    console.warn("Server route exception during POST persistence:", e?.message);
-    // Fallback for paused Supabase projects to allow UI progression
+    console.error("Server route exception during POST persistence:", e?.message);
     return NextResponse.json({
-      success: true,
-      submissionId: "mock-exception-" + Date.now(),
-    });
+      success: false,
+      error: e?.message || "Internal server error",
+    }, { status: 500 });
   }
 }

@@ -1,5 +1,7 @@
+import { Suspense } from "react";
+import { PostHogProvider } from "@/components/analytics/posthog-provider";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import type { Metadata } from "next";
-import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 
 import "./globals.css";
@@ -7,6 +9,7 @@ import "./globals.css";
 import { DemoProvider } from "@/components/app/demo-provider";
 
 import { AssessmentProvider } from "@/components/assessment/assessment-provider";
+import { RouteClerkProvider } from "@/components/providers/route-clerk-provider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://tryfundme.in"),
@@ -40,27 +43,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <ClerkProvider
-      appearance={{
-        layout: {
-          logoImageUrl: "/fundme-logo.png",
-          logoPlacement: "inside",
-          socialButtonsPlacement: "bottom",
-        },
-        variables: {
-          colorPrimary: "#ff6b3d",
-          colorText: "#171513",
-          fontFamily: "var(--font-sans)",
-          colorBackground: "#ffffff",
-        },
-        elements: {
-          formButtonPrimary: "bg-[#171513] hover:bg-[#2a2622] text-[14px] font-medium normal-case shadow-none",
-          card: "shadow-[0_20px_50px_rgba(18,15,11,0.06)] border border-black/8 rounded-[28px] bg-white",
-          headerTitle: "text-[#171513] font-semibold tracking-[-0.03em] text-[24px]",
-          headerSubtitle: "text-[#645d54] text-[15px]",
-        }
-      }}
-    >
+    <RouteClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <head>
           <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -87,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               })
             }}
           />
+          <Suspense fallback={null}><PostHogProvider><GoogleAnalytics /></PostHogProvider></Suspense>
           <DemoProvider>
             <AssessmentProvider>
               {children}
@@ -95,6 +79,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </DemoProvider>
         </body>
       </html>
-    </ClerkProvider>
+    </RouteClerkProvider>
   );
 }

@@ -7,18 +7,23 @@
     "build": "node -e \"if(!require('fs').existsSync('./middleware.ts')){console.error('ERROR: middleware.ts is missing!');process.exit(1)}\" && next build --webpack",
     "start": "next start",
     "lint": "eslint",
+    "test:assessment": "node --env-file=.env.local --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types tests/assessment/*.test.mjs",
     "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.0.12",
     "@supabase/supabase-js": "^2.103.0",
+    "@types/pdf-parse": "^1.1.5",
     "clsx": "^2.1.1",
     "framer-motion": "^12.10.0",
     "lucide-react": "^0.511.0",
     "next": "^16.0.0",
+    "pdf-parse": "^2.4.5",
+    "posthog-js": "^1.422.5",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-phone-number-input": "^3.4.17",
+    "resend": "^6.25.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.0"
   },

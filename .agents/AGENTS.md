@@ -36,14 +36,23 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 > NEVER delete, rename, or modify core build-pipeline configuration files (`postcss.config.mjs`, `next.config.ts`, `tsconfig.json`, `package.json`) unless explicitly requested and verified.
 > If a change is made to these files, you MUST run a clean build (`rm -rf .next && pnpm run build`) locally and verify the output size before proceeding.
 
-## Persistent Project Memory (BRAIN.md)
+## Persistent Project Memory
 > [!IMPORTANT]
-> You must treat `BRAIN.md` as the authoritative source of truth for the project. 
-> 1. Read `BRAIN.md` before making architectural decisions or investigating complex bugs.
-> 2. At the end of every substantial task, evaluate if any new patterns, fixes, constraints, or decisions should be persisted. If so, update `BRAIN.md` directly. Do not duplicate information.
+> The authority order is defined by `.agent-os/FUNDME MD OS/fundme_project_os/CANONICAL_SOURCE_MAP.md`; current verified state lives in `PROJECT_STATE.md` in the same directory. `BRAIN.md` is supporting engineering/incident memory only and must not override or duplicate canonical product, design, system, phase, or deployment truth.
+> 1. Read the canonical source map and project state before architectural decisions; read `BRAIN.md` when investigating implementation history or complex bugs.
+> 2. Record durable product/architecture decisions in canonical `DECISIONS.md`. Update `BRAIN.md` only for reusable engineering lessons.
 
 ## Framer Motion Hydration Safeguards
 > [!WARNING]
 > Never conditionally toggle or remove structural Framer Motion props (`initial`, `animate`, `whileInView`) based on client-side state that differs from SSR (e.g., `prefers-reduced-motion`, `window` size) during the initial hydration pass.
 > - **Why:** If a component renders on the server with `initial={{ opacity: 0 }}`, and on the client the `whileInView` prop is stripped due to an OS setting, the component will be permanently stuck at `opacity: 0` causing a blank screen.
 > - **How to fix:** Instead of conditionally stripping the prop, conditionally set the `transition` duration to `0`, or use `<MotionConfig reducedMotion="user">` at the root.
+
+## Canonical Repository Structure & Path Enforcement
+> [!CAUTION]
+> All FundMe code, worktrees, checkpoints, and engineering evidence MUST live under `/Users/totem/Desktop/Code/Fundme*`.
+> - Canonical Repo: `/Users/totem/Desktop/Code/Fundme`
+> - Active Worktrees: `/Users/totem/Desktop/Code/Fundme-worktrees/`
+> - Historical Archives & Evidence: `/Users/totem/Desktop/Code/Fundme-archive/`
+> NEVER create FundMe folders in `/Users/totem/Desktop/Projects` or elsewhere unless explicitly authorized.
+

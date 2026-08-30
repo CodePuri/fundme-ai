@@ -1,58 +1,50 @@
 "use client";
 
-import { ASSESSMENT_STORAGE_KEY } from "@/components/assessment/assessment-provider";
+import { createInitialSession, GRILL_STORAGE_KEY } from "../../lib/assessment/persistence.ts";
+import type { GrillSession } from "../../lib/assessment/types.ts";
 
 const ONBOARDING_DRAFT_KEY = "onboardingDraft";
 
-/**
- * Map onboarding draft data into assessment state.
- * Reads from localStorage "onboardingDraft", transforms, and writes
- * to the assessment storage so /assessment pages pick it up.
- */
-export function mapOnboardingToAssessment(): void {
-  if (typeof window === "undefined") return;
+type OnboardingDraft = {
+  name?: string;
+  role?: string;
+  companyName?: string;
+  linkedIn?: string;
+  websiteUrl?: string;
+  notes?: string;
+  files?: string[];
+};
 
+export function mapOnboardingDraftToSession(draft: OnboardingDraft, timestamp = new Date().toISOString()): GrillSession {
+  const session = createInitialSession(timestamp);
+  session.input.startupName = draft.companyName?.slice(0, 160) ?? "";
+  session.input.websiteUrl = draft.websiteUrl?.slice(0, 2_048) ?? "";
+  session.input.founderName = draft.name?.slice(0, 120) ?? "";
+  session.input.founderRole = draft.role?.slice(0, 120) ?? "";
+  session.input.description = draft.notes?.slice(0, 280) ?? "";
+  session.input.profileText = draft.linkedIn ? `Founder-supplied profile link: ${draft.linkedIn}`.slice(0, 20_000) : "";
+  session.artifacts = (draft.files ?? []).slice(0, 10).map((name, index) => ({
+    id: `onboarding-file-${index}`,
+    kind: "notes",
+    name: name.slice(0, 255),
+    size: 0,
+    type: "",
+    status: "attached",
+    attachedAt: timestamp,
+  }));
+  return session;
+}
+
+/** Compatibility bridge for an existing onboarding draft. No service or database write occurs. */
+export function mapOnboardingToAssessment(): boolean {
+  if (typeof window === "undefined") return false;
   try {
     const raw = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
-    if (!raw) return;
-
-    const draft = JSON.parse(raw);
-    if (!draft) return;
-
-    // Read existing assessment state (if any)
-    let assessmentState = {
-      websiteUrl: "",
-      startupName: "",
-      linkedInUrl: "",
-      uploadedFiles: [],
-      answers: [],
-      analysisStatus: "idle" as const,
-      creditsRemaining: 10,
-      hasPaid: false,
-      reportGenerated: false,
-      report: null as unknown,
-    };
-
-    try {
-      const existing = window.localStorage.getItem(ASSESSMENT_STORAGE_KEY);
-      if (existing) {
-        assessmentState = { ...assessmentState, ...JSON.parse(existing) };
-      }
-    } catch {
-      // start fresh
-    }
-
-    // Map onboarding fields -> assessment fields
-    const merged = {
-      ...assessmentState,
-      startupName: draft.companyName || assessmentState.startupName || "",
-      linkedInUrl: draft.linkedIn || assessmentState.linkedInUrl || "",
-      websiteUrl: draft.websiteUrl || assessmentState.websiteUrl || "",
-    };
-
-    // Persist
-    window.localStorage.setItem(ASSESSMENT_STORAGE_KEY, JSON.stringify(merged));
+    if (!raw) return false;
+    const session = mapOnboardingDraftToSession(JSON.parse(raw) as OnboardingDraft);
+    window.localStorage.setItem(GRILL_STORAGE_KEY, JSON.stringify(session));
+    return true;
   } catch {
-    // Silently fail -- assessment page will still work with defaults
+    return false;
   }
 }
