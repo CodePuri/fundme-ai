@@ -47,3 +47,12 @@ Not lazy about: understanding the problem (read it fully and trace the real flow
 > Never conditionally toggle or remove structural Framer Motion props (`initial`, `animate`, `whileInView`) based on client-side state that differs from SSR (e.g., `prefers-reduced-motion`, `window` size) during the initial hydration pass.
 > - **Why:** If a component renders on the server with `initial={{ opacity: 0 }}`, and on the client the `whileInView` prop is stripped due to an OS setting, the component will be permanently stuck at `opacity: 0` causing a blank screen.
 > - **How to fix:** Instead of conditionally stripping the prop, conditionally set the `transition` duration to `0`, or use `<MotionConfig reducedMotion="user">` at the root.
+
+## Canonical Repository Structure & Path Enforcement
+> [!CAUTION]
+> All FundMe code, worktrees, checkpoints, and engineering evidence MUST live under `/Users/totem/Desktop/Code/Fundme*`.
+> - Canonical Repo: `/Users/totem/Desktop/Code/Fundme`
+> - Active Worktrees: `/Users/totem/Desktop/Code/Fundme-worktrees/`
+> - Historical Archives & Evidence: `/Users/totem/Desktop/Code/Fundme-archive/`
+> NEVER create FundMe folders in `/Users/totem/Desktop/Projects` or elsewhere unless explicitly authorized.
+

@@ -15,3 +15,11 @@ The canonical authority order and active project state live in [CANONICAL_SOURCE
 ## 3. Coding Conventions & Best Practices
 - Prevent hydration bugs by ensuring SSR and initial Client render match perfectly.
 - Avoid using `window` or OS media queries to dynamically alter the structural props of Framer Motion components (like `initial`, `animate`, `whileInView`) during the first hydration pass.
+
+## 4. Canonical Repository Structure & Path Enforcement
+- All FundMe code, worktrees, checkpoints, and engineering evidence must live under `/Users/totem/Desktop/Code/Fundme*`.
+  - Canonical Repo: `/Users/totem/Desktop/Code/Fundme`
+  - Active Worktrees: `/Users/totem/Desktop/Code/Fundme-worktrees/`
+  - Historical Archives & Evidence: `/Users/totem/Desktop/Code/Fundme-archive/`
+- Never create FundMe folders in `/Users/totem/Desktop/Projects` or elsewhere unless explicitly authorized.
+
