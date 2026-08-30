@@ -265,6 +265,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         formData.append("linkedInUrl", session.input.linkedInUrl || "");
         formData.append("description", session.input.description || "");
         formData.append("profileText", session.input.profileText || "");
+        const refCode = typeof window !== "undefined" ? (window.sessionStorage.getItem("fundme-referral-code") || window.localStorage.getItem("fundme-referral-code") || "") : "";
+        if (refCode) formData.append("referralCode", refCode);
         formData.append("answers", JSON.stringify(session.answers));
 
         const deckFile = fileMapRef.current.get("pitch-deck");

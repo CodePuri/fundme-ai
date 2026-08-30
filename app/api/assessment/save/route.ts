@@ -1,3 +1,5 @@
+import { recordReferralSignup } from "@/lib/analytics/referrals";
+import { logAnalyticsEvent } from "@/lib/analytics/events";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { claimAssessmentForUser, saveAssessmentToDatabase } from "@/lib/assessment/database";
@@ -21,6 +23,7 @@ export async function POST(req: Request) {
     const body = await req.json() as {
       claimToken?: string;
       session?: GrillSession;
+      referralCode?: string;
     };
 
     const claimToken = body.claimToken?.trim();
@@ -33,6 +36,14 @@ export async function POST(req: Request) {
           claimToken,
           userEmail,
           userName,
+        });
+        if (body.referralCode || claimToken) {
+          await recordReferralSignup({ referralCode: body.referralCode, clerkUserId: userId, claimToken });
+        }
+        await logAnalyticsEvent({
+          eventName: "assessment_saved",
+          clerkUserId: userId,
+          properties: { referralCode: body.referralCode || null },
         });
         return NextResponse.json({ ok: true, success: true, assessmentId: result.assessmentId });
       } catch (claimErr: any) {
@@ -56,7 +67,15 @@ export async function POST(req: Request) {
         report: session.report,
         rawSession: session,
       });
-      return NextResponse.json({ ok: true, success: true, assessmentId: saved.id });
+      if (body.referralCode || effectiveToken) {
+          await recordReferralSignup({ referralCode: body.referralCode, clerkUserId: userId, claimToken: effectiveToken });
+        }
+        await logAnalyticsEvent({
+          eventName: "assessment_saved",
+          clerkUserId: userId,
+          properties: { referralCode: body.referralCode || null },
+        });
+        return NextResponse.json({ ok: true, success: true, assessmentId: saved.id });
     }
 
     return NextResponse.json({ ok: false, error: "Missing claimToken or session data." }, { status: 400 });

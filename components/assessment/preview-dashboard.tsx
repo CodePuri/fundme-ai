@@ -18,6 +18,11 @@ import {
   ShieldCheck,
   Sparkles,
   UserRound,
+  Share2,
+  Copy,
+  Users,
+  Trophy,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -83,6 +88,69 @@ export function PreviewDashboard() {
   const [loadingServer, setLoadingServer] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const claimedRef = useRef(false);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [copiedShare, setCopiedShare] = useState(false);
+  const [referralStats, setReferralStats] = useState<{
+    referralCode: string;
+    referralCount: number;
+    priorityRank: number;
+    priorityTier: string;
+    referralLink: string;
+  } | null>(null);
+  const [copiedRef, setCopiedRef] = useState(false);
+
+  // Load public share token and referral stats
+  useEffect(() => {
+    const claimToken = searchParams.get("claim_token") || (typeof window !== "undefined" ? window.localStorage.getItem("fundme-claim-token") : null);
+    const userId = user?.id || "preview-founder";
+
+    // 1. Fetch referral stats
+    fetch(`/api/referrals/stats?clerkUserId=${encodeURIComponent(userId)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.ok && data.stats) setReferralStats(data.stats);
+      })
+      .catch(() => {});
+
+    // 2. Fetch or create public share
+    if (claimToken || serverAssessment?.id) {
+      fetch("/api/assessment/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          assessmentId: serverAssessment?.id,
+          claimToken: claimToken || undefined,
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.ok && data.shareUrl) {
+            const fullUrl = `${window.location.origin}${data.shareUrl}`;
+            setShareUrl(fullUrl);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [user?.id, searchParams, serverAssessment?.id]);
+
+  const copyShareLink = async () => {
+    if (!shareUrl) return;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedShare(true);
+      setTimeout(() => setCopiedShare(false), 2000);
+    } catch {}
+  };
+
+  const copyReferralLink = async () => {
+    if (!referralStats?.referralLink) return;
+    try {
+      await navigator.clipboard.writeText(referralStats.referralLink);
+      setCopiedRef(true);
+      setTimeout(() => setCopiedRef(false), 2000);
+    } catch {}
+  };
+
 
   // Auto-sync Clerk sign-in state to Demo state
   useEffect(() => {
@@ -268,6 +336,77 @@ export function PreviewDashboard() {
           <Link className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#171513] px-4 text-sm font-semibold text-white hover:bg-[#302d29]" href="/assessment/result">View assessment <ArrowRight className="size-3.5" /></Link>
         </div>
       </section>
+      {/* Public Share & Referral Waitlist Loop */}
+      <section className="mt-6 grid gap-4 md:grid-cols-2">
+        {/* Public Share Card */}
+        <div className="premium-card flex flex-col justify-between p-5">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="grid size-8 place-items-center rounded-lg bg-orange-100 text-[#ff6b3d]">
+                  <Share2 className="size-4" />
+                </span>
+                <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Public Shareable Diagnosis</h2>
+              </div>
+              <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[11px] font-medium text-stone-600">Privacy-Safe</span>
+            </div>
+            <p className="mt-2 text-[13px] text-[var(--text-secondary)] leading-relaxed">
+              Share a clean, verified preview of your funding fit score without exposing private pitch decks or contact details.
+            </p>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs font-medium" onClick={copyShareLink} disabled={!shareUrl}>
+              {copiedShare ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+              {copiedShare ? "Link copied!" : "Copy public link"}
+            </Button>
+            {shareUrl ? (
+              <a
+                href={shareUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-9 items-center gap-1 rounded-md px-3 text-xs font-medium text-[var(--text-secondary)] hover:bg-black/5"
+              >
+                Open preview <ExternalLink className="size-3" />
+              </a>
+            ) : null}
+          </div>
+        </div>
+
+        {/* Waitlist Priority & Referral Card */}
+        <div className="premium-card flex flex-col justify-between p-5">
+          <div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="grid size-8 place-items-center rounded-lg bg-emerald-100 text-[#246b48]">
+                  <Trophy className="size-4" />
+                </span>
+                <h2 className="text-[15px] font-semibold text-[var(--foreground)]">Early Access Priority</h2>
+              </div>
+              <span className="rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-800">
+                {referralStats?.priorityTier || "Standard Waitlist"}
+              </span>
+            </div>
+            <div className="mt-3 flex items-baseline gap-3">
+              <span className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
+                #{referralStats?.priorityRank || 100}
+              </span>
+              <span className="text-xs text-[var(--text-secondary)]">
+                {referralStats?.referralCount || 0} founders referred
+              </span>
+            </div>
+            <p className="mt-1 text-[13px] text-[var(--text-secondary)]">
+              Each founder who assesses their startup via your link moves your workspace forward on the waitlist.
+            </p>
+          </div>
+          <div className="mt-4 flex items-center gap-2">
+            <Button size="sm" variant="outline" className="gap-1.5 text-xs font-medium" onClick={copyReferralLink} disabled={!referralStats?.referralLink}>
+              {copiedRef ? <Check className="size-3.5 text-emerald-600" /> : <Copy className="size-3.5" />}
+              {copiedRef ? "Referral link copied!" : "Copy referral invite"}
+            </Button>
+          </div>
+        </div>
+      </section>
+
 
       <section className="mt-6">
         <div className="flex items-end justify-between gap-4">

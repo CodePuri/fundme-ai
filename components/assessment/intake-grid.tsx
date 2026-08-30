@@ -12,7 +12,8 @@ import {
   UserRound,
   X,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { trackClientEvent } from "@/lib/analytics/client";
 
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { Button } from "@/components/ui/button";
@@ -91,8 +92,21 @@ function AttachedFile({
 
 export function IntakeGrid() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { session, updateInput, removeArtifact, submitIntake } = useAssessment();
   const [errors, setErrors] = useState<IntakeErrors>({});
+
+  useEffect(() => {
+    const ref = searchParams.get("ref");
+    if (ref) {
+      try {
+        window.sessionStorage.setItem("fundme-referral-code", ref);
+        window.localStorage.setItem("fundme-referral-code", ref);
+        trackClientEvent("referral_attributed", { referralCode: ref });
+      } catch {}
+    }
+    trackClientEvent("assessment_started", { hasReferral: Boolean(ref) });
+  }, [searchParams]);
 
   useEffect(() => {
     if (session.input.websiteUrl || session.input.startupName) return;

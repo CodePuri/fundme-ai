@@ -1,3 +1,5 @@
+import { recordReferralAssessmentCompleted } from "@/lib/analytics/referrals";
+import { logAnalyticsEvent } from "@/lib/analytics/events";
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { ingestWebsite } from "@/lib/ingestion/website";
@@ -21,6 +23,7 @@ export async function POST(req: Request) {
     let linkedInUrl = "";
     let description = "";
     let profileText = "";
+    let referralCode = "";
     let answers: Partial<Record<MentorQuestionId, MentorAnswer>> = {};
     let pitchDeckBuffer: Buffer | null = null;
     let pitchDeckName = "";
@@ -38,6 +41,7 @@ export async function POST(req: Request) {
       linkedInUrl = String(formData.get("linkedInUrl") || "").trim();
       description = String(formData.get("description") || "").trim();
       profileText = String(formData.get("profileText") || "").trim();
+      referralCode = String(formData.get("referralCode") || "").trim();
 
       const rawAnswers = formData.get("answers");
       if (rawAnswers && typeof rawAnswers === "string") {
@@ -208,9 +212,17 @@ export async function POST(req: Request) {
       console.warn("Could not save pending assessment to database:", dbErr);
     }
 
-    return NextResponse.json({
-      ok: true,
-      claimToken,
+    if (referralCode) {
+        await recordReferralAssessmentCompleted({ referralCode, claimToken });
+      }
+      await logAnalyticsEvent({
+        eventName: "assessment_completed",
+        properties: { referralCode: referralCode || null, readinessScore: report.readinessScore },
+      });
+
+      return NextResponse.json({
+        ok: true,
+        claimToken,
       report,
       aiMetadata,
       evidenceRecord,

@@ -34,7 +34,7 @@ import { serializeReport, shareReport } from "@/lib/assessment/share";
 import type { DimensionScore } from "@/lib/assessment/types";
 import { earliestValidRoute } from "@/lib/assessment/validation";
 
-function ScoreRing({ score }: { score: number }) {
+export function ScoreRing({ score }: { score: number }) {
   return (
     <div
       aria-label={`Funding readiness score ${score} out of 100`}
