@@ -1,3 +1,4 @@
+import { sendAssessmentSavedEmail } from "@/lib/email/resend";
 import { recordReferralSignup } from "@/lib/analytics/referrals";
 import { logAnalyticsEvent } from "@/lib/analytics/events";
 import { auth, currentUser } from "@clerk/nextjs/server";
@@ -45,6 +46,16 @@ export async function POST(req: Request) {
           clerkUserId: userId,
           properties: { referralCode: body.referralCode || null },
         });
+        
+        if (userEmail) {
+          sendAssessmentSavedEmail(userEmail, {
+            founderName: userName || "Founder",
+            startupName: result.assessment?.startup_name || "Your startup",
+            readinessScore: result.assessment?.readiness_score || 0,
+            verdict: result.assessment?.verdict || "Funding Readiness Assessment Saved",
+            workspaceUrl: `https://staging.tryfundme.in/app/preview?claim_token=${claimToken}`,
+          }).catch(e => console.warn("Email send error:", e));
+        }
         return NextResponse.json({ ok: true, success: true, assessmentId: result.assessmentId });
       } catch (claimErr: any) {
         // If assessment wasn't found by claim token but session is supplied, create directly
@@ -75,6 +86,16 @@ export async function POST(req: Request) {
           clerkUserId: userId,
           properties: { referralCode: body.referralCode || null },
         });
+        
+        if (userEmail && saved.report) {
+          sendAssessmentSavedEmail(userEmail, {
+            founderName: session.input.founderName || userName || "Founder",
+            startupName: session.input.startupName || "Your startup",
+            readinessScore: session.report.readinessScore,
+            verdict: session.report.verdict,
+            workspaceUrl: `https://staging.tryfundme.in/app/preview?claim_token=${effectiveToken}`,
+          }).catch(e => console.warn("Email send error:", e));
+        }
         return NextResponse.json({ ok: true, success: true, assessmentId: saved.id });
     }
 

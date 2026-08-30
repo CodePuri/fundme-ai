@@ -1,8 +1,14 @@
+import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rate-limit";
 import { NextRequest, NextResponse } from "next/server";
 import { createOrGetShareToken } from "@/lib/assessment/share";
 import { logAnalyticsEvent } from "@/lib/analytics/events";
 
 export async function POST(req: NextRequest) {
+  const rate = checkRateLimit(req, "share", { maxRequests: 30, windowMs: 60_000 });
+  if (!rate.allowed) {
+    return createRateLimitResponse(rate.resetInMs);
+  }
+
   try {
     const json = await req.json();
     const { assessmentId, claimToken } = json || {};

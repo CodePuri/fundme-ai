@@ -6,39 +6,50 @@ export async function GET(req: Request) {
   try {
     const { userId } = await auth();
     const url = new URL(req.url);
-    const claimToken = url.searchParams.get("claim_token");
+    const claimToken = url.searchParams.get("claim_token")?.trim();
 
     if (!userId && !claimToken) {
       return NextResponse.json({ ok: false, hasAssessment: false, error: "Unauthorized" }, { status: 401 });
     }
 
+    // 1. If authenticated user, fetch their own latest assessment
+    if (userId) {
+      const data = await getLatestAssessmentForUser(userId);
+      if (data.hasAssessment) {
+        return NextResponse.json({
+          ok: true,
+          hasAssessment: true,
+          assessment: data.assessment,
+          founder: data.founder,
+          startup: data.startup,
+        });
+      }
+    }
+
+    // 2. If claimToken provided for an unauthenticated / pending session
     if (claimToken) {
       const supabase = getSupabaseAdmin();
       const { data: assessment } = await supabase
         .from("assessments")
         .select("*")
         .eq("claim_token", claimToken)
-        .single();
+        .maybeSingle();
 
-      if (assessment) {
-        return NextResponse.json({
-          ok: true,
-          hasAssessment: true,
-          assessment,
-          founder: { name: assessment.founder_name },
-          startup: { startup_name: assessment.startup_name, website_url: assessment.website_url },
-        });
+      if (!assessment) {
+        return NextResponse.json({ ok: false, hasAssessment: false, error: "Assessment not found" }, { status: 404 });
       }
-    }
 
-    if (userId) {
-      const data = await getLatestAssessmentForUser(userId);
+      // Security Guard: If already claimed by another user, deny unauthenticated access
+      if (assessment.claim_status === "claimed" && assessment.clerk_user_id !== userId) {
+        return NextResponse.json({ ok: false, hasAssessment: false, error: "Access denied. Assessment belongs to another account." }, { status: 403 });
+      }
+
       return NextResponse.json({
         ok: true,
-        hasAssessment: data.hasAssessment,
-        assessment: data.assessment,
-        founder: data.founder,
-        startup: data.startup,
+        hasAssessment: true,
+        assessment,
+        founder: { name: assessment.founder_name },
+        startup: { startup_name: assessment.startup_name, website_url: assessment.website_url },
       });
     }
 

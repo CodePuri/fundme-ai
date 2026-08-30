@@ -1,3 +1,4 @@
+import { checkRateLimit, createRateLimitResponse } from "@/lib/security/rate-limit";
 import { recordReferralAssessmentCompleted } from "@/lib/analytics/referrals";
 import { logAnalyticsEvent } from "@/lib/analytics/events";
 import { NextResponse } from "next/server";
@@ -14,6 +15,11 @@ import type { ArtifactMetadata, GrillSession, MentorAnswer, MentorQuestionId } f
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+  const rate = checkRateLimit(req, "analyze", { maxRequests: 15, windowMs: 60_000 });
+  if (!rate.allowed) {
+    return createRateLimitResponse(rate.resetInMs);
+  }
+
   try {
     const contentType = req.headers.get("content-type") || "";
     let founderName = "";

@@ -85,7 +85,7 @@ export async function shareReport(input: ShareInput): Promise<"shared" | "copied
       await input.share({ title: input.title, text: input.text, url: input.url });
       return "shared";
     } catch {
-      // Rejected and unsupported native shares use the explicit clipboard fallback.
+      // Rejected and unsupported native shares use clipboard fallback.
     }
   }
   await input.writeText(input.url || input.text);
@@ -105,48 +105,26 @@ export function createPreviewReferralCode(identifier: string): string {
 export async function createOrGetShareToken(params: {
   assessmentId?: string;
   claimToken?: string;
+  clerkUserId?: string;
 }): Promise<{ shareToken: string; shareUrl: string; referralCode: string }> {
   const supabase = getSupabaseAdmin();
-  const { assessmentId, claimToken } = params;
+  const { assessmentId, claimToken, clerkUserId } = params;
 
-  // Find row
-  let query = supabase.from("assessments").select("id, claim_token, share_token, clerk_user_id, startup_name");
-  if (assessmentId) {
-    query = query.eq("id", assessmentId);
-  } else if (claimToken) {
-    query = query.eq("claim_token", claimToken);
-  } else {
-    throw new Error("Must provide assessmentId or claimToken");
+  const { data, error } = await supabase.rpc("rpc_create_or_get_share_token", {
+    p_assessment_id: assessmentId || null,
+    p_claim_token: claimToken || null,
+    p_clerk_user_id: clerkUserId || null,
+  });
+
+  if (error || !data) {
+    throw new Error(`Failed to create or get share token: ${error?.message || "Not found"}`);
   }
 
-  const { data: row, error } = await query.single();
-  if (error || !row) {
-    throw new Error("Assessment not found for sharing");
-  }
-
-  const referralCode = createPreviewReferralCode(row.clerk_user_id || row.claim_token);
-
-  if (row.share_token) {
-    return {
-      shareToken: row.share_token,
-      shareUrl: `/share/${row.share_token}`,
-      referralCode,
-    };
-  }
-
-  // Generate new unguessable token
-  const token = `sh_${crypto.randomBytes(12).toString("hex")}`;
-  await supabase
-    .from("assessments")
-    .update({
-      share_token: token,
-      shared_at: new Date().toISOString(),
-    })
-    .eq("id", row.id);
+  const referralCode = createPreviewReferralCode(data.referralCode);
 
   return {
-    shareToken: token,
-    shareUrl: `/share/${token}`,
+    shareToken: data.shareToken,
+    shareUrl: data.shareUrl,
     referralCode,
   };
 }
@@ -155,58 +133,18 @@ export async function getPublicShareReport(shareToken: string): Promise<PublicSh
   if (!shareToken) return null;
   const supabase = getSupabaseAdmin();
 
-  // Query ONLY public-safe columns
-  const { data: row, error } = await supabase
-    .from("assessments")
-    .select(
-      "share_token, startup_name, readiness_score, verdict, concise_verdict, confidence, evidence_coverage, strongest_dimension, weakest_dimension, traction_state, dimensions, actions, created_at, share_views, clerk_user_id, claim_token"
-    )
-    .eq("share_token", shareToken)
-    .single();
+  const { data, error } = await supabase.rpc("get_public_share_report", {
+    p_share_token: shareToken,
+  });
 
-  if (error || !row) {
+  if (error || !data) {
     return null;
   }
 
-  // Increment view count asynchronously
-  supabase
-    .from("assessments")
-    .update({ share_views: (row.share_views || 0) + 1 })
-    .eq("share_token", shareToken)
-    .then(() => {});
-
-  const referralCode = createPreviewReferralCode(row.clerk_user_id || row.claim_token);
-
-  // Strictly filter public actions (title, horizon, detail only)
-  const rawActions = Array.isArray(row.actions) ? row.actions : [];
-  const publicActions = rawActions.map((a: any) => ({
-    horizon: String(a.horizon || "fix-now"),
-    title: String(a.title || ""),
-    detail: String(a.detail || ""),
-  }));
-
-  const rawDimensions = Array.isArray(row.dimensions) ? row.dimensions : [];
-  const dimensions = rawDimensions.map((d: any) => ({
-    id: String(d.id || ""),
-    label: String(d.label || ""),
-    score: Number(d.score || 0),
-    explanation: String(d.explanation || ""),
-  }));
+  const referralCode = createPreviewReferralCode(data.referralCode || data.shareToken);
 
   return {
-    shareToken: row.share_token,
-    startupName: row.startup_name || "Startup",
-    readinessScore: row.readiness_score,
-    verdict: row.verdict,
-    conciseVerdict: row.concise_verdict || row.verdict,
-    confidence: row.confidence,
-    evidenceCoverage: row.evidence_coverage,
-    strongestDimension: row.strongest_dimension || "problem-clarity",
-    weakestDimension: row.weakest_dimension || "traction-proof",
-    tractionState: row.traction_state || "unverified",
-    dimensions,
-    publicActions,
-    generatedAt: row.created_at,
+    ...data,
     referralCode,
   };
 }

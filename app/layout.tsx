@@ -1,3 +1,6 @@
+import { Suspense } from "react";
+import { PostHogProvider } from "@/components/analytics/posthog-provider";
+import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
 
@@ -67,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               })
             }}
           />
+          <Suspense fallback={null}><PostHogProvider><GoogleAnalytics /></PostHogProvider></Suspense>
           <DemoProvider>
             <AssessmentProvider>
               {children}
