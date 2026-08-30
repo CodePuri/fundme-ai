@@ -20,14 +20,25 @@ const clerkRoutes = hasClerkKeys
     })
   : null;
 
-export default function middleware(request: NextRequest, event: NextFetchEvent) {
+export default async function middleware(request: NextRequest, event: NextFetchEvent) {
+  let response: NextResponse;
   if (hasClerkKeys && clerkRoutes) {
-    return clerkRoutes(request, event);
+    const clerkRes = await clerkRoutes(request, event);
+    response = clerkRes || NextResponse.next();
+  } else if (isClerkIndependentPublicPath(request.nextUrl.pathname) || isPublicRoute(request)) {
+    response = NextResponse.next();
+  } else {
+    response = NextResponse.next();
   }
-  if (isClerkIndependentPublicPath(request.nextUrl.pathname) || isPublicRoute(request)) {
-    return NextResponse.next();
+
+  // SEO Isolation Guard: Staging and Preview domains must NEVER be indexed
+  const host = request.headers.get("host") || "";
+  const isStagingOrPreview = host.includes("staging.tryfundme.in") || host.includes("vercel.app") || process.env.VERCEL_ENV === "preview";
+  if (isStagingOrPreview) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
   }
-  return NextResponse.next();
+
+  return response;
 }
 
 export const config = {
