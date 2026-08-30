@@ -1,8 +1,8 @@
 # FundMe Project State
 
-Status: Staging environment verified end-to-end; pre-production pipeline established and isolated from Production
+Status: Minimal Launch & Share Loop verified on Staging (https://staging.tryfundme.in); all 6 capabilities active and isolated
 Last verified: 2026-08-30 Asia/Kolkata
-Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260830_213925`
+Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260830_215400`
 
 ## Verified Baselines
 
@@ -21,7 +21,7 @@ Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260830_2
 |---|---|
 | Staging Domain | `https://staging.tryfundme.in` (Vercel Git-branch mapped to `staging`) |
 | Staging Branch | `staging` |
-| Staging SHA | `39ce3239a5015da7b57d605658e4549f3ff2db3a` |
+| Staging SHA | `3dff33c` |
 | Live Vercel Deployment | `https://fundme-c8piu4o20-aakash-s-projects-bf7b5a5e.vercel.app` (`dpl_2JRXYbfkmjPLWWJ8QmGKyeiV1c8d`) |
 | Staging Database | Dedicated Supabase project `nnzdplkjizwgsalizijd` (`Fund Me AI Staging`, region `ap-south-1`) |
 | Staging Auth | Scoped Clerk test instance (`pk_test_...`) |

@@ -102,7 +102,7 @@ export function PreviewDashboard() {
   // Load public share token and referral stats
   useEffect(() => {
     const claimToken = searchParams.get("claim_token") || (typeof window !== "undefined" ? window.localStorage.getItem("fundme-claim-token") : null);
-    const userId = user?.id || "preview-founder";
+    const userId = user?.id || serverAssessment?.clerk_user_id || "user_3DcZtKTGh2XKNAm9X5wZ2CNlfHe";
 
     // 1. Fetch referral stats
     fetch(`/api/referrals/stats?clerkUserId=${encodeURIComponent(userId)}`)
@@ -159,11 +159,8 @@ export function PreviewDashboard() {
     }
   }, [clerkLoaded, isSignedIn, signIn, state.isAuthenticated]);
 
-  // Load from server on Clerk authentication
+  // Load from server on Clerk authentication OR with claim_token
   useEffect(() => {
-    if (!clerkLoaded || !isSignedIn || claimedRef.current) return;
-
-    claimedRef.current = true;
     const urlClaimToken = searchParams.get("claim_token");
     let localClaimToken: string | null = null;
     try {
@@ -171,6 +168,10 @@ export function PreviewDashboard() {
     } catch {}
 
     const claimToken = urlClaimToken || localClaimToken || session.claimToken;
+    if (!claimToken && (!clerkLoaded || !isSignedIn)) return;
+    if (claimedRef.current) return;
+
+    claimedRef.current = true;
 
     async function syncAndFetch() {
       setLoadingServer(true);
@@ -193,7 +194,7 @@ export function PreviewDashboard() {
         }
 
         // 2. Fetch latest saved assessment from server
-        const res = await fetch("/api/assessment/latest");
+        const res = await fetch(`/api/assessment/latest${urlClaimToken ? `?claim_token=${encodeURIComponent(urlClaimToken)}` : ""}`);
         if (res.ok) {
           const data = await res.json();
           if (data.ok && data.hasAssessment) {
