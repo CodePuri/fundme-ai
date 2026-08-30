@@ -370,6 +370,35 @@ export async function synthesizeAssessmentWithAi(
   }
 }
 
+const VALID_DIMENSIONS = new Set<DimensionId>([
+  "founder-credibility",
+  "founder-market-fit",
+  "problem-clarity",
+  "solution-clarity",
+  "market-clarity",
+  "differentiation",
+  "product-maturity",
+  "traction-proof",
+  "funding-narrative",
+  "pitch-deck-readiness",
+]);
+
+function normalizeFindingType(type: string): Finding["type"] {
+  const t = (type || "").toLowerCase().trim();
+  if (t === "strength") return "strength";
+  if (t === "contradiction") return "contradiction";
+  if (t === "red-flag" || t === "redflag") return "red-flag";
+  if (t === "unsupported-claim" || t === "unsupported") return "unsupported-claim";
+  return "missing-evidence";
+}
+
+function normalizeSeverity(severity: string): Finding["severity"] {
+  const s = (severity || "").toLowerCase().trim();
+  if (s === "high" || s === "critical") return "high";
+  if (s === "low") return "low";
+  return "medium";
+}
+
 function mergeFindings(
   deterministic: Finding[],
   aiFindings?: AiStructuredOutput["synthesizedFindings"]
@@ -377,12 +406,12 @@ function mergeFindings(
   if (!aiFindings || aiFindings.length === 0) return deterministic;
 
   const validAiFindings: Finding[] = aiFindings
-    .filter((f) => f && f.id && f.explanation && f.action && f.dimension)
+    .filter((f) => f && f.id && f.explanation && f.action && f.dimension && VALID_DIMENSIONS.has(f.dimension as DimensionId))
     .map((f) => ({
       id: f.id,
-      type: f.type || "missing-evidence",
-      severity: f.severity || "medium",
-      dimension: f.dimension,
+      type: normalizeFindingType(f.type),
+      severity: normalizeSeverity(f.severity),
+      dimension: f.dimension as DimensionId,
       explanation: f.explanation,
       evidenceIds: [],
       action: f.action,
