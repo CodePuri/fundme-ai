@@ -8,17 +8,23 @@ import {
 
 const isPublicRoute = createRouteMatcher(CLERK_PUBLIC_ROUTE_PATTERNS);
 
-const clerkRoutes = clerkMiddleware(async (auth, req) => {
-  if (!isPublicRoute(req)) {
-    await auth.protect();
-  }
-});
+const hasClerkKeys = Boolean(
+  process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY && process.env.CLERK_SECRET_KEY
+);
+
+const clerkRoutes = hasClerkKeys
+  ? clerkMiddleware(async (auth, req) => {
+      if (!isPublicRoute(req)) {
+        await auth.protect();
+      }
+    })
+  : null;
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
-  if (isClerkIndependentPublicPath(request.nextUrl.pathname)) {
+  if (!hasClerkKeys || isClerkIndependentPublicPath(request.nextUrl.pathname) || isPublicRoute(request)) {
     return NextResponse.next();
   }
-  return clerkRoutes(request, event);
+  return clerkRoutes ? clerkRoutes(request, event) : NextResponse.next();
 }
 
 export const config = {
