@@ -60,3 +60,4 @@ api_*_response.json
 *_supabase_row.json
 payload*.json
 nextjs.log
+.vercel
