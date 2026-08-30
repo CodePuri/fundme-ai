@@ -198,6 +198,15 @@ export function FundingReadinessReport() {
     [report],
   );
 
+  useEffect(() => {
+    if (report) {
+      trackClientEvent("result_viewed", {
+        readinessScore: report.readinessScore,
+        scoreBucket: report.readinessScore >= 70 ? "high" : report.readinessScore >= 50 ? "medium" : "low",
+      });
+    }
+  }, [report]);
+
   if (!report) {
     return (
       <div className="mx-auto max-w-xl rounded-[24px] border border-[var(--border)] bg-white p-8 text-center">
@@ -244,14 +253,6 @@ export function FundingReadinessReport() {
     signIn();
     router.push("/app/preview");
   }
-  useEffect(() => {
-    if (report) {
-      trackClientEvent("result_viewed", {
-        readinessScore: report.readinessScore,
-        scoreBucket: report.readinessScore >= 70 ? "high" : report.readinessScore >= 50 ? "medium" : "low",
-      });
-    }
-  }, [report]);
 
   function handleSaveClick(source: string = "hero") {
     trackClientEvent("save_cta_clicked", { source });
