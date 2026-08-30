@@ -4,7 +4,13 @@ import { getLatestAssessmentForUser, getAssessmentByClaimToken } from "@/lib/ass
 
 export async function GET(req: Request) {
   try {
-    const { userId } = await auth();
+    let userId: string | null = null;
+    try {
+      const clerkAuth = await auth();
+      userId = clerkAuth.userId;
+    } catch {
+      // Unauthenticated caller or unconfigured Clerk in preview
+    }
     const url = new URL(req.url);
     const claimToken = url.searchParams.get("claim_token")?.trim();
 

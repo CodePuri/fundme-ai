@@ -11,7 +11,13 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { userId } = await auth();
+    let userId: string | null = null;
+    try {
+      const clerkAuth = await auth();
+      userId = clerkAuth.userId;
+    } catch {
+      // Anonymous caller or unconfigured Clerk in preview
+    }
     const json = await req.json();
     const { assessmentId, claimToken } = json || {};
 
