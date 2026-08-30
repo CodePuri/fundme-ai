@@ -21,10 +21,13 @@ const clerkRoutes = hasClerkKeys
   : null;
 
 export default function middleware(request: NextRequest, event: NextFetchEvent) {
-  if (!hasClerkKeys || isClerkIndependentPublicPath(request.nextUrl.pathname) || isPublicRoute(request)) {
+  if (hasClerkKeys && clerkRoutes) {
+    return clerkRoutes(request, event);
+  }
+  if (isClerkIndependentPublicPath(request.nextUrl.pathname) || isPublicRoute(request)) {
     return NextResponse.next();
   }
-  return clerkRoutes ? clerkRoutes(request, event) : NextResponse.next();
+  return NextResponse.next();
 }
 
 export const config = {
