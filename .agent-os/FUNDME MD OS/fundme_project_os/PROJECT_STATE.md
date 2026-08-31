@@ -11,8 +11,8 @@ Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260831_0
 |---|---|
 | Production Domain | `https://tryfundme.in` (HTTP/2 200, Vercel Anycast) |
 | Production Branch | `main` |
-| Production Release SHA | `a878b09` |
-| Rollback Tag | `release-pre-v1-prod-baseline-1040928` |
+| Production Release SHA | `081ad63` |
+| Rollback Tag | `rollback/pre-conversion-loop-v1-34d4213` |
 | Production Database | Dedicated Supabase project `wduygrhtijvaevcwptnr` (`Fund Me AI`, region `ap-south-1`) |
 | Production Auth | Dedicated Clerk Production instance `ins_3IeGsTifITbBh9PcCyg8WUhz9YE` (`pk_live_Y2xlcmsudHJ5ZnVuZG1lLmluJA`) |
 | Google OAuth | Live FundMe-owned Web Application Client (`986859817529-pg96k43a7ellud13opeerkjd82n4ho3m.apps.googleusercontent.com`) |
@@ -27,7 +27,7 @@ Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260831_0
 |---|---|
 | Staging Domain | `https://staging.tryfundme.in` (Vercel Git-branch mapped to `staging`) |
 | Staging Branch | `staging` |
-| Staging SHA | `cc05577` |
+| Staging SHA | `081ad63` |
 | Staging Database | Dedicated Supabase project `nnzdplkjizwgsalizijd` (`Fund Me AI Staging`, region `ap-south-1`) |
 | Staging Auth | Scoped Clerk test instance (`pk_test_...`) with Development mode badge |
 | SEO Isolation | `X-Robots-Tag: noindex, nofollow` enforced on all requests |
