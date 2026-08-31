@@ -1,4 +1,5 @@
 import {
+  CANONICAL_RUBRIC_VERSION,
   DEMO_RUBRIC_VERSION,
   type DimensionId,
   type DimensionScore,
@@ -9,6 +10,8 @@ import {
   type MentorQuestionId,
   type TractionState,
 } from "./types.ts";
+
+export { CANONICAL_RUBRIC_VERSION, DEMO_RUBRIC_VERSION };
 
 const DIMENSION_LABELS: Record<DimensionId, string> = {
   "founder-credibility": "Founder credibility",

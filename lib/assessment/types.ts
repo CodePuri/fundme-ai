@@ -1,5 +1,11 @@
 export const GRILL_SESSION_VERSION = 1 as const;
-export const DEMO_RUBRIC_VERSION = "fundme-demo-rubric@1" as const;
+export const CANONICAL_RUBRIC_VERSION = "fundme-rubric@2026.08-calibrated-v1" as const;
+export const DEMO_RUBRIC_VERSION = CANONICAL_RUBRIC_VERSION;
+export const SUPPORTED_RUBRIC_VERSIONS = [
+  "fundme-rubric@2026.08-calibrated-v1",
+  "fundme-demo-rubric@1",
+] as const;
+export type RubricVersion = typeof SUPPORTED_RUBRIC_VERSIONS[number];
 
 export type AssessmentRoute =
   | "/assessment"

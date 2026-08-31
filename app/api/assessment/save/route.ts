@@ -51,7 +51,7 @@ export async function POST(req: Request) {
           properties: { referralCode: body.referralCode || null },
         });
         
-        if (userEmail) {
+        if (userEmail && !result?.already_claimed) {
           sendAssessmentSavedEmail(userEmail, {
             founderName: userName || "Founder",
             startupName: result.assessment?.startup_name || "Your startup",

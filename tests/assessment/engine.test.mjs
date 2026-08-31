@@ -50,9 +50,13 @@ const strongAnswers = {
 };
 
 test("produces identical reports for identical evidence and timestamp", async () => {
-  const { assessSession } = await loadEngine();
+  const { assessSession, DEMO_RUBRIC_VERSION } = await loadEngine();
   const input = session({ answers: strongAnswers });
-  assert.deepEqual(assessSession(input, generatedAt), assessSession(input, generatedAt));
+  const rep1 = assessSession(input, generatedAt);
+  const rep2 = assessSession(input, generatedAt);
+  assert.equal(rep1.rubricVersion, "fundme-rubric@2026.08-calibrated-v1");
+  assert.equal(rep1.rubricVersion, DEMO_RUBRIC_VERSION);
+  assert.deepEqual(rep1, rep2);
 });
 
 test("scores specific, evidenced answers above vague answers", async () => {

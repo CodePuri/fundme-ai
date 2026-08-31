@@ -139,7 +139,10 @@ function validReport(value: unknown): boolean {
   const deckValid = record(value.deckReview) && new Set(["not-provided", "received-unparsed", "parsed"]).has(String(value.deckReview.status))
     && boundedString(value.deckReview.summary, 3_000) && stringArray(value.deckReview.findings, 20, 1_000);
 
-  return value.rubricVersion === "fundme-demo-rubric@1"
+  const isValidRubricVersion = value.rubricVersion === "fundme-rubric@2026.08-calibrated-v1"
+    || value.rubricVersion === "fundme-demo-rubric@1";
+
+  return isValidRubricVersion
     && boundedString(value.generatedAt, 64)
     && typeof value.readinessScore === "number" && value.readinessScore >= 0 && value.readinessScore <= 100
     && boundedString(value.verdict, 500) && boundedString(value.conciseVerdict, 1_000)

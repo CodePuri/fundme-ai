@@ -264,3 +264,27 @@ test("confirms early-access success only after browser storage succeeds", async 
   assert.equal(retry.session.persistenceWarning, null);
   assert.equal(JSON.parse(storage.getItem(adapters.GRILL_STORAGE_KEY)).persistenceWarning, null);
 });
+
+test("preserves and recovers historical reports from legacy rubric versions", async () => {
+  const adapters = await loadAdapters();
+  const session = adapters.createInitialSession("2026-07-23T00:00:00.000Z");
+  const reviewed = { ...session, stage: "result", reviewedAt: "2026-07-23T00:10:00.000Z" };
+  const currentReport = adapters.assessSession(session, "2026-07-23T00:10:00.000Z");
+  
+  // Historical report with legacy rubric version
+  const legacyReport = {
+    ...currentReport,
+    rubricVersion: "fundme-demo-rubric@1",
+  };
+  const legacyPayload = {
+    ...reviewed,
+    processingState: legacyReport.completionState,
+    report: legacyReport,
+  };
+  
+  const storage = memoryStorage({ [adapters.GRILL_STORAGE_KEY]: JSON.stringify(legacyPayload) });
+  const loaded = adapters.loadSession(storage);
+  assert.equal(loaded.stage, "result");
+  assert.equal(loaded.report?.rubricVersion, "fundme-demo-rubric@1");
+  assert.equal(loaded.report?.readinessScore, legacyReport.readinessScore);
+});
