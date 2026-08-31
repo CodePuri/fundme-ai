@@ -11,15 +11,16 @@ Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260831_0
 |---|---|
 | Production Domain | `https://tryfundme.in` (HTTP/2 200, Vercel Anycast) |
 | Production Branch | `main` |
-| Production Release SHA | `081ad63` |
+| Production Release SHA | `c465064` |
 | Rollback Tag | `rollback/pre-conversion-loop-v1-34d4213` |
 | Production Database | Dedicated Supabase project `wduygrhtijvaevcwptnr` (`Fund Me AI`, region `ap-south-1`) |
 | Production Auth | Dedicated Clerk Production instance `ins_3IeGsTifITbBh9PcCyg8WUhz9YE` (`pk_live_Y2xlcmsudHJ5ZnVuZG1lLmluJA`) |
 | Google OAuth | Live FundMe-owned Web Application Client (`986859817529-pg96k43a7ellud13opeerkjd82n4ho3m.apps.googleusercontent.com`) |
 | Production FAPI | `https://clerk.tryfundme.in/v1/environment` (HTTP 200, SSL valid) |
+| Calibrated Rubric | `fundme-rubric@2026.08-calibrated-v1` (Deterministic, versioned, historical-safe) |
 | AI Synthesis Engine | Server-side `groq` provider (`openai/gpt-oss-120b`), deterministic score preservation |
 | SEO Baseline | Production `robots.txt`, `sitemap.xml`, OpenGraph, Twitter, Schema.org WebApplication |
-| Automated Tests | 70/70 tests passing (61 assessment tests + 9 security/BOLA/IDOR tests) |
+| Automated Tests | 71/71 tests passing (62 assessment tests + 9 security/BOLA/IDOR tests) |
 | Browser E2E Status | 100% PASS (Full live customer journey: landing -> assessment -> AI diagnosis -> Google OAuth sign-in -> Production DB write -> public share -> signed-out sanitized view) |
 
 ### Staging Environment Baseline (Isolated Pre-Production)
@@ -27,7 +28,7 @@ Evidence root: `/Users/totem/Desktop/Code/Fundme-archive/verification/20260831_0
 |---|---|
 | Staging Domain | `https://staging.tryfundme.in` (Vercel Git-branch mapped to `staging`) |
 | Staging Branch | `staging` |
-| Staging SHA | `081ad63` |
+| Staging SHA | `c465064` |
 | Staging Database | Dedicated Supabase project `nnzdplkjizwgsalizijd` (`Fund Me AI Staging`, region `ap-south-1`) |
 | Staging Auth | Scoped Clerk test instance (`pk_test_...`) with Development mode badge |
 | SEO Isolation | `X-Robots-Tag: noindex, nofollow` enforced on all requests |
