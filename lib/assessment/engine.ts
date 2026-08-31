@@ -372,12 +372,11 @@ function missingFinding(
 }
 
 export function assessSession(session: GrillSession, generatedAt: string): FundingReadinessReport {
-  const stage = answer(session, "stage");
-  const traction = answer(session, "traction");
-  const tractionClassification = classifyTraction(traction);
-  const founderFit = answer(session, "founder-fit");
-  const differentiation = answer(session, "differentiation");
-  const fundingOutcome = answer(session, "funding-outcome");
+  const stageAnswer = answer(session, "stage");
+  const tractionAnswer = answer(session, "traction");
+  const founderFitAnswer = answer(session, "founder-fit");
+  const differentiationAnswer = answer(session, "differentiation");
+  const fundingOutcomeAnswer = answer(session, "funding-outcome");
   
   const deckArtifact = session.artifacts.find(
     (artifact) => artifact.kind === "pitch-deck" && artifact.status === "attached",
@@ -404,17 +403,62 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   const websiteDescription = session.input.websiteDescription?.trim() || "";
   const hasWebsiteContent = Boolean(websiteExtractedText || websiteTitle || websiteDescription);
 
+  // Multi-source extraction for traction
+  const tractionExtracted = ((description + " " + websiteExtractedText).match(/(?:\$?\d+(?:[.,]\d+)?\s*(?:k|m|b)?\s*(?:mrr|arr|revenue|customers?|users?|logos?|pilots?|growth)|paying\s+customers?|enterprise\s+logos?|hospital\s+pilots?)[^.]*/gi) || []).join("; ");
+  const tractionDeck = deckArtifact?.detectedSections?.includes("traction") ? (deckArtifact.extractedText?.match(/(?:\$?\d+(?:[.,]\d+)?\s*(?:k|m|b)?\s*(?:mrr|arr|revenue|customers?|users?|logos?|pilots?|growth)|annual\s+run\s+rate|arr|mrr)[^.]*/gi)?.join("; ") || "Pitch deck includes traction slide") : "";
+  const effectiveTraction = tractionAnswer || tractionExtracted || tractionDeck;
+  const tractionClassification = classifyTraction(effectiveTraction);
+
+  // Multi-source extraction for founder-market fit
+  const fmfExtracted = profile || (isResumeParsed ? founderProfileArtifact!.extractedText : "") || (deckArtifact?.detectedSections?.includes("team") ? "Pitch deck includes team and experience slide" : "");
+  const effectiveFounderFit = founderFitAnswer || fmfExtracted;
+
+  // Multi-source extraction for differentiation
+  const diffExtracted = (description + " " + websiteExtractedText).match(/(?:unlike|replaces|alternative|versus|vs\.?|faster than|automated|proprietary|workflow|moat|advantage|competitive|better than)[^.]*/i)?.[0] || (deckArtifact?.detectedSections?.some((s) => s === "competition" || s === "advantage") ? "Pitch deck includes competitive landscape" : "");
+  const effectiveDifferentiation = differentiationAnswer || diffExtracted;
+
+  // Multi-source extraction for product maturity / stage
+  const combinedMaturityText = (stageAnswer + " " + description + " " + websiteExtractedText + " " + (deckArtifact?.extractedText || "")).toLowerCase();
+  let maturityScore = 20;
+  let maturityExplanation = "Product stage was not answered.";
+  let maturityEvidenceUsed: string[] = [];
+  if (stageAnswer) {
+    maturityScore = evidenceScore(stageAnswer, 20);
+    maturityExplanation = "Product maturity reflects the founder's submitted stage statement.";
+    maturityEvidenceUsed = ["stage-answer"];
+  } else if (/(?:\$?\d+(?:,\d+)?\s*(?:mrr|arr|revenue)|paying\s+customers?|enterprise\s+logos?|paying\s+teams?|live\s+product|in\s+production)/i.test(combinedMaturityText)) {
+    maturityScore = 75;
+    maturityExplanation = "Submitted materials confirm live product with commercial adoption.";
+    maturityEvidenceUsed = description ? ["startup-description"] : (hasWebsiteContent ? ["startup-website"] : []);
+  } else if (/(?:pilot|pilots|beta|poc|agreements?\s+signed|hospital\s+pilots?)/i.test(combinedMaturityText)) {
+    maturityScore = 55;
+    maturityExplanation = "Submitted materials indicate active pilot validation or beta stage.";
+    maturityEvidenceUsed = description ? ["startup-description"] : (hasWebsiteContent ? ["startup-website"] : []);
+  } else if (/(?:prototype|architecting|building|mvp)/i.test(combinedMaturityText)) {
+    maturityScore = 38;
+    maturityExplanation = "Submitted materials describe an active prototype in development.";
+    maturityEvidenceUsed = description ? ["startup-description"] : [];
+  } else if (/(?:pre[- ]?launch|idea|concept|stealth)/i.test(combinedMaturityText)) {
+    maturityScore = 25;
+    maturityExplanation = "Product is in early concept / pre-launch stage.";
+    maturityEvidenceUsed = description ? ["startup-description"] : [];
+  }
+
+  // Multi-source extraction for funding narrative
+  const fundingExtracted = ((description + " " + (deckArtifact?.extractedText || "")).match(/(?:raising|raise|seed\s+round|series\s+[a-z]|round\s+size|runway|\$\d+(?:\.\d+)?\s*[mkb])[^.]*/i)?.[0] || "") || (deckArtifact?.detectedSections?.includes("funding-ask") ? "Pitch deck includes funding ask and milestones slide" : "");
+  const effectiveFundingOutcome = fundingOutcomeAnswer || fundingExtracted;
+
   const evidence: EvidenceReference[] = [
     { id: "startup-description", label: "Startup description", value: description || "Not supplied", state: description ? "submitted" : "missing" },
     { id: "startup-website", label: "Startup website", value: website ? (hasWebsiteContent ? `${website} (extracted: ${websiteTitle || websiteDescription || "live content"})` : website) : "Not supplied", state: website ? "submitted" : "missing" },
     { id: "founder-name", label: "Founder name", value: session.input.founderName.trim(), state: "submitted" },
     { id: "founder-role", label: "Founder role", value: session.input.founderRole.trim() || "Not supplied", state: session.input.founderRole.trim() ? "submitted" : "missing" },
     { id: "founder-profile", label: "Founder profile", value: founderProfileEvidenceValue, state: hasFounderProfileEvidence ? "submitted" : "missing" },
-    { id: "stage-answer", label: "Product stage", value: stage || "Not answered", state: stage ? "submitted" : "missing" },
-    { id: "traction-answer", label: "Traction", value: traction || "Not answered", state: traction ? "submitted" : "missing" },
-    { id: "founder-fit-answer", label: "Founder-market fit", value: founderFit || "Not answered", state: founderFit ? "submitted" : "missing" },
-    { id: "differentiation-answer", label: "Differentiation", value: differentiation || "Not answered", state: differentiation ? "submitted" : "missing" },
-    { id: "funding-answer", label: "Funding outcome", value: fundingOutcome || "Not answered", state: fundingOutcome ? "submitted" : "missing" },
+    { id: "stage-answer", label: "Product stage", value: stageAnswer || (maturityEvidenceUsed.length ? "Inferred from submitted materials" : "Not answered"), state: stageAnswer || maturityEvidenceUsed.length ? "submitted" : "missing" },
+    { id: "traction-answer", label: "Traction", value: effectiveTraction || "Not answered", state: effectiveTraction ? "submitted" : "missing" },
+    { id: "founder-fit-answer", label: "Founder-market fit", value: effectiveFounderFit || "Not answered", state: effectiveFounderFit ? "submitted" : "missing" },
+    { id: "differentiation-answer", label: "Differentiation", value: effectiveDifferentiation || "Not answered", state: effectiveDifferentiation ? "submitted" : "missing" },
+    { id: "funding-answer", label: "Funding outcome", value: effectiveFundingOutcome || "Not answered", state: effectiveFundingOutcome ? "submitted" : "missing" },
     { id: "pitch-deck", label: "Pitch deck", value: isDeckParsed ? `Parsed ${deckArtifact!.pageCount || 1} slides (${deckArtifact!.name})` : (hasDeck ? "Attached; contents not parsed" : "Not supplied"), state: hasDeck ? (isDeckParsed ? "submitted" : "attached") : "missing" },
   ];
 
@@ -465,10 +509,14 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     ),
     dimension(
       "founder-market-fit",
-      evidenceScore(founderFit, 22),
-      founderFit ? "The founder supplied a direct founder-market-fit explanation." : "No founder-market-fit explanation was submitted.",
-      founderFit ? ["founder-fit-answer"] : [],
-      founderFit ? [] : ["Relevant experience, access, or lived insight"],
+      founderFitAnswer ? evidenceScore(founderFitAnswer, 22) : (effectiveFounderFit ? Math.min(88, evidenceScore(effectiveFounderFit, 24)) : 22),
+      founderFitAnswer
+        ? "The founder supplied a direct founder-market-fit explanation."
+        : (effectiveFounderFit
+          ? "Founder background demonstrates relevant domain context and experience."
+          : "No founder-market-fit explanation was submitted."),
+      founderFitAnswer ? ["founder-fit-answer"] : (hasFounderProfileEvidence ? ["founder-profile"] : (hasDeck ? ["pitch-deck"] : [])),
+      effectiveFounderFit ? [] : ["Relevant experience, access, or lived insight"],
     ),
     dimension(
       "problem-clarity",
@@ -494,44 +542,52 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
     ),
     dimension(
       "market-clarity",
-      evidenceScore(`${description} ${traction}`, 20),
-      "Market clarity is inferred only from named users and submitted traction context.",
-      [...(description ? ["startup-description"] : []), ...(traction ? ["traction-answer"] : [])],
+      evidenceScore(`${description} ${websiteExtractedText} ${effectiveTraction}`, 20) + (deckArtifact?.detectedSections?.some((s) => s === "market" || s === "business-model") ? 10 : 0),
+      "Market clarity is inferred from named users, industry terms, and submitted traction context.",
+      [...(description ? ["startup-description"] : []), ...(website ? ["startup-website"] : []), ...(effectiveTraction ? ["traction-answer"] : [])],
       ["Market size and reachable segment evidence"],
     ),
     dimension(
       "differentiation",
-      evidenceScore(differentiation, 20),
-      differentiation ? "The founder named an alternative and switching rationale." : "No competitive alternative or switching rationale was submitted.",
-      differentiation ? ["differentiation-answer"] : [],
-      differentiation ? [] : ["Named alternative and measurable advantage"],
+      differentiationAnswer ? evidenceScore(differentiationAnswer, 20) : (effectiveDifferentiation ? Math.min(85, evidenceScore(effectiveDifferentiation, 28)) : 20),
+      differentiationAnswer
+        ? "The founder named an alternative and switching rationale."
+        : (effectiveDifferentiation
+          ? "Submitted materials identify competitive positioning and workflow advantages."
+          : "No competitive alternative or switching rationale was submitted."),
+      differentiationAnswer ? ["differentiation-answer"] : (diffExtracted ? (description ? ["startup-description"] : ["startup-website"]) : (hasDeck ? ["pitch-deck"] : [])),
+      effectiveDifferentiation ? [] : ["Named alternative and measurable advantage"],
     ),
     dimension(
       "product-maturity",
-      evidenceScore(stage, 20),
-      stage ? "Product maturity reflects the founder's submitted stage statement." : "Product stage was not answered.",
-      stage ? ["stage-answer"] : [],
-      stage ? [] : ["Current stage and shipping evidence"],
+      maturityScore,
+      maturityExplanation,
+      maturityEvidenceUsed,
+      maturityScore > 25 ? [] : ["Current stage and shipping evidence"],
     ),
     dimension(
       "traction-proof",
-      tractionClassification.state === "positive" ? evidenceScore(traction, 15) : tractionClassification.state === "contradictory" ? 20 : 15,
+      tractionClassification.state === "positive" ? Math.min(92, evidenceScore(effectiveTraction, 28)) : tractionClassification.state === "contradictory" ? 20 : tractionClassification.state === "none" ? 20 : 15,
       tractionClassification.state === "positive"
-        ? "Traction strength depends on the specificity of the submitted metrics."
+        ? "Traction strength reflects submitted customer, revenue, or pilot proof."
         : tractionClassification.state === "missing"
           ? "No traction information was submitted."
           : tractionClassification.state === "none"
             ? "The founder explicitly reported no current traction."
             : "The traction answer contains conflicting current claims.",
-      traction ? ["traction-answer"] : [],
+      effectiveTraction ? (tractionAnswer ? ["traction-answer"] : (description ? ["startup-description"] : (hasWebsiteContent ? ["startup-website"] : ["pitch-deck"]))) : [],
       tractionClassification.state === "positive" ? [] : ["Users, revenue, retention, pilots, or customer references"],
     ),
     dimension(
       "funding-narrative",
-      evidenceScore(fundingOutcome, 18),
-      fundingOutcome ? "The use-of-funds statement is scored for specificity and milestone linkage." : "No funding outcome was submitted.",
-      fundingOutcome ? ["funding-answer"] : [],
-      fundingOutcome ? [] : ["Raise amount, runway, use of funds, and target milestone"],
+      fundingOutcomeAnswer ? evidenceScore(fundingOutcomeAnswer, 18) : (effectiveFundingOutcome ? Math.min(85, evidenceScore(effectiveFundingOutcome, 25)) : 18),
+      fundingOutcomeAnswer
+        ? "The use-of-funds statement is scored for specificity and milestone linkage."
+        : (effectiveFundingOutcome
+          ? "Funding ask and milestone targets identified in submitted materials."
+          : "No funding outcome was submitted."),
+      fundingOutcomeAnswer ? ["funding-answer"] : (fundingExtracted ? (hasDeck ? ["pitch-deck"] : ["startup-description"]) : []),
+      effectiveFundingOutcome ? [] : ["Raise amount, runway, use of funds, and target milestone"],
     ),
     dimension(
       "pitch-deck-readiness",
@@ -546,9 +602,9 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
   if (tractionClassification.state === "missing") findings.push(missingFinding("missing-traction", "traction-proof", "No traction information was submitted.", "Add one verifiable traction metric with a date."));
   if (tractionClassification.state === "none") findings.push(missingFinding("no-current-traction", "traction-proof", "The founder explicitly reported no current traction.", "Define the first measurable traction milestone and its target date."));
   if (!description && !hasWebsiteContent) findings.push(missingFinding("missing-startup-description", "problem-clarity", "No startup description was submitted, and the Preview did not extract claims from the website or deck.", "Add one sentence naming the customer, problem, and product approach."));
-  if (!founderFit) findings.push(missingFinding("missing-founder-fit", "founder-market-fit", "Founder-market fit is unsupported.", "Explain the team's relevant experience, access, or insight."));
-  if (!differentiation) findings.push(missingFinding("missing-differentiation", "differentiation", "The current alternative and switching reason are missing.", "Name the buyer's current workaround and why they would switch."));
-  if (!fundingOutcome) findings.push(missingFinding("missing-funding-outcome", "funding-narrative", "The round is not connected to a measurable milestone.", "State the raise, runway, use of funds, and target milestone."));
+  if (!founderFitAnswer) findings.push(missingFinding("missing-founder-fit", "founder-market-fit", "Founder-market fit is unsupported.", "Explain the team's relevant experience, access, or insight."));
+  if (!differentiationAnswer) findings.push(missingFinding("missing-differentiation", "differentiation", "The current alternative and switching reason are missing.", "Name the buyer's current workaround and why they would switch."));
+  if (!fundingOutcomeAnswer) findings.push(missingFinding("missing-funding-outcome", "funding-narrative", "The round is not connected to a measurable milestone.", "State the raise, runway, use of funds, and target milestone."));
   if (!hasDeck) findings.push(missingFinding("missing-deck", "pitch-deck-readiness", "No pitch deck was provided.", "Attach a deck when you want its presence represented; parsing is not available in this Preview."));
   if (tractionClassification.ambiguousTimeline) {
     findings.push({
@@ -557,13 +613,13 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
       severity: "medium",
       dimension: "traction-proof",
       explanation: "The traction answer contains multiple values without enough timing context to compare them safely.",
-      evidenceIds: ["traction-answer"],
+      evidenceIds: [tractionAnswer ? "traction-answer" : "startup-description"],
       action: "Add dates or explicitly label the historical and current traction values.",
     });
   }
 
-  const claimsPreLaunch = /pre[- ]?launch|(?:(?:have|has)\s+not|(?:haven|hasn)['’]t|not)\s+launched|(?:(?:are|is|was|were)\s+not|(?:aren|isn|wasn|weren)['’]t|not)\s+(?:currently\s+|yet\s+)?live|(?:(?:have|has|had)\s+not|(?:haven|hasn|hadn)['’]t)\s+(?:yet\s+)?gone\s+live|no customers|\bidea\b/i.test(stage)
-    && !/live today|now live|currently live|launched today/i.test(stage);
+  const claimsPreLaunch = /pre[- ]?launch|(?:(?:have|has)\s+not|(?:haven|hasn)['’]t|not)\s+launched|(?:(?:are|is|was|were)\s+not|(?:aren|isn|wasn|weren)['’]t|not)\s+(?:currently\s+|yet\s+)?live|(?:(?:have|has|had)\s+not|(?:haven|hasn|hadn)['’]t)\s+(?:yet\s+)?gone\s+live|no customers|\bidea\b/i.test(stageAnswer || description)
+    && !/live today|now live|currently live|launched today/i.test(stageAnswer || description);
   if (tractionClassification.state === "contradictory") {
     findings.unshift({
       id: "traction-claim-conflict",
@@ -571,7 +627,7 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
       severity: "high",
       dimension: "traction-proof",
       explanation: "The traction answer contains conflicting current claims.",
-      evidenceIds: ["traction-answer"],
+      evidenceIds: [tractionAnswer ? "traction-answer" : "startup-description"],
       action: "Reconcile the current traction values with dates, definitions, and source evidence.",
     });
   } else if (claimsPreLaunch && tractionClassification.state === "positive") {
@@ -581,19 +637,19 @@ export function assessSession(session: GrillSession, generatedAt: string): Fundi
       severity: "high",
       dimension: "traction-proof",
       explanation: "The submitted stage says the startup is pre-launch or has no customers, while the traction answer claims current commercial evidence.",
-      evidenceIds: ["stage-answer", "traction-answer"],
+      evidenceIds: [stageAnswer ? "stage-answer" : "startup-description", tractionAnswer ? "traction-answer" : "startup-description"],
       action: "Reconcile the product-stage and traction statements with dates and definitions.",
     });
   }
 
-  if (tractionClassification.state === "positive" && SPECIFICITY_PATTERN.test(traction)) {
+  if (tractionClassification.state === "positive" && SPECIFICITY_PATTERN.test(effectiveTraction)) {
     findings.push({
       id: "specific-traction",
       type: "strength",
       severity: "low",
       dimension: "traction-proof",
       explanation: "The traction answer includes a measurable signal.",
-      evidenceIds: ["traction-answer"],
+      evidenceIds: [tractionAnswer ? "traction-answer" : "startup-description"],
       action: "Keep source evidence ready for diligence.",
     });
   }

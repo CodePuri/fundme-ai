@@ -527,7 +527,7 @@ export function FundingReadinessReport() {
               <button aria-label="Close authentication handoff" className="grid size-11 place-items-center rounded-full border border-black/8 hover:bg-black/[0.03] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]" onClick={closeAuth} type="button"><X className="size-4" /></button>
             </div>
             <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]" id="auth-handoff-description">
-              Keep this result and open your Preview matches.
+              Keep this result and access your founder dashboard.
             </p>
             {session.persistenceWarning ? (
               <p className="mt-3 rounded-[14px] border border-amber-200 bg-amber-50 p-3 text-[13px] leading-5 text-amber-950" role="alert">

@@ -231,7 +231,7 @@ export function IntakeGrid() {
             </details>
             <details className="mt-2 px-1 text-[12px] leading-5 text-[var(--text-secondary)]">
               <summary className="flex min-h-9 cursor-pointer items-center rounded-md font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--focus-ring)]">How profile sources work</summary>
-              <p className="mt-1">Evaluates founder background, domain authority, and founder-market fit. Uses public URL or submitted text.</p>
+              <p className="mt-1">Evaluates founder background and domain experience from your submitted profile text, resume file, and role context.</p>
             </details>
           </article>
 
