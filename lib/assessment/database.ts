@@ -83,7 +83,10 @@ export async function claimAssessmentForUser(params: {
     throw new Error(`Failed to claim assessment: ${error.message}`);
   }
 
-  return data;
+  return {
+    ...data,
+    already_claimed: data?.already_claimed ?? (data?.assessment?.claim_status === "claimed"),
+  };
 }
 
 export async function getLatestAssessmentForUser(clerkUserId: string) {

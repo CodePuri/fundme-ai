@@ -31,16 +31,32 @@ export function sanitizeAnalyticsProperties(
 
   const BLOCKED_KEYS = new Set([
     "email",
+    "user_email",
+    "useremail",
     "token",
     "claim_token",
     "claimtoken",
+    "share_token",
+    "sharetoken",
     "raw_session",
     "rawsession",
     "transcript",
     "deck_text",
     "decktext",
+    "deck_contents",
+    "deckcontents",
+    "evidence",
+    "raw_evidence",
+    "rawevidence",
+    "founder_text",
+    "foundertext",
+    "profile_text",
+    "profiletext",
+    "free_text",
+    "freetext",
     "password",
     "secret",
+    "secrets",
   ]);
 
   for (const [key, value] of Object.entries(properties)) {
