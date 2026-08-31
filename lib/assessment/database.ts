@@ -1,9 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { FundingReadinessReport, GrillSession } from "./types.ts";
 
-const FUNDME_SERVER_INTERNAL_SECRET =
-  process.env.FUNDME_SERVER_INTERNAL_SECRET || "fundme_staging_sec_7a89f0e1c2d3b4a5";
-
 export function getSupabaseAdmin(): SupabaseClient {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -14,11 +11,6 @@ export function getSupabaseAdmin(): SupabaseClient {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
-    },
-    global: {
-      headers: {
-        "x-fundme-server-secret": FUNDME_SERVER_INTERNAL_SECRET,
-      },
     },
   });
 }

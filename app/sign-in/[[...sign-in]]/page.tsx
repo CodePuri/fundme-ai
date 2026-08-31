@@ -1,9 +1,38 @@
 import { SignIn } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import { getLatestAssessmentForUser } from "@/lib/assessment/database";
 
-export default function SignInPage() {
+export default async function SignInPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ redirect_url?: string }>;
+}) {
+  const { userId } = await auth();
+  const params = await searchParams;
+
+  if (userId) {
+    if (params.redirect_url) {
+      redirect(params.redirect_url);
+    }
+    try {
+      const latest = await getLatestAssessmentForUser(userId);
+      if (latest.hasAssessment) {
+        redirect("/app/preview");
+      } else {
+        redirect("/assessment");
+      }
+    } catch {
+      redirect("/app/preview");
+    }
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-white">
-      <SignIn fallbackRedirectUrl="/onboarding" />
+      <SignIn
+        fallbackRedirectUrl="/app/preview"
+        forceRedirectUrl={params.redirect_url || undefined}
+      />
     </main>
   );
 }

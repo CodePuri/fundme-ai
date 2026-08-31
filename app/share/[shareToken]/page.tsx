@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, Check, ShieldCheck, Sparkles, Share2, Copy } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
 import { getPublicShareReport } from "@/lib/assessment/share";
 import { ScoreRing } from "@/components/assessment/funding-readiness-report";
 import { Button } from "@/components/ui/button";
@@ -61,6 +62,14 @@ export default async function PublicSharePage({
     notFound();
   }
 
+  let isOwner = false;
+  try {
+    const clerkAuth = await auth();
+    if (clerkAuth.userId && report.referralCode === clerkAuth.userId) {
+      isOwner = true;
+    }
+  } catch {}
+
   return (
     <div className="min-h-screen bg-[var(--background)] px-4 py-8 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-[880px]">
@@ -76,11 +85,19 @@ export default async function PublicSharePage({
             <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
               Verified Diagnosis
             </span>
-            <Link href={`/assessment?ref=${report.referralCode}`}>
-              <Button size="sm" className="hidden text-xs sm:inline-flex">
-                Get Assessed Free
-              </Button>
-            </Link>
+            {isOwner ? (
+              <Link href="/app/preview">
+                <Button size="sm" variant="secondary" className="text-xs">
+                  ← My Workspace
+                </Button>
+              </Link>
+            ) : (
+              <Link href={`/assessment?ref=${report.referralCode}`}>
+                <Button size="sm" className="hidden text-xs sm:inline-flex">
+                  Get Assessed Free
+                </Button>
+              </Link>
+            )}
           </div>
         </header>
 

@@ -255,8 +255,47 @@ export function FundingReadinessReport() {
     router.push("/app/preview");
   }
 
-  function handleSaveClick(source: string = "hero") {
+  async function handleSaveClick(source: string = "hero") {
     trackClientEvent("save_cta_clicked", { source });
+
+    if (state.isAuthenticated) {
+      // User is ALREADY authenticated in session — save directly and go to workspace
+      try {
+        await fetch("/api/assessment/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            claimToken: session.claimToken || undefined,
+            session,
+          }),
+        });
+      } catch (err) {
+        console.error("Save assessment error:", err);
+      }
+      router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
+      return;
+    }
+
+    // Try direct save in case authenticated via cookie
+    try {
+      const saveRes = await fetch("/api/assessment/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          claimToken: session.claimToken || undefined,
+          session,
+        }),
+      });
+      if (saveRes.ok) {
+        const data = await saveRes.json();
+        if (data.ok) {
+          signIn();
+          router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
+          return;
+        }
+      }
+    } catch {}
+
     trackClientEvent("signup_started", { hasClaimToken: Boolean(session.claimToken) });
     setAuthOpen(true);
   }

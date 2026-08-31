@@ -16,8 +16,10 @@ import {
   X,
 } from "lucide-react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { UserButton } from "@clerk/nextjs";
 import { useMounted } from "@/lib/hooks/use-mounted";
 import { useSafeReducedMotion } from "@/lib/hooks/use-safe-reduced-motion";
+import { useProductAuthState } from "@/lib/hooks/use-product-auth-state";
 
 // import { PublicAuthController } from "@/components/public/public-auth-controller";
 import { BrandLockup } from "@/components/ui/brand-lockup";
@@ -102,6 +104,7 @@ function Header() {
   const shouldReduceMotion = useSafeReducedMotion();
   const { scrollY } = useScroll();
   const [scrolled, setScrolled] = useState(false);
+  const { isLoaded, isSignedIn, signOut, hasSavedAssessment, primaryCta } = useProductAuthState();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     setScrolled(latest > 40);
@@ -135,13 +138,42 @@ function Header() {
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Link
-            className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
-            href="/assessment"
-            style={{ color: "#ffffff" }}
-          >
-            Get Started
-          </Link>
+          {!isLoaded ? (
+            <div className="h-9 w-24 rounded-full bg-black/5 animate-pulse" />
+          ) : isSignedIn ? (
+            <>
+              <Link
+                className="rounded-full border border-black/10 bg-white/80 px-4 py-2 text-[13.5px] font-semibold text-[#171513] transition-colors hover:bg-white hover:border-black/20"
+                href="/app/preview"
+              >
+                {hasSavedAssessment ? "My assessment" : "Dashboard"}
+              </Link>
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "size-8.5 rounded-full border border-[#d9cbbd]",
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Link
+                className="text-[14px] font-semibold text-[#171513] transition-colors hover:text-black"
+                href="/sign-in"
+              >
+                Sign In
+              </Link>
+              <Link
+                className="rounded-full bg-[#171513] px-5 py-2.5 text-[14px] font-medium transition-colors hover:bg-[#2a2622]"
+                href={primaryCta.href}
+                style={{ color: "#ffffff" }}
+              >
+                {primaryCta.label}
+              </Link>
+            </>
+          )}
         </div>
 
         <button
@@ -163,6 +195,18 @@ function Header() {
           transition={{ duration: 0.25, ease: EASE_OUT }}
         >
           <div className="flex flex-col gap-2">
+            {isSignedIn ? (
+              <div className="mb-2 border-b border-black/8 pb-3">
+                <Link
+                  className="flex items-center justify-between rounded-2xl bg-white/70 px-4 py-3 text-[14px] font-semibold text-[#171513]"
+                  href="/app/preview"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  <span>{hasSavedAssessment ? "My assessment" : "Dashboard"}</span>
+                  <ArrowRight className="size-4 text-[#ff6b3d]" />
+                </Link>
+              </div>
+            ) : null}
             {navItems.map((item) => (
               <Link
                 className="rounded-2xl px-3 py-2 text-[14px] font-semibold text-[#171513] transition-colors hover:bg-white/50"
@@ -173,14 +217,35 @@ function Header() {
                 {item.label}
               </Link>
             ))}
-            <Link
-              className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium"
-              href="/assessment"
-              onClick={() => setMenuOpen(false)}
-              style={{ color: "#ffffff" }}
-            >
-              Get Started
-            </Link>
+            {isSignedIn ? (
+              <button
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl border border-black/8 bg-white/80 px-4 py-3 text-[14px] font-medium text-[#171513]"
+                onClick={() => {
+                  setMenuOpen(false);
+                  signOut();
+                }}
+                type="button"
+              >
+                Sign out
+              </button>
+            ) : (
+              <>
+                <Link
+                  className="rounded-2xl px-3 py-2 text-[14px] font-semibold text-[#171513] transition-colors hover:bg-white/50"
+                  href="/sign-in"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+                <Link
+                  className="mt-2 block rounded-2xl bg-[#171513] px-4 py-3 text-center text-[14px] font-medium text-white"
+                  href={primaryCta.href}
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {primaryCta.label}
+                </Link>
+              </>
+            )}
           </div>
         </motion.div>
       ) : null}
@@ -338,6 +403,7 @@ function FloatingCardMid({
 
 function HomepageHero() {
   const shouldReduceMotion = useSafeReducedMotion();
+  const { isLoaded, isSignedIn, hasSavedAssessment, primaryCta, secondaryCta } = useProductAuthState();
 
   return (
     <section className="relative overflow-hidden pt-32 sm:pt-36 lg:pt-40">
@@ -405,21 +471,34 @@ function HomepageHero() {
               Drop your website. We scan your positioning, founder signals, and application readiness against real accelerator criteria.
             </motion.p>
 
-            {/* CTA row — single primary action */}
+            {/* CTA row — intelligent product continuation */}
             <motion.div className="mt-9 flex flex-col items-center gap-3 sm:mt-10" variants={fadeRise}>
-              <Link href="/assessment" passHref legacyBehavior>
-                <motion.a
-                  className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
-                  whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
-                  whileTap={shouldReduceMotion ? undefined : tapCompress}
-                >
-                  Get Started Free
-                  <ArrowRight className="size-3.5" />
-                </motion.a>
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                <Link href={primaryCta.href} passHref legacyBehavior>
+                  <motion.a
+                    className="inline-flex items-center gap-2 rounded-full bg-[#171513] px-7 py-3.5 text-[14.5px] font-medium text-white shadow-[0_12px_32px_rgba(18,15,11,0.12)] transition-colors hover:bg-[#2a2622]"
+                    whileHover={shouldReduceMotion ? undefined : { scale: 1.03, y: -1 }}
+                    whileTap={shouldReduceMotion ? undefined : tapCompress}
+                  >
+                    {primaryCta.label}
+                    <ArrowRight className="size-3.5" />
+                  </motion.a>
+                </Link>
+                {secondaryCta ? (
+                  <Link href={secondaryCta.href} passHref legacyBehavior>
+                    <motion.a
+                      className="inline-flex items-center gap-2 rounded-full border border-[#d9cbbd] bg-white/80 px-6 py-3.5 text-[14px] font-medium text-[#171513] shadow-[0_4px_16px_rgba(18,15,11,0.04)] backdrop-blur transition-colors hover:bg-white"
+                      whileHover={shouldReduceMotion ? undefined : { scale: 1.02, y: -1 }}
+                      whileTap={shouldReduceMotion ? undefined : tapCompress}
+                    >
+                      {secondaryCta.label}
+                    </motion.a>
+                  </Link>
+                ) : null}
+              </div>
             </motion.div>
             <motion.div className="mt-3 text-[13px] font-medium text-[#615a51]" variants={fadeRise}>
-              Free assessment. No credit card required.
+              {primaryCta.subtext}
             </motion.div>
 
             {/* Trust row removed — single trust rail section below handles this */}

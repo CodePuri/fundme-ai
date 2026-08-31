@@ -19,7 +19,7 @@ test("Security: Anonymous client cannot call private RPCs directly over Supabase
     p_clerk_user_id: "user_victim_123",
   });
   assert.ok(latestErr, "Direct anonymous call to rpc_get_latest_assessment must be rejected");
-  assert.match(latestErr.message, /Access denied/);
+  assert.match(latestErr.message, /permission denied|Access denied/i);
 
   // 2. Direct RPC rpc_save_assessment without server secret must fail
   const { error: saveErr } = await anonClient.rpc("rpc_save_assessment", {
@@ -31,7 +31,7 @@ test("Security: Anonymous client cannot call private RPCs directly over Supabase
     p_report: { readinessScore: 100 },
   });
   assert.ok(saveErr, "Direct anonymous call to rpc_save_assessment must be rejected");
-  assert.match(saveErr.message, /Access denied/);
+  assert.match(saveErr.message, /permission denied|Access denied/i);
 
   // 3. Direct RPC rpc_claim_assessment without server secret must fail
   const { error: claimErr } = await anonClient.rpc("rpc_claim_assessment", {
@@ -39,21 +39,21 @@ test("Security: Anonymous client cannot call private RPCs directly over Supabase
     p_claim_token: "target-token",
   });
   assert.ok(claimErr, "Direct anonymous call to rpc_claim_assessment must be rejected");
-  assert.match(claimErr.message, /Access denied/);
+  assert.match(claimErr.message, /permission denied|Access denied/i);
 
   // 4. Direct RPC rpc_create_or_get_share_token without server secret must fail
   const { error: shareErr } = await anonClient.rpc("rpc_create_or_get_share_token", {
     p_assessment_id: "00000000-0000-0000-0000-000000000000",
   });
   assert.ok(shareErr, "Direct anonymous call to rpc_create_or_get_share_token must be rejected");
-  assert.match(shareErr.message, /Access denied/);
+  assert.match(shareErr.message, /permission denied|Access denied/i);
 
   // 5. Direct RPC rpc_get_referral_stats without server secret must fail
   const { error: statsErr } = await anonClient.rpc("rpc_get_referral_stats", {
     p_clerk_user_id: "user_victim_123",
   });
   assert.ok(statsErr, "Direct anonymous call to rpc_get_referral_stats must be rejected");
-  assert.match(statsErr.message, /Access denied/);
+  assert.match(statsErr.message, /permission denied|Access denied/i);
 });
 
 test("Security: Anonymous client cannot read or modify private tables via Supabase Data API", async () => {
