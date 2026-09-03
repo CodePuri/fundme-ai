@@ -147,6 +147,7 @@ export async function ingestWebsite(rawUrl: string): Promise<IngestedWebsite> {
       fetchedAt,
     };
   } catch (err) {
+    const fetchError = err instanceof Error ? err : null;
     return {
       url: rawUrl,
       normalizedUrl,
@@ -156,7 +157,7 @@ export async function ingestWebsite(rawUrl: string): Promise<IngestedWebsite> {
       headings: [],
       cleanText: "",
       productSignals: [],
-      error: err?.name === "AbortError" ? "Website request timed out (6s)." : (err?.message || "Failed to fetch website."),
+      error: fetchError?.name === "AbortError" ? "Website request timed out (6s)." : (fetchError?.message || "Failed to fetch website."),
       fetchedAt,
     };
   }

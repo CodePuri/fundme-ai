@@ -5,6 +5,9 @@ import { buildStructuredEvidence } from "../../lib/assessment/evidence-model.ts"
 import { assessSession } from "../../lib/assessment/engine.ts";
 import { saveAssessmentToDatabase, claimAssessmentForUser, getLatestAssessmentForUser } from "../../lib/assessment/database.ts";
 import { randomUUID } from "node:crypto";
+import { assertStagingIntegrationEnvironment } from "../helpers/staging-integration-environment.mjs";
+
+assertStagingIntegrationEnvironment();
 
 test("FULL CUSTOMER LOOP: Material -> Ingestion -> Assessment -> Claim -> Save -> Retrieve", async () => {
   // Step 1: Real Ingestion of Founder Material

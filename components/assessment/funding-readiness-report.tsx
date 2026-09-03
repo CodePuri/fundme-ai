@@ -129,7 +129,7 @@ const MATCH_TONES = [
 
 export function FundingReadinessReport() {
   const router = useRouter();
-  const { signIn } = useDemo();
+  const { signIn, state } = useDemo();
   const { session, hasHydrated } = useAssessment();
   const report = session.report;
   const [shareStatus, setShareStatus] = useState<string | null>(null);
@@ -202,7 +202,6 @@ export function FundingReadinessReport() {
   useEffect(() => {
     if (report) {
       trackClientEvent("result_viewed", {
-        readinessScore: report.readinessScore,
         scoreBucket: report.readinessScore >= 70 ? "high" : report.readinessScore >= 50 ? "medium" : "low",
       });
     }
@@ -296,7 +295,7 @@ export function FundingReadinessReport() {
       }
     } catch {}
 
-    trackClientEvent("signup_started", { hasClaimToken: Boolean(session.claimToken) });
+    trackClientEvent("signup_started");
     setAuthOpen(true);
   }
 

@@ -23,10 +23,9 @@ test("Analytics: sanitizes sensitive and private payload keys", () => {
   assert.equal(clean.claimToken, undefined);
   assert.equal(clean.transcript, undefined);
   assert.equal(clean.deck_text, undefined);
-  assert.equal(clean.validMetric, 42);
-  assert.equal(clean.hasDeck, true);
-  assert.ok(typeof clean.safeSummary === "string");
-  assert.ok(clean.safeSummary.length <= 100);
+  assert.equal(clean.validMetric, undefined);
+  assert.equal(clean.hasDeck, undefined);
+  assert.equal(clean.safeSummary, undefined);
 });
 
 test("Share & Referrals: generates stable preview referral code", () => {

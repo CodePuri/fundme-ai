@@ -102,7 +102,7 @@ export function IntakeGrid() {
       try {
         window.sessionStorage.setItem("fundme-referral-code", ref);
         window.localStorage.setItem("fundme-referral-code", ref);
-        trackClientEvent("referral_attributed", { referralCode: ref });
+        trackClientEvent("referral_attributed", { hasReferral: true });
       } catch {}
     }
     trackClientEvent("assessment_started", { hasReferral: Boolean(ref) });

@@ -29,39 +29,19 @@ export function sanitizeAnalyticsProperties(
   if (!properties) return {};
   const sanitized: Record<string, string | number | boolean | null> = {};
 
-  const BLOCKED_KEYS = new Set([
-    "email",
-    "user_email",
-    "useremail",
-    "token",
-    "claim_token",
-    "claimtoken",
-    "share_token",
-    "sharetoken",
-    "raw_session",
-    "rawsession",
-    "transcript",
-    "deck_text",
-    "decktext",
-    "deck_contents",
-    "deckcontents",
-    "evidence",
-    "raw_evidence",
-    "rawevidence",
-    "founder_text",
-    "foundertext",
-    "profile_text",
-    "profiletext",
-    "free_text",
-    "freetext",
-    "password",
-    "secret",
-    "secrets",
+  const ALLOWED_KEYS = new Set([
+    "device",
+    "source",
+    "utm_source",
+    "utm_medium",
+    "utm_campaign",
+    "hasreferral",
+    "scorebucket",
   ]);
 
   for (const [key, value] of Object.entries(properties)) {
     const lowerKey = key.toLowerCase();
-    if (BLOCKED_KEYS.has(lowerKey)) continue;
+    if (!ALLOWED_KEYS.has(lowerKey)) continue;
 
     if (typeof value === "string") {
       // Truncate long strings to prevent leaking raw text bodies

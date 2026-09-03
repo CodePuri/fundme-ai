@@ -55,7 +55,7 @@ function extractRawPdfText(buffer: Buffer | Uint8Array): string {
     if (m[1]) textChunks.push(m[1]);
   }
 
-  const arrayTjMatches = str.matchAll(/\[(.*?)\]\s*TJ/gs);
+  const arrayTjMatches = str.matchAll(/\[([\s\S]*?)\]\s*TJ/g);
   for (const m of arrayTjMatches) {
     const inner = m[1];
     const subMatches = inner.matchAll(/\(([^)]+)\)/g);
@@ -89,7 +89,6 @@ export async function parsePdfBuffer(
     try {
       const { PDFParse } = await import("pdf-parse");
       const parser = new PDFParse({ data: buffer });
-      await parser.load();
       const textResult = await parser.getText();
       await parser.destroy();
       fullText = (textResult?.text || "").trim();

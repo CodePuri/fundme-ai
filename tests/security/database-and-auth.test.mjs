@@ -5,9 +5,10 @@ import { getPublicShareReport, createOrGetShareToken } from "../../lib/assessmen
 import { claimAssessmentForUser, saveAssessmentToDatabase, getLatestAssessmentForUser, getAssessmentByClaimToken } from "../../lib/assessment/database.ts";
 import { checkRateLimit } from "../../lib/security/rate-limit.ts";
 import { sanitizeAnalyticsProperties } from "../../lib/analytics/events.ts";
+import { assertStagingIntegrationEnvironment } from "../helpers/staging-integration-environment.mjs";
 
-const STAGING_SUPABASE_URL = process.env.SUPABASE_URL || "https://nnzdplkjizwgsalizijd.supabase.co";
-const STAGING_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5uemRwbGtqaXp3Z3NhbGl6aWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODgwOTMyNTcsImV4cCI6MjEwMzY2OTI1N30.2CaimTCv6mW0TTclGCP7rP9RknVVKpgnSSj6yGuvMts";
+const { supabaseUrl: STAGING_SUPABASE_URL } = assertStagingIntegrationEnvironment();
+const STAGING_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 test("Security: Anonymous client cannot call private RPCs directly over Supabase PostgREST", async () => {
   const anonClient = createClient(STAGING_SUPABASE_URL, STAGING_ANON_KEY, {

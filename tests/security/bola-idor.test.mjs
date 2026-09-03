@@ -2,6 +2,9 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { saveAssessmentToDatabase, getLatestAssessmentForUser } from "../../lib/assessment/database.ts";
 import { createOrGetShareToken, getPublicShareReport } from "../../lib/assessment/share.ts";
+import { assertStagingIntegrationEnvironment } from "../helpers/staging-integration-environment.mjs";
+
+assertStagingIntegrationEnvironment();
 
 test("Security: Cross-User Assessment Isolation — User A cannot fetch User B assessment", async () => {
   const userA = "user_sec_alice_" + Date.now();

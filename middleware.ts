@@ -21,7 +21,7 @@ const clerkRoutes = hasClerkKeys
   : null;
 
 export default async function middleware(request: NextRequest, event: NextFetchEvent) {
-  let response: NextResponse;
+  let response: Response;
   if (hasClerkKeys && clerkRoutes) {
     const clerkRes = await clerkRoutes(request, event);
     response = clerkRes || NextResponse.next();

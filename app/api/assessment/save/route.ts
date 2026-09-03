@@ -3,8 +3,53 @@ import { recordReferralSignup } from "@/lib/analytics/referrals";
 import { logAnalyticsEvent } from "@/lib/analytics/events";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { claimAssessmentForUser, saveAssessmentToDatabase } from "@/lib/assessment/database";
+import {
+  claimAssessmentForUser,
+  getFirstSaveEmailDeliveryStatus,
+  recordFirstSaveEmailDelivery,
+  saveAssessmentToDatabase,
+} from "@/lib/assessment/database";
 import type { GrillSession } from "@/lib/assessment/types";
+
+async function sendFirstSaveEmail(params: {
+  assessmentId: string;
+  clerkUserId: string;
+  userEmail: string | null;
+  founderName: string;
+  startupName: string;
+  readinessScore: number;
+  verdict: string;
+  workspaceUrl: string;
+}) {
+  if (!params.userEmail) return;
+
+  try {
+    if (await getFirstSaveEmailDeliveryStatus(params)) return;
+
+    const emailResult = await sendAssessmentSavedEmail(params.userEmail, {
+      founderName: params.founderName,
+      startupName: params.startupName,
+      readinessScore: params.readinessScore,
+      verdict: params.verdict,
+      workspaceUrl: params.workspaceUrl,
+    }, { assessmentId: params.assessmentId });
+
+    if (!emailResult.ok) {
+      console.warn("Assessment saved email was not accepted by the provider.");
+      return;
+    }
+
+    if (!await recordFirstSaveEmailDelivery({
+      assessmentId: params.assessmentId,
+      clerkUserId: params.clerkUserId,
+      providerMessageId: emailResult.messageId,
+    })) {
+      console.warn("Assessment saved email delivery was already recorded.");
+    }
+  } catch {
+    console.warn("Assessment saved email delivery could not be recorded.");
+  }
+}
 
 export async function POST(req: Request) {
   try {
@@ -48,17 +93,21 @@ export async function POST(req: Request) {
         await logAnalyticsEvent({
           eventName: "assessment_saved",
           clerkUserId: userId,
-          properties: { referralCode: body.referralCode || null },
+          properties: { hasReferral: Boolean(body.referralCode) },
         });
         
-        if (userEmail && !result?.already_claimed) {
-          sendAssessmentSavedEmail(userEmail, {
+        const assessmentId = result.assessmentId || result.assessment?.id;
+        if (assessmentId) {
+          await sendFirstSaveEmail({
+            assessmentId,
+            clerkUserId: userId,
+            userEmail,
             founderName: userName || "Founder",
             startupName: result.assessment?.startup_name || "Your startup",
             readinessScore: result.assessment?.readiness_score || 0,
             verdict: result.assessment?.verdict || "Funding Readiness Assessment Saved",
             workspaceUrl: `${baseUrl}/app/preview?claim_token=${claimToken}`,
-          }).catch(e => console.warn("Email send error:", e));
+          });
         }
         return NextResponse.json({ ok: true, success: true, assessmentId: result.assessmentId });
       } catch (claimErr: any) {
@@ -72,6 +121,10 @@ export async function POST(req: Request) {
     // Direct save if session provided
     if (body.session && body.session.report) {
       const session = body.session;
+      const report = session.report;
+      if (!report) {
+        return NextResponse.json({ ok: false, error: "Missing assessment report." }, { status: 400 });
+      }
       const effectiveToken = claimToken || session.claimToken || `claim-${userId}-${Date.now()}`;
       const saved = await saveAssessmentToDatabase({
         claimToken: effectiveToken,
@@ -79,7 +132,7 @@ export async function POST(req: Request) {
         founderName: session.input.founderName || userName || "Founder",
         startupName: session.input.startupName || "Your startup",
         websiteUrl: session.input.websiteUrl || null,
-        report: session.report,
+        report,
         rawSession: session,
       });
       if (body.referralCode || effectiveToken) {
@@ -88,17 +141,20 @@ export async function POST(req: Request) {
       await logAnalyticsEvent({
         eventName: "assessment_saved",
         clerkUserId: userId,
-        properties: { referralCode: body.referralCode || null },
+        properties: { hasReferral: Boolean(body.referralCode) },
       });
       
-      if (userEmail && saved.report) {
-        sendAssessmentSavedEmail(userEmail, {
+      if (saved.report && saved.id) {
+        await sendFirstSaveEmail({
+          assessmentId: saved.id,
+          clerkUserId: userId,
+          userEmail,
           founderName: session.input.founderName || userName || "Founder",
           startupName: session.input.startupName || "Your startup",
-          readinessScore: session.report.readinessScore,
-          verdict: session.report.verdict,
+          readinessScore: report.readinessScore,
+          verdict: report.verdict,
           workspaceUrl: `${baseUrl}/app/preview?claim_token=${effectiveToken}`,
-        }).catch(e => console.warn("Email send error:", e));
+        });
       }
       return NextResponse.json({ ok: true, success: true, assessmentId: saved.id });
     }

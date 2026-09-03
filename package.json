@@ -7,7 +7,8 @@
     "build": "node -e \"if(!require('fs').existsSync('./middleware.ts')){console.error('ERROR: middleware.ts is missing!');process.exit(1)}\" && next build --webpack",
     "start": "next start",
     "lint": "eslint",
-    "test:assessment": "node --env-file=.env.local --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types tests/assessment/*.test.mjs",
+    "test:assessment": "node --env-file=.env.local --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types tests/assessment/ai-provider.test.mjs tests/assessment/analytics-actor-boundary.test.mjs tests/assessment/analytics-privacy.test.mjs tests/assessment/auth-state-coherence.test.mjs tests/assessment/commercial-funnel.test.mjs tests/assessment/email-template.test.mjs tests/assessment/email.test.mjs tests/assessment/engine.test.mjs tests/assessment/evidence-model.test.mjs tests/assessment/ingestion.test.mjs tests/assessment/launch-loop.test.mjs tests/assessment/onboarding-recovery.test.mjs tests/assessment/persistence-share.test.mjs tests/assessment/questions.test.mjs tests/assessment/routes.test.mjs tests/assessment/session-contract.test.mjs tests/assessment/speech-adapter.test.mjs",
+    "test:staging-integration": "FUNDME_TEST_TARGET=staging node --env-file=.env.staging.local --disable-warning=ExperimentalWarning --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test --experimental-strip-types tests/assessment/email-delivery.test.mjs tests/assessment/full-customer-loop.test.mjs tests/security/database-and-auth.test.mjs tests/security/bola-idor.test.mjs",
     "checkpoint": "bash scripts/checkpoint-backup.sh"
   },
   "dependencies": {

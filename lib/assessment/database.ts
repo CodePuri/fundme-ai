@@ -115,3 +115,47 @@ export async function getAssessmentByClaimToken(claimToken: string, clerkUserId?
 
   return data?.found ? data.assessment : null;
 }
+
+export async function getFirstSaveEmailDeliveryStatus(params: {
+  assessmentId: string;
+  clerkUserId: string;
+}): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("first_save_email_sent_at")
+    .eq("id", params.assessmentId)
+    .eq("clerk_user_id", params.clerkUserId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to read first-save email delivery status: ${error.message}`);
+  }
+
+  return Boolean(data?.first_save_email_sent_at);
+}
+
+export async function recordFirstSaveEmailDelivery(params: {
+  assessmentId: string;
+  clerkUserId: string;
+  providerMessageId?: string;
+}): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("assessments")
+    .update({
+      first_save_email_sent_at: new Date().toISOString(),
+      first_save_email_provider_id: params.providerMessageId || null,
+    })
+    .eq("id", params.assessmentId)
+    .eq("clerk_user_id", params.clerkUserId)
+    .is("first_save_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to record first-save email delivery: ${error.message}`);
+  }
+
+  return Boolean(data?.id);
+}

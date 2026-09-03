@@ -7,11 +7,29 @@ export type AssessmentEmailProps = {
   shareUrl?: string;
 };
 
+function plainText(value: string): string {
+  return value.replace(/[\r\n]+/g, " ").trim();
+}
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function renderAssessmentSavedEmail(props: AssessmentEmailProps): { subject: string; html: string; text: string } {
   const { founderName, startupName, readinessScore, verdict, workspaceUrl, shareUrl } = props;
-  const subject = `Your FundMe Funding Readiness Diagnosis (${readinessScore}/100) — ${startupName}`;
+  const safeFounderName = plainText(founderName || "Founder");
+  const safeStartupName = plainText(startupName || "Your startup");
+  const safeVerdict = plainText(verdict || "Funding Readiness Assessment Saved");
+  const safeWorkspaceUrl = plainText(workspaceUrl);
+  const safeShareUrl = shareUrl ? plainText(shareUrl) : undefined;
+  const subject = plainText(`Your FundMe Funding Readiness Diagnosis (${readinessScore}/100) — ${safeStartupName}`);
 
-  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${subject}</title>
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(subject)}</title>
 <style>
 body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #fcfbf9; color: #171513; margin: 0; padding: 24px; }
 .container { max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #ede8e1; border-radius: 16px; overflow: hidden; }
@@ -27,32 +45,32 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helve
 <div class="container">
 <div class="header">FundMe</div>
 <div class="content">
-<p style="font-size: 16px; margin: 0 0 16px;">Hi ${founderName || "Founder"},</p>
+<p style="font-size: 16px; margin: 0 0 16px;">Hi ${escapeHtml(safeFounderName)},</p>
 <p style="font-size: 15px; line-height: 1.5; color: #44403c; margin: 0 0 16px;">
-Your funding readiness diagnosis for <strong>${startupName}</strong> has been saved to your secure workspace.
+Your funding readiness diagnosis for <strong>${escapeHtml(safeStartupName)}</strong> has been saved to your secure workspace.
 </p>
 <div class="score-card">
 <div class="score">${readinessScore}<span class="score-max">/100</span></div>
-<div class="verdict">${verdict}</div>
+<div class="verdict">${escapeHtml(safeVerdict)}</div>
 </div>
 <div style="text-align: center;">
-<a href="${workspaceUrl}" class="btn">Open Your Workspace</a>
+<a href="${escapeHtml(safeWorkspaceUrl)}" class="btn">Open Your Workspace</a>
 </div>
-${shareUrl ? `<p style="font-size: 13px; color: #78716c; margin-top: 24px; text-align: center;">Public Share Link: <a href="${shareUrl}" style="color: #ff6b3d;">${shareUrl}</a></p>` : ""}
+${safeShareUrl ? `<p style="font-size: 13px; color: #78716c; margin-top: 24px; text-align: center;">Public Share Link: <a href="${escapeHtml(safeShareUrl)}" style="color: #ff6b3d;">${escapeHtml(safeShareUrl)}</a></p>` : ""}
 </div>
 <div class="footer"><p style="margin: 0;">FundMe · Get assessed before you apply · No spam, just real startup intelligence.</p></div>
 </div></body></html>`;
 
-  const text = `Hi ${founderName || "Founder"},
+  const text = `Hi ${safeFounderName},
 
-Your funding readiness diagnosis for ${startupName} has been saved to your workspace.
+Your funding readiness diagnosis for ${safeStartupName} has been saved to your workspace.
 
 Readiness Score: ${readinessScore}/100
-Verdict: ${verdict}
+Verdict: ${safeVerdict}
 
 Access your saved workspace:
-${workspaceUrl}
-${shareUrl ? `\nPublic share link: ${shareUrl}\n` : ""}
+${safeWorkspaceUrl}
+${safeShareUrl ? `\nPublic share link: ${safeShareUrl}\n` : ""}
 FundMe — Stop pitching blind. Get assessed before you apply.
 `;
 

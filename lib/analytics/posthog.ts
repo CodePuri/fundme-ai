@@ -17,13 +17,10 @@ export function initPostHog() {
     posthog.init(key, {
       api_host: host,
       person_profiles: "identified_only",
-      capture_pageview: true,
-      capture_pageleave: true,
-      autocapture: true,
-      session_recording: {
-        maskAllInputs: true,
-        maskTextSelector: "*",
-      },
+      capture_pageview: false,
+      capture_pageleave: false,
+      autocapture: false,
+      disable_session_recording: true,
       loaded: (ph) => {
         if (process.env.NODE_ENV === "development") ph.debug();
       },
