@@ -38,26 +38,12 @@ export type ProductAuthContext = {
 };
 
 export function useProductAuthState(): ProductAuthContext {
-  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-
   // 1. Clerk authentication state
-  let clerkLoaded = true;
-  let isSignedIn = false;
-  let user: any = null;
-  let clerkSignOut: any = async () => {};
-
-  try {
-    const clerkUser = useUser();
-    const clerk = useClerk();
-    clerkLoaded = clerkUser.isLoaded;
-    isSignedIn = Boolean(clerkUser.isSignedIn);
-    user = clerkUser.user ?? null;
-    clerkSignOut = clerk.signOut;
-  } catch {
-    // Standalone / test fallback when ClerkProvider is absent
-    clerkLoaded = true;
-    isSignedIn = false;
-  }
+  const clerkUser = useUser();
+  const { signOut: clerkSignOut } = useClerk();
+  const clerkLoaded = clerkUser.isLoaded;
+  const isSignedIn = Boolean(clerkUser.isSignedIn);
+  const user = clerkUser.user ?? null;
 
   // 2. Local browser session state
   const [localSession, setLocalSession] = useState<GrillSession | null>(null);

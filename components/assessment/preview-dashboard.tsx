@@ -161,7 +161,7 @@ export function PreviewDashboard() {
         })
         .catch(() => {});
     }
-  }, [user?.id, searchParams, serverAssessment?.id]);
+  }, [user?.id, searchParams, serverAssessment?.clerk_user_id, serverAssessment?.id]);
 
   const copyShareLink = async () => {
     if (!shareUrl) return;

@@ -63,8 +63,11 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
   const [session, setSession] = useState<GrillSession>(() => createInitialSession());
   const [hasHydrated, setHasHydrated] = useState(false);
   const sessionRef = useRef(session);
-  sessionRef.current = session;
   const fileMapRef = useRef<Map<string, File>>(new Map());
+
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   useEffect(() => {
     const hydrationTimer = window.setTimeout(() => {

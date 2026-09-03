@@ -12,7 +12,6 @@ export function AnalysisProgress() {
   const { session, hasHydrated, generateReport } = useAssessment();
   const [activeIndex, setActiveIndex] = useState(0);
   const [progressPercent, setProgressPercent] = useState(15);
-  const [isCompleted, setIsCompleted] = useState(false);
   const startedRef = useRef(false);
 
   const stages = useMemo(() => [
@@ -50,9 +49,6 @@ export function AnalysisProgress() {
   useEffect(() => {
     if (!hasHydrated) return;
     if (session.report) {
-      setIsCompleted(true);
-      setProgressPercent(100);
-      setActiveIndex(stages.length - 1);
       const timer = window.setTimeout(() => {
         router.replace("/assessment/result");
       }, 400);
@@ -87,7 +83,9 @@ export function AnalysisProgress() {
     };
   }, [hasHydrated, session.report, stages.length]);
 
-  const progress = progressPercent;
+  const isCompleted = Boolean(session.report);
+  const progress = session.report ? 100 : progressPercent;
+  const displayedStageIndex = session.report ? stages.length - 1 : activeIndex;
 
   return (
     <div className="mx-auto flex min-h-[62vh] max-w-[760px] flex-col items-center justify-center py-10 text-center">
@@ -99,7 +97,7 @@ export function AnalysisProgress() {
 
       <p className="eyebrow mt-8">Analyzing your funding fit</p>
       <h1 className="instrument-serif mt-3 text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)]" aria-live="polite">
-        {stages[activeIndex]}
+        {stages[displayedStageIndex]}
       </h1>
       <p className="type-body mt-2 max-w-[62ch] text-[var(--text-secondary)]">
         Evaluating evidence depth, founder-market fit, and the specific claims investors will challenge.

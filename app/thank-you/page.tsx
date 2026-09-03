@@ -14,12 +14,17 @@ export default function ThankYouPage() {
   const [draftData, setDraftData] = useState<{ name?: string; email?: string } | null>(null);
 
   useEffect(() => {
+    let timer: number | undefined;
     try {
       const saved = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
       if (saved) {
-        setDraftData(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        timer = window.setTimeout(() => setDraftData(parsed), 0);
       }
     } catch {}
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
   }, []);
 
   const firstName = user?.firstName ?? user?.fullName?.split(" ")[0] ?? draftData?.name?.split(" ")[0] ?? null;

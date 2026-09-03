@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, CheckCircle2 } from "lucide-react";
@@ -10,14 +10,14 @@ function AccountSaveContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const submissionId = searchParams.get("submissionId");
-  const [hasStored, setHasStored] = useState(false);
+  const hasStoredRef = useRef(false);
 
   useEffect(() => {
-    if (submissionId && !hasStored) {
+    if (submissionId && !hasStoredRef.current) {
       window.localStorage.setItem("fundme_submission_id_to_link", submissionId);
-      setHasStored(true);
+      hasStoredRef.current = true;
     }
-  }, [submissionId, hasStored]);
+  }, [submissionId]);
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col items-center justify-center p-4 sm:p-8">

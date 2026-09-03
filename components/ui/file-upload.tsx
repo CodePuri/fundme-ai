@@ -23,6 +23,15 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
     }
   }, []);
 
+  const handleFiles = useCallback((newFiles: File[]) => {
+    const uniqueNewFiles = newFiles.filter((file) => !files.includes(file.name));
+    const uniqueNewNames = uniqueNewFiles.map((file) => file.name);
+    onChange([...files, ...uniqueNewNames]);
+    if (onFilesAdded && uniqueNewFiles.length > 0) {
+      onFilesAdded(uniqueNewFiles);
+    }
+  }, [files, onChange, onFilesAdded]);
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -33,7 +42,7 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
         handleFiles(Array.from(e.dataTransfer.files));
       }
     },
-    [files, onChange, onFilesAdded],
+    [handleFiles],
   );
 
   const handleChange = useCallback(
@@ -42,19 +51,8 @@ export function FileUploadArea({ files, onChange, onFilesAdded, className = "" }
         handleFiles(Array.from(e.target.files));
       }
     },
-    [files, onChange, onFilesAdded],
+    [handleFiles],
   );
-
-  const handleFiles = (newFiles: File[]) => {
-    const fileNames = newFiles.map((f) => f.name);
-    // filter out duplicates
-    const uniqueNewFiles = newFiles.filter((f) => !files.includes(f.name));
-    const uniqueNewNames = uniqueNewFiles.map((f) => f.name);
-    onChange([...files, ...uniqueNewNames]);
-    if (onFilesAdded && uniqueNewFiles.length > 0) {
-      onFilesAdded(uniqueNewFiles);
-    }
-  };
 
   const removeFile = (fileName: string) => {
     onChange(files.filter((name) => name !== fileName));
