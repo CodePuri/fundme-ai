@@ -266,7 +266,7 @@ export function FundingReadinessReport({ viewerId, identityResolved }: { viewerI
     trackClientEvent("save_cta_clicked", { source });
     setSaveStatus(null);
 
-    if (state.isAuthenticated) {
+    if (viewerId) {
       try {
         const response = await fetch("/api/assessment/save", {
           method: "POST",
@@ -286,28 +286,8 @@ export function FundingReadinessReport({ viewerId, identityResolved }: { viewerI
       return;
     }
 
-    // Try direct save in case authenticated via cookie
-    try {
-      const saveRes = await fetch("/api/assessment/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          claimToken: session.claimToken || undefined,
-          session,
-        }),
-      });
-      if (saveRes.ok) {
-        const data = await saveRes.json();
-        if (data.ok) {
-          signIn();
-          router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
-          return;
-        }
-      }
-    } catch {}
-
-    if (viewerId) {
-      setSaveStatus("Your assessment could not be saved. Please try again.");
+    if (state.isAuthenticated) {
+      router.push("/app/preview");
       return;
     }
 

@@ -31,8 +31,10 @@ test("Sign-in & Sign-up routes: redirect already-authenticated users to their wo
 test("Funding readiness report: authenticated users save directly without redundant modal prompt", async () => {
   const reportSource = await readFile(new URL("components/assessment/funding-readiness-report.tsx", root), "utf8");
 
-  assert.match(reportSource, /if\s*\(\s*state\.isAuthenticated\s*\)/);
+  assert.match(reportSource, /if\s*\(\s*viewerId\s*\)/);
+  assert.match(reportSource, /if\s*\(\s*state\.isAuthenticated\s*\)\s*\{\s*router\.push\("\/app\/preview"\)/);
   assert.match(reportSource, /fetch\("\/api\/assessment\/save"/);
+  assert.equal(reportSource.match(/fetch\("\/api\/assessment\/save"/g)?.length, 1);
   assert.match(reportSource, /if \(!response\.ok \|\| !\(await response\.json\(\)\)\.ok\)/);
   assert.match(reportSource, /Your assessment could not be saved/);
   assert.match(reportSource, /router\.push\(`\/app\/preview/);
