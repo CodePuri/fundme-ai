@@ -37,3 +37,20 @@ test("Next configuration does not inline runtime credentials into browser bundle
 
   assert.doesNotMatch(source, /\benv\s*:/);
 });
+
+test("Supabase admin client never falls back to the public anonymous key", async () => {
+  const { getSupabaseAdmin } = await import("../../lib/assessment/database.ts");
+  const originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const originalAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  try {
+    delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "public-test-key";
+    assert.throws(getSupabaseAdmin, /SUPABASE_SERVICE_ROLE_KEY/);
+  } finally {
+    if (originalServiceRoleKey === undefined) delete process.env.SUPABASE_SERVICE_ROLE_KEY;
+    else process.env.SUPABASE_SERVICE_ROLE_KEY = originalServiceRoleKey;
+    if (originalAnonKey === undefined) delete process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    else process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = originalAnonKey;
+  }
+});
