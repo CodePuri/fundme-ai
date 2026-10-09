@@ -32,12 +32,11 @@ test("PostHog disables automatic collection surfaces", async () => {
   assert.match(source, /disable_session_recording:\s*true/);
 });
 
-test("Next configuration does not inline runtime credentials into browser bundles", async () => {
+test("Next configuration does not define a build-time env map", async () => {
   const source = await readFile(new URL("../../next.config.ts", import.meta.url), "utf8");
 
   assert.doesNotMatch(source, /\benv\s*:/);
 });
-
 test("Supabase admin client never falls back to the public anonymous key", async () => {
   const { getSupabaseAdmin } = await import("../../lib/assessment/database.ts");
   const originalServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
