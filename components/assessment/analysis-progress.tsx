@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { validateIntake } from "@/lib/assessment/validation";
 
-export function AnalysisProgress() {
+export function AnalysisProgress({ ownerId, identityResolved }: { ownerId: string | null; identityResolved: boolean }) {
   const router = useRouter();
-  const { session, hasHydrated, generateReport } = useAssessment();
+  const { session, hasHydrated, viewerId, generateReport } = useAssessment();
+  const accountMatches = ownerId === viewerId;
   const [activeIndex, setActiveIndex] = useState(0);
   const [progressPercent, setProgressPercent] = useState(15);
   const startedRef = useRef(false);
@@ -47,7 +48,10 @@ export function AnalysisProgress() {
 
   // 1. Validation and generation flow
   useEffect(() => {
-    if (!hasHydrated) return;
+    if (!hasHydrated || !identityResolved || !accountMatches) {
+      startedRef.current = false;
+      return;
+    }
     if (session.report) {
       const timer = window.setTimeout(() => {
         router.replace("/assessment/result");
@@ -60,13 +64,16 @@ export function AnalysisProgress() {
     }
     if (!startedRef.current) {
       startedRef.current = true;
-      generateReport().catch((err) => console.warn("Analysis progress error:", err));
+      generateReport(ownerId).catch((err) => {
+        startedRef.current = false;
+        console.warn("Analysis progress error:", err);
+      });
     }
-  }, [generateReport, hasHydrated, router, session.artifacts, session.input, session.report, stages.length]);
+  }, [accountMatches, generateReport, hasHydrated, identityResolved, ownerId, router, session.artifacts, session.input, session.report, stages.length]);
 
   // 2. Progress pacing animation
   useEffect(() => {
-    if (!hasHydrated || session.report) return;
+    if (!hasHydrated || !identityResolved || !accountMatches || session.report) return;
     const stageInterval = window.setInterval(() => {
       setActiveIndex((prev) => {
         const next = prev + 1;
@@ -81,11 +88,15 @@ export function AnalysisProgress() {
     return () => {
       window.clearInterval(stageInterval);
     };
-  }, [hasHydrated, session.report, stages.length]);
+  }, [accountMatches, hasHydrated, identityResolved, session.report, stages.length]);
 
   const isCompleted = Boolean(session.report);
   const progress = session.report ? 100 : progressPercent;
   const displayedStageIndex = session.report ? stages.length - 1 : activeIndex;
+
+  if (!identityResolved || (hasHydrated && !accountMatches)) {
+    return <div className="mx-auto max-w-xl py-16 text-center" role="alert"><h1 className="text-xl font-semibold">Account check unavailable</h1><p className="mt-2 text-sm">Refresh this page to continue your assessment safely.</p></div>;
+  }
 
   return (
     <div className="mx-auto flex min-h-[62vh] max-w-[760px] flex-col items-center justify-center py-10 text-center">

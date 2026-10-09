@@ -1,6 +1,6 @@
 "use client";
 
-import { createInitialSession, GRILL_STORAGE_KEY } from "../../lib/assessment/persistence.ts";
+import { assessmentStorageForViewer, browserKeyForViewer, createInitialSession, loadSession, saveSession } from "../../lib/assessment/persistence.ts";
 import type { GrillSession } from "../../lib/assessment/types.ts";
 
 const ONBOARDING_DRAFT_KEY = "onboardingDraft";
@@ -36,14 +36,17 @@ export function mapOnboardingDraftToSession(draft: OnboardingDraft, timestamp = 
 }
 
 /** Compatibility bridge for an existing onboarding draft. No service or database write occurs. */
-export function mapOnboardingToAssessment(): boolean {
+export function mapOnboardingToAssessment(userId: string | null = null): boolean {
   if (typeof window === "undefined") return false;
   try {
-    const raw = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
+    const raw = window.localStorage.getItem(browserKeyForViewer(ONBOARDING_DRAFT_KEY, userId));
     if (!raw) return false;
     const session = mapOnboardingDraftToSession(JSON.parse(raw) as OnboardingDraft);
-    window.localStorage.setItem(GRILL_STORAGE_KEY, JSON.stringify(session));
-    return true;
+    const storage = assessmentStorageForViewer(window.localStorage, userId);
+    const existing = loadSession(storage);
+    if (existing.report || existing.stage !== "intake" || existing.artifacts.length
+      || Object.values(existing.input).some((value) => typeof value === "string" && Boolean(value.trim()))) return false;
+    return saveSession(storage, session).ok;
   } catch {
     return false;
   }

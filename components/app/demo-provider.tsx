@@ -5,10 +5,13 @@ import {
   startTransition,
   useContext,
   useEffect,
+  useCallback,
   useMemo,
   useState,
 } from "react";
 import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
+import { browserKeyForViewer } from "@/lib/assessment/persistence";
 
 import {
   createApplicationQuestions,
@@ -254,54 +257,68 @@ function updateApplicationSession(
 }
 
 export function DemoProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState<DemoState>(defaultState);
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const { isLoaded: clerkLoaded, user } = useUser();
+  const viewerId = user?.id ?? null;
+  const identityKey = clerkLoaded ? (viewerId ?? "anonymous") : null;
+  const [state, setRawState] = useState<DemoState>(defaultState);
+  const [loadedIdentityKey, setLoadedIdentityKey] = useState<string | null>(null);
+  const hasHydrated = identityKey !== null && loadedIdentityKey === identityKey;
+  const storageKey = browserKeyForViewer(STORAGE_KEY, viewerId);
+  const stepKey = browserKeyForViewer(ONBOARDING_STEP_KEY, viewerId);
+  const draftKey = browserKeyForViewer(ONBOARDING_DRAFT_KEY, viewerId);
+  const setState = useCallback<React.Dispatch<React.SetStateAction<DemoState>>>((update) => {
+    if (hasHydrated) setRawState(update);
+  }, [hasHydrated]);
 
   useEffect(() => {
+    if (identityKey === null) return;
     let saved: string | null = null;
     try {
-      saved = window.localStorage.getItem(STORAGE_KEY);
+      saved = window.localStorage.getItem(storageKey);
     } catch {
-      setHasHydrated(true);
+      setRawState(defaultState);
+      setLoadedIdentityKey(identityKey);
       return;
     }
 
     if (!saved) {
-      setHasHydrated(true);
+      setRawState(defaultState);
+      setLoadedIdentityKey(identityKey);
       return;
     }
 
     try {
-      setState(hydrateState(JSON.parse(saved) as Partial<DemoState>));
+      setRawState(hydrateState(JSON.parse(saved) as Partial<DemoState>));
     } catch {
       try {
-        window.localStorage.removeItem(STORAGE_KEY);
+        window.localStorage.removeItem(storageKey);
       } catch {
         // Storage can be unavailable in privacy-restricted browser contexts.
       }
+      setRawState(defaultState);
     } finally {
-      setHasHydrated(true);
+      setLoadedIdentityKey(identityKey);
     }
-  }, []);
+  }, [identityKey, storageKey]);
 
   useEffect(() => {
     if (!hasHydrated) {
       return;
     }
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      window.localStorage.setItem(storageKey, JSON.stringify(state));
     } catch {
       // Keep the Preview identity usable for this tab without claiming persistence.
     }
-  }, [hasHydrated, state]);
+  }, [hasHydrated, state, storageKey]);
 
   useEffect(() => {
     function handleDemoReset(event: KeyboardEvent) {
       if (event.shiftKey && event.key.toLowerCase() === "r") {
         try {
-          window.localStorage.removeItem(STORAGE_KEY);
-          window.localStorage.removeItem(ONBOARDING_STEP_KEY);
-          window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+          window.localStorage.removeItem(storageKey);
+          window.localStorage.removeItem(stepKey);
+          window.localStorage.removeItem(draftKey);
         } catch {
           // A reset still returns to the public route when storage is unavailable.
         }
@@ -311,11 +328,11 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("keydown", handleDemoReset);
     return () => window.removeEventListener("keydown", handleDemoReset);
-  }, []);
+  }, [draftKey, stepKey, storageKey]);
 
   const value = useMemo<DemoContextValue>(
     () => ({
-      state,
+      state: hasHydrated ? state : defaultState,
       hasHydrated,
       signIn: () => {
         startTransition(() => {
@@ -341,8 +358,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         }));
       },
       completeOnboarding: ({ founderName, founderRole, companyName, linkedIn, notes, files }) => {
-        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
-        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        try {
+          window.localStorage.removeItem(stepKey);
+          window.localStorage.removeItem(draftKey);
+        } catch {
+          // Server-confirmed onboarding must not fail because browser storage is unavailable.
+        }
         setState((current) => ({
           ...current,
           isAuthenticated: true,
@@ -381,8 +402,12 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         );
       },
       startNewIdea: () => {
-        window.localStorage.removeItem(ONBOARDING_STEP_KEY);
-        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        try {
+          window.localStorage.removeItem(stepKey);
+          window.localStorage.removeItem(draftKey);
+        } catch {
+          // The new local flow remains available in memory.
+        }
         setState((current) => ({
           ...current,
           resumeBannerDismissed: false,
@@ -553,7 +578,7 @@ export function DemoProvider({ children }: { children: React.ReactNode }) {
         }
       },
     }),
-    [hasHydrated, state],
+    [draftKey, hasHydrated, setState, state, stepKey],
   );
 
   return <DemoContext.Provider value={value}>{children}</DemoContext.Provider>;

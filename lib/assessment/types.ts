@@ -184,6 +184,7 @@ export type GrillSession = {
   skippedQuestionIds: MentorQuestionId[];
   reviewedAt: string | null;
   report: FundingReadinessReport | null;
+  reportOwnerId?: string | null;
   earlyAccess: EarlyAccessState;
   persistenceWarning: string | null;
   updatedAt: string;

@@ -124,7 +124,7 @@ test("approved routes contain no random scoring, live database, or payment depen
     "lib/assessment/engine.ts",
   ];
   const source = (await Promise.all(files.map((file) => readFile(new URL(file, root), "utf8")))).join("\n");
-  assert.doesNotMatch(source, /Math\.random|from ["'][^"']*(?:supabase|stripe|clerk)|checkout\s*\(/i);
+  assert.doesNotMatch(source, /Math\.random|from ["'][^"']*(?:supabase|stripe)|checkout\s*\(/i);
 });
 
 test("assessment intake reads homepage context through the guarded storage adapter", async () => {

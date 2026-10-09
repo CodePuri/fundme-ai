@@ -5,6 +5,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -12,6 +13,8 @@ import {
 
 import { assessSession } from "@/lib/assessment/engine";
 import {
+  assessmentStorageForViewer,
+  browserKeyForViewer,
   clearSession,
   createInitialSession,
   GRILL_STORAGE_KEY,
@@ -20,6 +23,7 @@ import {
   saveSession,
   type EarlyAccessPersistenceResult,
 } from "@/lib/assessment/persistence";
+import { useUser } from "@clerk/nextjs";
 import { nextMentorQuestion } from "@/lib/assessment/questions";
 import type {
   AnswerSource,
@@ -34,6 +38,7 @@ export const ASSESSMENT_STORAGE_KEY = GRILL_STORAGE_KEY;
 type AssessmentContextValue = {
   session: GrillSession;
   hasHydrated: boolean;
+  viewerId: string | null;
   updateInput: (field: keyof StartupInput, value: string) => void;
   attachFile: (file: File, kind: ArtifactKind) => string | null;
   removeArtifact: (id: string) => void;
@@ -43,10 +48,11 @@ type AssessmentContextValue = {
   submitAnswer: (text: string, source: AnswerSource) => boolean;
   skipQuestion: () => void;
   beginAssessment: () => void;
-  generateReport: () => Promise<void>;
+  generateReport: (ownerId?: string | null) => Promise<void>;
   setEarlyAccessDraft: (email: string) => void;
   submitEarlyAccess: (email: string) => EarlyAccessPersistenceResult;
   restart: () => void;
+  finalizeAnonymousSessionSave: (anonymousSession: GrillSession) => boolean;
 };
 
 const AssessmentContext = createContext<AssessmentContextValue | null>(null);
@@ -60,32 +66,49 @@ function eventId(prefix: string, timestamp: string): string {
 }
 
 export function AssessmentProvider({ children }: { children: React.ReactNode }) {
+  const { isLoaded: clerkLoaded, user } = useUser();
+  const viewerId = user?.id ?? null;
+  const identityKey = clerkLoaded ? (viewerId ?? "anonymous") : null;
   const [session, setSession] = useState<GrillSession>(() => createInitialSession());
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const [loadedIdentityKey, setLoadedIdentityKey] = useState<string | null>(null);
+  const hasHydrated = identityKey !== null && loadedIdentityKey === identityKey;
+  const blankSession = useMemo(() => createInitialSession(), []);
   const sessionRef = useRef(session);
+  const activeIdentityRef = useRef(identityKey);
+  const identityEpochRef = useRef(0);
   const fileMapRef = useRef<Map<string, File>>(new Map());
+
+  useLayoutEffect(() => {
+    if (activeIdentityRef.current !== identityKey) identityEpochRef.current += 1;
+    activeIdentityRef.current = identityKey;
+  }, [identityKey]);
 
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
 
   useEffect(() => {
+    if (identityKey === null) return;
     const hydrationTimer = window.setTimeout(() => {
+      fileMapRef.current.clear();
+      let loaded: GrillSession;
       try {
-        setSession(loadSession(window.localStorage));
+        loaded = loadSession(assessmentStorageForViewer(window.localStorage, viewerId));
       } catch {
-        setSession(createInitialSession(undefined, "Browser storage is unavailable. Progress can continue in this tab but cannot be recovered after refresh."));
+        loaded = createInitialSession(undefined, "Browser storage is unavailable. Progress can continue in this tab but cannot be recovered after refresh.");
       }
-      setHasHydrated(true);
+      sessionRef.current = loaded;
+      setSession(loaded);
+      setLoadedIdentityKey(identityKey);
     }, 0);
     return () => window.clearTimeout(hydrationTimer);
-  }, []);
+  }, [identityKey, viewerId]);
 
   useEffect(() => {
     if (!hasHydrated) return;
     let result: ReturnType<typeof saveSession>;
     try {
-      result = saveSession(window.localStorage, session);
+      result = saveSession(assessmentStorageForViewer(window.localStorage, viewerId), session);
     } catch {
       result = { ok: false, error: "Progress could not be saved because browser storage is unavailable." };
     }
@@ -95,7 +118,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       }, 0);
       return () => window.clearTimeout(warningTimer);
     }
-  }, [hasHydrated, session]);
+  }, [hasHydrated, session, viewerId]);
 
   const updateInput = useCallback((field: keyof StartupInput, value: string) => {
     setSession((current) => ({
@@ -103,6 +126,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       input: { ...current.input, [field]: value },
       processingState: "preparing",
       report: null,
+      reportOwnerId: null,
+      claimToken: undefined,
       updatedAt: now(),
     }));
   }, []);
@@ -127,6 +152,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         },
       ],
       report: null,
+      reportOwnerId: null,
+      claimToken: undefined,
       updatedAt: timestamp,
     }));
     return null;
@@ -141,6 +168,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       ...current,
       artifacts: current.artifacts.filter((artifact) => artifact.id !== id),
       report: null,
+      reportOwnerId: null,
+      claimToken: undefined,
       updatedAt: now(),
     }));
   }, [session.artifacts]);
@@ -175,6 +204,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       processingState: "questioning",
       reviewedAt: timestamp,
       report: null,
+      reportOwnerId: null,
+      claimToken: undefined,
       updatedAt: timestamp,
     }));
   }, []);
@@ -215,6 +246,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
           },
         ],
         report: null,
+        reportOwnerId: null,
+        claimToken: undefined,
         updatedAt: timestamp,
       };
     });
@@ -241,6 +274,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
           createdAt: timestamp,
         }],
         report: null,
+        reportOwnerId: null,
+        claimToken: undefined,
         updatedAt: timestamp,
       };
     });
@@ -252,11 +287,19 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
       stage: "result",
       processingState: "assessing",
       report: null,
+      reportOwnerId: null,
+      claimToken: undefined,
       updatedAt: now(),
     }));
   }, []);
 
-  const generateReport = useCallback(async () => {
+  const generateReport = useCallback(async (ownerId: string | null = null) => {
+    const requestedIdentity = activeIdentityRef.current;
+    const requestedEpoch = identityEpochRef.current;
+    if (!requestedIdentity) return;
+    if ((requestedIdentity === "anonymous" ? null : requestedIdentity) !== ownerId) {
+      throw new Error("Account changed before assessment generation. Reload to continue.");
+    }
     const timestamp = now();
     const currentSession = sessionRef.current;
 
@@ -271,7 +314,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         formData.append("linkedInUrl", currentSession.input.linkedInUrl || "");
         formData.append("description", currentSession.input.description || "");
         formData.append("profileText", currentSession.input.profileText || "");
-        const refCode = typeof window !== "undefined" ? (window.sessionStorage.getItem("fundme-referral-code") || window.localStorage.getItem("fundme-referral-code") || "") : "";
+        const referralKey = browserKeyForViewer("fundme-referral-code", ownerId);
+        const refCode = typeof window !== "undefined" ? (window.sessionStorage.getItem(referralKey) || window.localStorage.getItem(referralKey) || "") : "";
         if (refCode) formData.append("referralCode", refCode);
         formData.append("answers", JSON.stringify(currentSession.answers));
 
@@ -289,6 +333,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         if (res.ok) {
           const data = await res.json();
           if (data.ok && data.report) {
+            if (activeIdentityRef.current !== requestedIdentity || identityEpochRef.current !== requestedEpoch) return;
             if (data.claimToken) {
               try { window.localStorage.setItem("fundme-claim-token", data.claimToken); } catch {}
             }
@@ -298,7 +343,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
               stage: "result",
               processingState: data.report.completionState,
               report: data.report,
-              claimToken: data.claimToken || current.claimToken,
+              reportOwnerId: ownerId,
+              claimToken: data.claimToken || undefined,
               updatedAt: timestamp,
             }));
             return;
@@ -310,6 +356,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     }
 
     // 2. Deterministic local engine fallback
+    if (activeIdentityRef.current !== requestedIdentity || identityEpochRef.current !== requestedEpoch) return;
     setSession((current) => {
       const report = assessSession(current, timestamp);
       return {
@@ -317,6 +364,8 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
         stage: "result",
         processingState: report.completionState,
         report,
+        reportOwnerId: ownerId,
+        claimToken: undefined,
         updatedAt: timestamp,
       };
     });
@@ -331,26 +380,55 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
   }, []);
 
   const submitEarlyAccess = useCallback((email: string): EarlyAccessPersistenceResult => {
-    let storage: Storage | null = null;
-    try { storage = window.localStorage; } catch { /* handled by persistEarlyAccess */ }
+    let storage: ReturnType<typeof assessmentStorageForViewer> | null = null;
+    try { storage = assessmentStorageForViewer(window.localStorage, viewerId); } catch { /* handled by persistEarlyAccess */ }
     const result = persistEarlyAccess(storage, session, email);
     setSession(result.session);
     return result;
-  }, [session]);
+  }, [session, viewerId]);
 
   const restart = useCallback(() => {
     fileMapRef.current.clear();
     try {
-      clearSession(window.localStorage);
+      clearSession(assessmentStorageForViewer(window.localStorage, viewerId));
       setSession(createInitialSession());
     } catch {
       setSession(createInitialSession(undefined, "Browser storage is unavailable. The in-memory assessment was restarted."));
     }
-  }, []);
+  }, [viewerId]);
+
+  const finalizeAnonymousSessionSave = useCallback((anonymousSession: GrillSession): boolean => {
+    if (!viewerId || !hasHydrated || activeIdentityRef.current !== viewerId
+      || !anonymousSession.report || anonymousSession.reportOwnerId) return false;
+    const adopted = { ...anonymousSession, reportOwnerId: viewerId, updatedAt: now() };
+    try {
+      const storage = window.localStorage;
+      if (loadSession(storage).report?.generatedAt !== anonymousSession.report.generatedAt) return false;
+      const existing = sessionRef.current;
+      const hasExistingDraft = existing.stage !== "intake" || Boolean(existing.report)
+        || existing.artifacts.length > 0 || Object.values(existing.answers).length > 0
+        || Object.values(existing.input).some((value) => typeof value === "string" && Boolean(value.trim()))
+        || Boolean(existing.earlyAccess.email.trim());
+      if (hasExistingDraft) {
+        // The report is already saved on the server; keep this account's other local draft.
+        clearSession(storage);
+        return true;
+      }
+      const saved = saveSession(assessmentStorageForViewer(storage, viewerId), adopted);
+      if (!saved.ok) return false;
+      clearSession(storage);
+      sessionRef.current = adopted;
+      setSession(adopted);
+      return true;
+    } catch {
+      return false;
+    }
+  }, [hasHydrated, viewerId]);
 
   const value = useMemo<AssessmentContextValue>(() => ({
-    session,
+    session: hasHydrated ? session : blankSession,
     hasHydrated,
+    viewerId,
     updateInput,
     attachFile,
     removeArtifact,
@@ -364,9 +442,12 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     setEarlyAccessDraft,
     submitEarlyAccess,
     restart,
+    finalizeAnonymousSessionSave,
   }), [
     session,
+    blankSession,
     hasHydrated,
+    viewerId,
     updateInput,
     attachFile,
     removeArtifact,
@@ -380,6 +461,7 @@ export function AssessmentProvider({ children }: { children: React.ReactNode }) 
     setEarlyAccessDraft,
     submitEarlyAccess,
     restart,
+    finalizeAnonymousSessionSave,
   ]);
 
   return <AssessmentContext.Provider value={value}>{children}</AssessmentContext.Provider>;
