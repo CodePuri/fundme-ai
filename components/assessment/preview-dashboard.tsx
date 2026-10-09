@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
   ArrowRight,
@@ -31,7 +31,9 @@ import { useDemo } from "@/components/app/demo-provider";
 import { useAssessment } from "@/components/assessment/assessment-provider";
 import { Button } from "@/components/ui/button";
 import { getPreviewMatches, PREVIEW_MATCH_CATEGORIES } from "@/lib/assessment/preview-matches";
+import { forOwner, localReportForViewer } from "@/lib/assessment/owner-scoped";
 import type { FundingReadinessReport } from "@/lib/assessment/types";
+import type { ReferralStats } from "@/lib/analytics/referrals";
 
 function CategoryIcon({ label }: { label: string }) {
   const className = "size-4";
@@ -103,65 +105,71 @@ export function PreviewDashboard() {
     signOut: () => {},
   });
 
-  const handleClerkSync = (auth: any) => {
-    setClerkAuth(auth);
-  };
+  const handleClerkSync = useCallback((auth: { clerkLoaded: boolean; isSignedIn: boolean; user: any; signOut: any }) => {
+    setClerkAuth((current) => current.clerkLoaded === auth.clerkLoaded
+      && current.isSignedIn === auth.isSignedIn
+      && current.user === auth.user
+      ? current : auth);
+  }, []);
 
   const { clerkLoaded, isSignedIn, user, signOut } = clerkAuth;
   const { state, signIn, hasHydrated: demoHydrated } = useDemo();
-  const { session } = useAssessment();
+  const { session, hasHydrated: assessmentHydrated } = useAssessment();
   const searchParams = useSearchParams();
 
-  const [serverAssessment, setServerAssessment] = useState<any>(null);
-  const [serverFounder, setServerFounder] = useState<any>(null);
-  const [serverStartup, setServerStartup] = useState<any>(null);
+  const [serverRecord, setServerRecord] = useState<{
+    ownerId: string;
+    assessment: any;
+    founder: any;
+    startup: any;
+  } | null>(null);
+  const activeServerRecord = forOwner(serverRecord, user?.id);
+  const serverAssessment = activeServerRecord?.assessment ?? null;
+  const serverFounder = activeServerRecord?.founder ?? null;
+  const serverStartup = activeServerRecord?.startup ?? null;
   const [loadingServer, setLoadingServer] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string | null>(null);
-  const claimedRef = useRef(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const syncRequestRef = useRef(0);
+  const urlClaimToken = searchParams.get("claim_token");
+  const sessionPayload = useMemo(() => session.report ? JSON.stringify(session) : null, [session]);
+  const [shareRecord, setShareRecord] = useState<{ ownerId: string; url: string } | null>(null);
+  const shareUrl = forOwner(shareRecord, user?.id)?.url ?? null;
   const [copiedShare, setCopiedShare] = useState(false);
-  const [referralStats, setReferralStats] = useState<{
-    referralCode: string;
-    referralCount: number;
-    priorityRank: number;
-    priorityTier: string;
-    referralLink: string;
-  } | null>(null);
+  const [referralRecord, setReferralRecord] = useState<{ ownerId: string; stats: ReferralStats } | null>(null);
+  const referralStats = forOwner(referralRecord, user?.id)?.stats ?? null;
   const [copiedRef, setCopiedRef] = useState(false);
 
-  // Load public share token and referral stats
+  // Account data is fetched only for the current Clerk identity.
   useEffect(() => {
-    const claimToken = searchParams.get("claim_token") || (typeof window !== "undefined" ? window.localStorage.getItem("fundme-claim-token") : null);
-    const userId = user?.id || serverAssessment?.clerk_user_id || "user_3DcZtKTGh2XKNAm9X5wZ2CNlfHe";
+    if (!isSignedIn || !user?.id) return;
+    const ownerId = user.id;
+    let active = true;
 
-    // 1. Fetch referral stats
-    fetch(`/api/referrals/stats?clerkUserId=${encodeURIComponent(userId)}`)
+    fetch("/api/referrals/stats", { cache: "no-store" })
       .then(res => res.json())
       .then(data => {
-        if (data.ok && data.stats) setReferralStats(data.stats);
+        if (active && data.ok && data.stats) setReferralRecord({ ownerId, stats: data.stats });
       })
       .catch(() => {});
 
-    // 2. Fetch or create public share
-    if (claimToken || serverAssessment?.id) {
+    if (serverAssessment?.id) {
       fetch("/api/assessment/share", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          assessmentId: serverAssessment?.id,
-          claimToken: claimToken || undefined,
-        }),
+        body: JSON.stringify({ assessmentId: serverAssessment.id }),
       })
         .then(res => res.json())
         .then(data => {
-          if (data.ok && data.shareUrl) {
+          if (active && data.ok && data.shareUrl) {
             const fullUrl = `${window.location.origin}${data.shareUrl}`;
-            setShareUrl(fullUrl);
+            setShareRecord({ ownerId, url: fullUrl });
           }
         })
         .catch(() => {});
     }
-  }, [user?.id, searchParams, serverAssessment?.clerk_user_id, serverAssessment?.id]);
+    return () => { active = false; };
+  }, [isSignedIn, user?.id, serverAssessment?.id]);
 
   const copyShareLink = async () => {
     if (!shareUrl) return;
@@ -189,62 +197,83 @@ export function PreviewDashboard() {
     }
   }, [clerkLoaded, isSignedIn, signIn, state.isAuthenticated]);
 
-  // Load from server on Clerk authentication OR with claim_token
+  // A claim token alone never authorizes a server save or an account lookup.
   useEffect(() => {
-    const urlClaimToken = searchParams.get("claim_token");
+    if (!clerkLoaded || !isSignedIn || !user?.id || !assessmentHydrated) return;
+
     let localClaimToken: string | null = null;
     try {
       localClaimToken = window.localStorage.getItem("fundme-claim-token");
     } catch {}
 
-    const claimToken = urlClaimToken || localClaimToken || session.claimToken;
-    if (!claimToken && (!clerkLoaded || !isSignedIn)) return;
-    if (claimedRef.current) return;
-
-    claimedRef.current = true;
+    const claimToken = urlClaimToken || localClaimToken;
+    const ownerId = user.id;
+    const requestId = ++syncRequestRef.current;
+    const isCurrentRequest = () => syncRequestRef.current === requestId;
 
     async function syncAndFetch() {
       setLoadingServer(true);
-      try {
-        // 1. If we have a claim token or local session, save/claim to server
-        if (claimToken || (session.report && session.input.founderName)) {
-          setSaveStatus("Saving assessment to your account...");
-          await fetch("/api/assessment/save", {
+      setSaveError(null);
+      if (claimToken) {
+        setSaveStatus("Saving assessment to your account...");
+        try {
+          const saveResponse = await fetch("/api/assessment/save", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              claimToken: claimToken || undefined,
-              session: session.report ? session : undefined,
+              claimToken,
+              session: sessionPayload && session.claimToken === claimToken ? JSON.parse(sessionPayload) : undefined,
             }),
           });
-          try {
-            window.localStorage.removeItem("fundme-claim-token");
-          } catch {}
-          setSaveStatus(null);
-        }
-
-        // 2. Fetch latest saved assessment from server
-        const res = await fetch(`/api/assessment/latest${urlClaimToken ? `?claim_token=${encodeURIComponent(urlClaimToken)}` : ""}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.ok && data.hasAssessment) {
-            setServerAssessment(data.assessment);
-            setServerFounder(data.founder);
-            setServerStartup(data.startup);
+          if (!saveResponse.ok || !(await saveResponse.json()).ok) {
+            throw new Error("Assessment save was not confirmed");
           }
+          if (isCurrentRequest()) {
+            try {
+              window.localStorage.removeItem("fundme-claim-token");
+            } catch {}
+          }
+        } catch {
+          if (isCurrentRequest()) setSaveError("We could not attach this browser assessment to your account.");
+        } finally {
+          if (isCurrentRequest()) setSaveStatus(null);
         }
-      } catch (err) {
-        console.warn("Error syncing or loading assessment from server:", err);
+      }
+
+      try {
+        const response = await fetch("/api/assessment/latest", { cache: "no-store" });
+        if (response.status === 404) {
+          if (isCurrentRequest()) setServerRecord({ ownerId, assessment: null, founder: null, startup: null });
+          return;
+        }
+        if (!response.ok) throw new Error("Assessment lookup failed");
+        const data = await response.json();
+        if (!data.ok) throw new Error("Assessment lookup was not confirmed");
+        if (isCurrentRequest()) {
+          setServerRecord({
+            ownerId,
+            assessment: data.hasAssessment ? data.assessment : null,
+            founder: data.hasAssessment ? data.founder : null,
+            startup: data.hasAssessment ? data.startup : null,
+          });
+        }
+      } catch {
+        if (isCurrentRequest()) setSaveError("We could not load your saved assessment. Refresh this page to retry.");
       } finally {
-        setLoadingServer(false);
+        if (isCurrentRequest()) setLoadingServer(false);
       }
     }
 
-    syncAndFetch();
-  }, [clerkLoaded, isSignedIn, searchParams, session]);
+    void syncAndFetch();
+    return () => {
+      if (isCurrentRequest()) syncRequestRef.current += 1;
+    };
+  }, [assessmentHydrated, clerkLoaded, isSignedIn, session.claimToken, sessionPayload, urlClaimToken, user?.id]);
 
-  if (!demoHydrated || (isSignedIn && loadingServer && !serverAssessment)) {
-    return <div className="premium-card p-8 text-[15px] text-[var(--text-secondary)]">Opening your saved assessment workspace…</div>;
+  const clerkSync = clerkConfigured ? <ClerkUserSync onSync={handleClerkSync} /> : null;
+
+  if (!demoHydrated || (clerkConfigured && !clerkLoaded) || (isSignedIn && loadingServer && !serverAssessment)) {
+    return <>{clerkSync}<div className="premium-card p-8 text-[15px] text-[var(--text-secondary)]">Opening your saved assessment workspace…</div></>;
   }
 
   // Determine active report and names
@@ -267,25 +296,25 @@ export function PreviewDashboard() {
     startupReview: serverAssessment.startup_review || { problem: "", solution: "", market: "", differentiation: "", traction: "", fundingNarrative: "" },
     deckReview: serverAssessment.deck_review || { status: "not-provided", summary: "", findings: [] },
     actions: serverAssessment.actions || [],
-  } : session.report;
+  } : localReportForViewer(session.report, isSignedIn);
 
   const founderName = serverFounder?.name
     || serverAssessment?.founder_name
     || user?.fullName
     || user?.firstName
-    || session.input.founderName.trim()
+    || (!isSignedIn ? session.input.founderName.trim() : "")
     || "Founder";
 
   const startupName = serverStartup?.startup_name
     || serverAssessment?.startup_name
-    || session.input.startupName.trim()
+    || (!isSignedIn ? session.input.startupName.trim() : "")
     || "Your startup";
 
   const isAuthenticated = state.isAuthenticated || isSignedIn;
 
   if (!isAuthenticated && !serverAssessment) {
     return (
-      <section className="premium-card mx-auto max-w-xl p-6 text-center sm:p-8">
+      <>{clerkSync}<section className="premium-card mx-auto max-w-xl p-6 text-center sm:p-8">
         <LockKeyhole className="mx-auto size-6 text-[#ff6b3d]" />
         <h1 className="type-section-title mt-3">Save this assessment first.</h1>
         <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]">Return to your result to continue into the Preview workspace.</p>
@@ -293,17 +322,18 @@ export function PreviewDashboard() {
           Return to assessment
           <ArrowRight className="size-4" />
         </Button>
-      </section>
+      </section></>
     );
   }
 
   if (!report) {
     return (
-      <section className="premium-card mx-auto max-w-xl p-6 text-center sm:p-8">
+      <>{clerkSync}<section className="premium-card mx-auto max-w-xl p-6 text-center sm:p-8">
         <h1 className="type-section-title">Start with your assessment.</h1>
         <p className="mt-3 text-[15px] leading-6 text-[var(--text-secondary)]">A funding diagnosis unlocks this workspace.</p>
+        {saveError ? <p className="mt-3 text-sm text-[var(--status-critical)]" role="alert">{saveError}</p> : null}
         <Button className="mt-5" onClick={() => window.location.assign("/assessment")}>Start assessment <ArrowRight className="size-4" /></Button>
-      </section>
+      </section></>
     );
   }
 
@@ -313,7 +343,7 @@ export function PreviewDashboard() {
 
   return (
     <div className="mx-auto max-w-[1080px] space-y-6">
-      {clerkConfigured ? <ClerkUserSync onSync={handleClerkSync} /> : null}
+      {clerkSync}
 
       <header className="flex flex-col gap-4 border-b border-[var(--border)] pb-5 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex min-w-0 items-center gap-3">
@@ -326,7 +356,7 @@ export function PreviewDashboard() {
         <div className="flex items-center gap-3">
           <span className="inline-flex w-fit items-center gap-2 rounded-full border border-[#246b48]/20 bg-[#f3fbf6] px-3 py-1.5 text-[13px] font-semibold text-[var(--status-positive)]">
             <ShieldCheck aria-hidden="true" className="size-3.5" />
-            {serverAssessment ? "Saved to account" : "Saved assessment"}
+            {serverAssessment ? "Saved to account" : "Preview assessment (this browser)"}
           </span>
           {isSignedIn ? (
             <button
@@ -347,6 +377,7 @@ export function PreviewDashboard() {
           {saveStatus}
         </div>
       ) : null}
+      {saveError ? <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-900" role="alert">{saveError}</p> : null}
 
       {/* 1. Core Diagnosis Status */}
       <section className="premium-card grid overflow-hidden md:grid-cols-[170px_minmax(0,1fr)_240px]">

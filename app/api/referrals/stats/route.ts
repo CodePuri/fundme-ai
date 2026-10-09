@@ -6,20 +6,16 @@ export async function GET(req: NextRequest) {
   try {
     let userId: string | null = null;
     try {
-      const clerkAuth = await auth();
-      userId = clerkAuth.userId;
+      userId = (await auth()).userId;
     } catch {
-      // Unauthenticated or unconfigured Clerk
+      // Treat missing Clerk configuration as unauthenticated.
     }
-    const clerkUserIdQuery = req.nextUrl.searchParams.get("clerkUserId")?.trim();
-    const effectiveUserId = userId || clerkUserIdQuery;
-
-    if (!effectiveUserId) {
+    if (!userId) {
       return NextResponse.json({ ok: false, error: "Unauthorized. Sign-in required for referral dashboard." }, { status: 401 });
     }
 
-    const origin = req.headers.get("origin") || req.nextUrl.origin || "https://staging.tryfundme.in";
-    const stats = await getFounderReferralStats(effectiveUserId, origin);
+    const origin = req.nextUrl.origin;
+    const stats = await getFounderReferralStats(userId, origin);
     return NextResponse.json({ ok: true, stats });
   } catch (err: any) {
     return NextResponse.json({ ok: false, error: err.message }, { status: 500 });

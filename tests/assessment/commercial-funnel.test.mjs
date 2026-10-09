@@ -70,7 +70,8 @@ test("the diagnosis exposes compact evidence, actions, and the FundMe opportunit
 test("the Preview dashboard is premium, compact, and groups the locked workspace", async () => {
   const sourceText = await source("components/assessment/preview-dashboard.tsx");
 
-  assert.match(sourceText, /Saved assessment/);
+  assert.match(sourceText, /Saved to account/);
+  assert.match(sourceText, /Preview assessment \(this browser\)/);
   assert.match(sourceText, /Top opportunities/);
   assert.match(sourceText, /View assessment/);
   assert.match(sourceText, /Optimize/);

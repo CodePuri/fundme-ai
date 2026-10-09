@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
+import { forOwner, localReportForViewer } from "../../lib/assessment/owner-scoped.ts";
 
 const root = new URL("../../", import.meta.url);
 
@@ -35,6 +36,30 @@ test("Funding readiness report: authenticated users save directly without redund
   assert.match(reportSource, /if \(!response\.ok \|\| !\(await response\.json\(\)\)\.ok\)/);
   assert.match(reportSource, /Your assessment could not be saved/);
   assert.match(reportSource, /router\.push\(`\/app\/preview/);
+});
+
+test("Preview workspace detects returning Clerk users before local-state gates and confirms saves", async () => {
+  const source = await readFile(new URL("components/assessment/preview-dashboard.tsx", root), "utf8");
+
+  assert.match(source, /const clerkSync = clerkConfigured \? <ClerkUserSync onSync=\{handleClerkSync\} \/> : null;/);
+  assert.ok(source.indexOf("const clerkSync =") < source.indexOf("if (!demoHydrated"));
+  assert.match(source, /if \(!clerkLoaded \|\| !isSignedIn \|\| !user\?\.id \|\| !assessmentHydrated\) return;/);
+  assert.match(source, /if \(!saveResponse\.ok \|\| !\(await saveResponse\.json\(\)\)\.ok\)/);
+  assert.ok(source.indexOf("if (!saveResponse.ok") < source.indexOf('removeItem("fundme-claim-token")'));
+  assert.match(source, /fetch\("\/api\/assessment\/latest", \{ cache: "no-store" \}\)/);
+  assert.doesNotMatch(source, /fetch\(`\/api\/assessment\/latest\$\{/);
+  assert.match(source, /Preview assessment \(this browser\)/);
+});
+
+test("Preview workspace never shows another Clerk user's cached server or browser report", () => {
+  const accountA = { ownerId: "user_a", assessment: { verdict: "private to A" } };
+  const localReport = { verdict: "browser report from A" };
+
+  assert.equal(forOwner(accountA, "user_b"), null);
+  assert.equal(forOwner(accountA, null), null);
+  assert.equal(forOwner(accountA, "user_a"), accountA);
+  assert.equal(localReportForViewer(localReport, true), null);
+  assert.equal(localReportForViewer(localReport, false), localReport);
 });
 
 test("Public Homepage: navbar and hero adapt intelligently based on product auth state", async () => {
