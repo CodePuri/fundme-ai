@@ -3,7 +3,7 @@
 ## Current release state
 
 - V1 code changes are on `fix/fundme-v1-closeout` and the existing `staging` branch at code checkpoint `2fec1e5ba507fd20308649669407984f97771ab4`. PR [#46](https://github.com/CodePuri/fundme-ai/pull/46) is open, mergeable, and has successful GitGuardian and Vercel checks. It has **not** been merged into `main`.
-- The staging deployment `dpl_4BjSd5BJ7AqB9gj4HZgLh7QGZVcH` is Ready and aliased to https://staging.tryfundme.in. Production remained on its prior hotfix deployment; no Production environment variable was changed during this closeout.
+- The code-validation staging deployment `dpl_4BjSd5BJ7AqB9gj4HZgLh7QGZVcH` was Ready and served from https://staging.tryfundme.in during browser verification. Documentation-only commits may produce a successor deployment without changing application code. Production remained on its prior hotfix deployment; no Production environment variable was changed during this closeout.
 - Production and staging Supabase project refs are `wduygrhtijvaevcwptnr` and `nnzdplkjizwgsalizijd` respectively. The staging Preview URL and privileged service-role credential match and are isolated from Production. The effective Production Vercel URL/key pair remains unverified because its Sensitive values are not exposed by Vercel CLI. A local legacy Production service-role JWT matched the Production project and was active; it also appears in Git history and requires rotation before launch.
 - Old branch-specific Vercel scopes were left in place because those branches still existed. They are cleanup-only, not a V1 gate.
 - PostHog setup is intentionally deferred at the founder's request. Do not treat it as blocking independent V1 engineering work.
