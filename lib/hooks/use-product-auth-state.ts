@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { useUser, useClerk } from "@clerk/nextjs";
-import { loadSession } from "@/lib/assessment/persistence";
+import { assessmentStorageForViewer, loadSession } from "@/lib/assessment/persistence";
 import type { GrillSession } from "@/lib/assessment/types";
 
 export type ProductAuthState =
@@ -38,62 +38,61 @@ export type ProductAuthContext = {
 };
 
 export function useProductAuthState(): ProductAuthContext {
-  const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-
   // 1. Clerk authentication state
-  let clerkLoaded = true;
-  let isSignedIn = false;
-  let user: any = null;
-  let clerkSignOut: any = async () => {};
-
-  try {
-    const clerkUser = useUser();
-    const clerk = useClerk();
-    clerkLoaded = clerkUser.isLoaded;
-    isSignedIn = Boolean(clerkUser.isSignedIn);
-    user = clerkUser.user ?? null;
-    clerkSignOut = clerk.signOut;
-  } catch {
-    // Standalone / test fallback when ClerkProvider is absent
-    clerkLoaded = true;
-    isSignedIn = false;
-  }
+  const clerkUser = useUser();
+  const { signOut: clerkSignOut } = useClerk();
+  const clerkLoaded = clerkUser.isLoaded;
+  const isSignedIn = Boolean(clerkUser.isSignedIn);
+  const user = clerkUser.user ?? null;
 
   // 2. Local browser session state
-  const [localSession, setLocalSession] = useState<GrillSession | null>(null);
-  const [localHydrated, setLocalHydrated] = useState(false);
+  const identityKey = clerkLoaded ? (user?.id ?? "anonymous") : null;
+  const [localRecord, setLocalRecord] = useState<{ identityKey: string; session: GrillSession | null } | null>(null);
+  const localSession = localRecord?.identityKey === identityKey ? localRecord.session : null;
+  const localHydrated = identityKey !== null && localRecord?.identityKey === identityKey;
 
   useEffect(() => {
+    if (!clerkLoaded) return;
     try {
       if (typeof window !== "undefined" && window.localStorage) {
-        const session = loadSession(window.localStorage);
-        setLocalSession(session);
+        const session = loadSession(assessmentStorageForViewer(window.localStorage, user?.id ?? null));
+        setLocalRecord({ identityKey: identityKey!, session });
       }
     } catch {
       // Storage unavailable
     } finally {
-      setLocalHydrated(true);
+      if (identityKey) setLocalRecord((current) => current?.identityKey === identityKey ? current : { identityKey, session: null });
     }
-  }, []);
+  }, [clerkLoaded, identityKey, user?.id]);
 
   // 3. Server saved assessment state for signed-in user
   const [serverData, setServerData] = useState<{
+    ownerId: string | null;
     hasAssessment: boolean;
     assessment: any | null;
     startup: any | null;
     founder: any | null;
     loaded: boolean;
   }>({
+    ownerId: null,
     hasAssessment: false,
     assessment: null,
     startup: null,
     founder: null,
     loaded: false,
   });
+  const serverRequestRef = useRef(0);
+  const activeServerData = serverData.ownerId === user?.id ? serverData : null;
 
   const fetchSavedAssessment = useCallback(async () => {
+    const requestId = ++serverRequestRef.current;
+    const ownerId = user?.id ?? null;
+    const commit = (record: typeof serverData) => {
+      if (serverRequestRef.current === requestId) setServerData(record);
+    };
     if (!isSignedIn) {
-      setServerData({
+      commit({
+        ownerId: null,
         hasAssessment: false,
         assessment: null,
         startup: null,
@@ -108,7 +107,8 @@ export function useProductAuthState(): ProductAuthContext {
       if (res.ok) {
         const data = await res.json();
         if (data.ok && data.hasAssessment) {
-          setServerData({
+          commit({
+            ownerId,
             hasAssessment: true,
             assessment: data.assessment,
             startup: data.startup,
@@ -118,7 +118,8 @@ export function useProductAuthState(): ProductAuthContext {
           return;
         }
       }
-      setServerData({
+      commit({
+        ownerId,
         hasAssessment: false,
         assessment: null,
         startup: null,
@@ -126,7 +127,8 @@ export function useProductAuthState(): ProductAuthContext {
         loaded: true,
       });
     } catch {
-      setServerData({
+      commit({
+        ownerId,
         hasAssessment: false,
         assessment: null,
         startup: null,
@@ -134,7 +136,7 @@ export function useProductAuthState(): ProductAuthContext {
         loaded: true,
       });
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, user?.id]);
 
   useEffect(() => {
     if (clerkLoaded) {
@@ -143,7 +145,7 @@ export function useProductAuthState(): ProductAuthContext {
   }, [clerkLoaded, isSignedIn, fetchSavedAssessment]);
 
   // Derive high-level product state
-  const isLoaded = clerkLoaded && localHydrated && (!isSignedIn || serverData.loaded);
+  const isLoaded = clerkLoaded && localHydrated && (!isSignedIn || Boolean(activeServerData?.loaded));
 
   const hasLocalResult = Boolean(localSession?.report && localSession?.processingState === "complete");
   const hasLocalProgress = Boolean(
@@ -154,10 +156,10 @@ export function useProductAuthState(): ProductAuthContext {
         localSession.input?.founderName?.trim())
   );
 
-  const hasSavedAssessment = serverData.hasAssessment;
-  const savedAssessment = serverData.assessment;
+  const hasSavedAssessment = Boolean(activeServerData?.hasAssessment);
+  const savedAssessment = activeServerData?.assessment ?? null;
   const savedStartupName =
-    serverData.startup?.startup_name || serverData.assessment?.startup_name || null;
+    activeServerData?.startup?.startup_name || activeServerData?.assessment?.startup_name || null;
 
   const productState: ProductAuthState = useMemo(() => {
     if (isSignedIn) {

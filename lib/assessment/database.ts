@@ -3,9 +3,9 @@ import type { FundingReadinessReport, GrillSession } from "./types.ts";
 
 export function getSupabaseAdmin(): SupabaseClient {
   const url = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) {
-    throw new Error("Supabase configuration missing (SUPABASE_URL or SUPABASE_KEY).");
+    throw new Error("Supabase server configuration missing (SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY).");
   }
   return createClient(url, key, {
     auth: {
@@ -114,4 +114,48 @@ export async function getAssessmentByClaimToken(claimToken: string, clerkUserId?
   }
 
   return data?.found ? data.assessment : null;
+}
+
+export async function getFirstSaveEmailDeliveryStatus(params: {
+  assessmentId: string;
+  clerkUserId: string;
+}): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("assessments")
+    .select("first_save_email_sent_at")
+    .eq("id", params.assessmentId)
+    .eq("clerk_user_id", params.clerkUserId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to read first-save email delivery status: ${error.message}`);
+  }
+
+  return Boolean(data?.first_save_email_sent_at);
+}
+
+export async function recordFirstSaveEmailDelivery(params: {
+  assessmentId: string;
+  clerkUserId: string;
+  providerMessageId?: string;
+}): Promise<boolean> {
+  const supabase = getSupabaseAdmin();
+  const { data, error } = await supabase
+    .from("assessments")
+    .update({
+      first_save_email_sent_at: new Date().toISOString(),
+      first_save_email_provider_id: params.providerMessageId || null,
+    })
+    .eq("id", params.assessmentId)
+    .eq("clerk_user_id", params.clerkUserId)
+    .is("first_save_email_sent_at", null)
+    .select("id")
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to record first-save email delivery: ${error.message}`);
+  }
+
+  return Boolean(data?.id);
 }

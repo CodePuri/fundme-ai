@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useMemo, useState, useRef } from "react";
+import { startTransition, useEffect, useLayoutEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { FileUploadArea } from "@/components/ui/file-upload";
 import { mapOnboardingToAssessment } from "@/components/assessment/onboarding-bridge";
+import { browserKeyForViewer } from "@/lib/assessment/persistence";
 import { PhoneInputField, PhoneData } from "@/components/ui/phone-input";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
@@ -43,12 +44,24 @@ type OnboardingDraft = {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { isLoaded: isClerkLoaded, isSignedIn } = useUser();
+  const { isLoaded: isClerkLoaded, isSignedIn, user } = useUser();
   const { completeOnboarding } = useDemo();
-  const [hasHydrated, setHasHydrated] = useState(false);
+  const identityKey = isClerkLoaded ? (user?.id ?? "anonymous") : null;
+  const [hydratedIdentityKey, setHydratedIdentityKey] = useState<string | null>(null);
+  const hasHydrated = identityKey !== null && hydratedIdentityKey === identityKey;
+  const draftKey = browserKeyForViewer(ONBOARDING_DRAFT_KEY, user?.id ?? null);
+  const stepKey = browserKeyForViewer(ONBOARDING_STEP_KEY, user?.id ?? null);
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const currentIdentityRef = useRef(identityKey);
+  const submissionAbortRef = useRef<AbortController | null>(null);
+
+  useLayoutEffect(() => {
+    currentIdentityRef.current = identityKey;
+  }, [identityKey]);
+
+  useEffect(() => () => submissionAbortRef.current?.abort(), [identityKey]);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -144,23 +157,27 @@ export default function OnboardingPage() {
   // Redirect already-submitted users straight to /thank-you
   useEffect(() => {
     if (!isClerkLoaded || !isSignedIn) return;
+    let active = true;
+    const controller = new AbortController();
     async function checkSubmission() {
       try {
-        const res = await fetch("/api/onboarding");
+        const res = await fetch("/api/onboarding", { signal: controller.signal });
         const data = await res.json();
-        if (data.submitted) {
-          mapOnboardingToAssessment();
+        if (active && data.submitted) {
+          mapOnboardingToAssessment(user?.id ?? null);
           window.location.assign("/assessment");
         }
       } catch {/* ignore, let user proceed */}
     }
     checkSubmission();
-  }, [isClerkLoaded, isSignedIn, router]);
+    return () => { active = false; controller.abort(); };
+  }, [isClerkLoaded, isSignedIn, router, user?.id]);
 
   // Client-side local storage rehydration
   useEffect(() => {
-    const savedStep = window.localStorage.getItem(ONBOARDING_STEP_KEY);
-    const savedDraft = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
+    if (identityKey === null) return;
+    const savedStep = window.localStorage.getItem(stepKey);
+    const savedDraft = window.localStorage.getItem(draftKey);
     
     let nextName = "";
     let nextRole = "";
@@ -200,7 +217,7 @@ export default function OnboardingPage() {
           nextStep = 1;
         }
       } catch {
-        window.localStorage.removeItem(ONBOARDING_DRAFT_KEY);
+        window.localStorage.removeItem(draftKey);
       }
     }
 
@@ -220,24 +237,28 @@ export default function OnboardingPage() {
       setHasImported(nextImported);
       setPhone(nextPhone);
       setPhoneData(nextPhoneData);
-      setHasHydrated(true);
+      setSubmissionId(null);
+      setElapsed(0);
+      setIsSubmitting(false);
+      setSubmitError(null);
+      setHydratedIdentityKey(identityKey);
     });
-  }, []);
+  }, [draftKey, identityKey, stepKey]);
 
   // Sync draft state back to cache
   useEffect(() => {
     if (!hasHydrated) return;
     if (step >= 1 && step <= 3) {
-      window.localStorage.setItem(ONBOARDING_STEP_KEY, String(step));
+      window.localStorage.setItem(stepKey, String(step));
     } else {
-      window.localStorage.removeItem(ONBOARDING_STEP_KEY);
+      window.localStorage.removeItem(stepKey);
     }
-  }, [hasHydrated, step]);
+  }, [hasHydrated, step, stepKey]);
 
   useEffect(() => {
     if (!hasHydrated) return;
     window.localStorage.setItem(
-      ONBOARDING_DRAFT_KEY,
+      draftKey,
       JSON.stringify({
         name,
         role,
@@ -253,7 +274,7 @@ export default function OnboardingPage() {
         phoneData
       })
     );
-  }, [hasHydrated, name, role, companyName, email, linkedIn, websiteUrl, xUrl, notes, files, hasImported, phone, phoneData]);
+  }, [draftKey, hasHydrated, name, role, companyName, email, linkedIn, websiteUrl, xUrl, notes, files, hasImported, phone, phoneData]);
 
   // Loading assessment dynamic messages array
   const loadingStepsArray = useMemo(() => {
@@ -268,7 +289,7 @@ export default function OnboardingPage() {
 
   // Step 5 inline processing timers
   useEffect(() => {
-    if (step !== 5) {
+    if (!hasHydrated || step !== 5) {
       setElapsed(0);
       return;
     }
@@ -284,10 +305,10 @@ export default function OnboardingPage() {
     }, 100);
 
     return () => window.clearInterval(timer);
-  }, [step]);
+  }, [hasHydrated, step]);
 
   useEffect(() => {
-    if (step !== 5) return;
+    if (!hasHydrated || step !== 5) return;
     if (elapsed >= 5000) {
       const t = setTimeout(() => {
         if (submissionId) {
@@ -298,7 +319,7 @@ export default function OnboardingPage() {
       }, 400);
       return () => clearTimeout(t);
     }
-  }, [step, elapsed, router, submissionId]);
+  }, [hasHydrated, step, elapsed, router, submissionId]);
 
   // Forceful session teardown ensuring absolute termination intent
   const terminateSession = (status: "idle" | "captured" = "idle") => {
@@ -426,20 +447,16 @@ export default function OnboardingPage() {
   }, []);
 
   async function finishOnboarding() {
+    if (!hasHydrated || !identityKey) return;
+    const submittedIdentity = identityKey;
+    submissionAbortRef.current?.abort();
+    const controller = new AbortController();
+    submissionAbortRef.current = controller;
     const resolvedName = name || "Priya Sharma";
     const resolvedRole = role || "Founder";
     const resolvedCompany = companyName || "Orbit Labs";
     const resolvedLinkedIn = linkedIn || "https://linkedin.com/in/yourname";
     const resolvedNotes = notes || defaultPitchText;
-
-    completeOnboarding({
-      founderName: resolvedName,
-      founderRole: resolvedRole,
-      companyName: resolvedCompany,
-      linkedIn: resolvedLinkedIn,
-      notes: resolvedNotes,
-      files,
-    });
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -447,6 +464,7 @@ export default function OnboardingPage() {
     try {
       const res = await fetch("/api/onboarding", {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: resolvedName,
@@ -471,6 +489,15 @@ export default function OnboardingPage() {
       }
 
       const data = await res.json().catch(() => ({}));
+      if (controller.signal.aborted || currentIdentityRef.current !== submittedIdentity) return;
+      completeOnboarding({
+        founderName: resolvedName,
+        founderRole: resolvedRole,
+        companyName: resolvedCompany,
+        linkedIn: resolvedLinkedIn,
+        notes: resolvedNotes,
+        files,
+      });
       if (data.submissionId) {
         setSubmissionId(data.submissionId);
       }
@@ -478,8 +505,11 @@ export default function OnboardingPage() {
       setIsSubmitting(false);
       setStep(5);
     } catch (e: any) {
+      if (controller.signal.aborted || currentIdentityRef.current !== submittedIdentity) return;
       setIsSubmitting(false);
       setSubmitError(e?.message || "We couldn't save your profile right now. Please try again.");
+    } finally {
+      if (submissionAbortRef.current === controller) submissionAbortRef.current = null;
     }
   }
 

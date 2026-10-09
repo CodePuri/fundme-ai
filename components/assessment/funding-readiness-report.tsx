@@ -24,6 +24,8 @@ import { useRouter } from "next/navigation";
 
 import { useDemo } from "@/components/app/demo-provider";
 import { useAssessment } from "@/components/assessment/assessment-provider";
+import { reportForViewer } from "@/lib/assessment/owner-scoped";
+import { PENDING_ASSESSMENT_SAVE_KEY, saveSession } from "@/lib/assessment/persistence";
 import { Button } from "@/components/ui/button";
 import {
   getPreviewMatches,
@@ -127,12 +129,14 @@ const MATCH_TONES = [
   "border-t-[#246b48]",
 ];
 
-export function FundingReadinessReport() {
+export function FundingReadinessReport({ viewerId, identityResolved }: { viewerId: string | null; identityResolved: boolean }) {
   const router = useRouter();
-  const { signIn } = useDemo();
-  const { session, hasHydrated } = useAssessment();
-  const report = session.report;
+  const { signIn, state } = useDemo();
+  const { session, hasHydrated, viewerId: activeViewerId } = useAssessment();
+  const accountMatches = viewerId === activeViewerId;
+  const report = identityResolved && accountMatches ? reportForViewer(session.report, session.reportOwnerId, viewerId) : null;
   const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const authTriggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
@@ -142,9 +146,9 @@ export function FundingReadinessReport() {
   const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
   useEffect(() => {
-    if (!hasHydrated || report) return;
-    router.replace(earliestValidRoute(session));
-  }, [hasHydrated, report, router, session]);
+    if (!hasHydrated || !identityResolved || !accountMatches || report) return;
+    router.replace(session.report ? (viewerId ? "/app/preview" : "/assessment") : earliestValidRoute(session));
+  }, [accountMatches, hasHydrated, identityResolved, report, router, session, viewerId]);
 
   const closeAuth = useCallback(() => {
     setAuthOpen(false);
@@ -202,11 +206,14 @@ export function FundingReadinessReport() {
   useEffect(() => {
     if (report) {
       trackClientEvent("result_viewed", {
-        readinessScore: report.readinessScore,
         scoreBucket: report.readinessScore >= 70 ? "high" : report.readinessScore >= 50 ? "medium" : "low",
       });
     }
   }, [report]);
+
+  if (!identityResolved || (hasHydrated && !accountMatches)) {
+    return <div className="mx-auto max-w-xl rounded-[24px] border border-[var(--border)] bg-white p-8 text-center" role="alert"><p className="font-semibold">Account check unavailable</p><p className="mt-2 text-sm">Refresh this page to open your assessment safely.</p></div>;
+  }
 
   if (!report) {
     return (
@@ -257,11 +264,11 @@ export function FundingReadinessReport() {
 
   async function handleSaveClick(source: string = "hero") {
     trackClientEvent("save_cta_clicked", { source });
+    setSaveStatus(null);
 
-    if (state.isAuthenticated) {
-      // User is ALREADY authenticated in session — save directly and go to workspace
+    if (viewerId) {
       try {
-        await fetch("/api/assessment/save", {
+        const response = await fetch("/api/assessment/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -269,34 +276,22 @@ export function FundingReadinessReport() {
             session,
           }),
         });
-      } catch (err) {
-        console.error("Save assessment error:", err);
+        if (!response.ok || !(await response.json()).ok) {
+          throw new Error("Assessment save was not confirmed");
+        }
+        router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
+      } catch {
+        setSaveStatus("Your assessment could not be saved. Please try again.");
       }
-      router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
       return;
     }
 
-    // Try direct save in case authenticated via cookie
-    try {
-      const saveRes = await fetch("/api/assessment/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          claimToken: session.claimToken || undefined,
-          session,
-        }),
-      });
-      if (saveRes.ok) {
-        const data = await saveRes.json();
-        if (data.ok) {
-          signIn();
-          router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
-          return;
-        }
-      }
-    } catch {}
+    if (state.isAuthenticated) {
+      router.push("/app/preview");
+      return;
+    }
 
-    trackClientEvent("signup_started", { hasClaimToken: Boolean(session.claimToken) });
+    trackClientEvent("signup_started");
     setAuthOpen(true);
   }
 
@@ -322,6 +317,7 @@ export function FundingReadinessReport() {
                   Save my assessment
                   <ArrowRight className="size-4" />
                 </Button>
+                {saveStatus ? <span className="self-center text-sm text-[var(--status-critical)]" role="alert">{saveStatus}</span> : null}
                 <Button className="min-h-12" onClick={download} variant="secondary">
                   <Download className="size-4" />
                   Download assessment
@@ -385,7 +381,7 @@ export function FundingReadinessReport() {
               : report.conciseVerdict || "Your story has ambition, but an investor’s first pass will scrutinize the gap between current claims and independently verifiable customer evidence."}
           </p>
           <p className="mt-2 text-xs text-[#825345]">
-            Based entirely on your submitted founder profile, website copy, and deck evidence.
+            Based only on the information you provided. Sources you did not submit are treated as missing evidence.
           </p>
         </section>
 
@@ -579,7 +575,37 @@ export function FundingReadinessReport() {
                 ref={googleButtonRef}
                 className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] px-5 text-sm font-medium text-[var(--button-primary-text)] transition-colors hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2"
                 href={session.claimToken ? `/sign-in?redirect_url=${encodeURIComponent(`/app/preview?claim_token=${session.claimToken}`)}` : "/sign-in?redirect_url=%2Fapp%2Fpreview"}
-                onClick={() => {
+                onClick={(event) => {
+                  if (!session.claimToken && !session.reportOwnerId) {
+                    try {
+                      if (!saveSession(window.localStorage, session).ok) {
+                        event.preventDefault();
+                        setSaveStatus("This browser could not preserve your assessment for sign-in. Download the report first.");
+                        return;
+                      }
+                    } catch {
+                      event.preventDefault();
+                      setSaveStatus("This browser could not preserve your assessment for sign-in. Download the report first.");
+                      return;
+                    }
+                  }
+                  try {
+                    const previous = window.sessionStorage.getItem(PENDING_ASSESSMENT_SAVE_KEY);
+                    let claimToken = session.claimToken || `import-${crypto.randomUUID()}`;
+                    if (previous) {
+                      try {
+                        const intent = JSON.parse(previous) as { generatedAt?: string; claimToken?: string };
+                        if (intent.generatedAt === report.generatedAt && intent.claimToken) claimToken = intent.claimToken;
+                      } catch {}
+                    }
+                    window.sessionStorage.setItem(PENDING_ASSESSMENT_SAVE_KEY, JSON.stringify({ generatedAt: report.generatedAt, claimToken }));
+                  } catch {
+                    if (!session.claimToken) {
+                      event.preventDefault();
+                      setSaveStatus("This browser could not preserve your assessment for sign-in. Download the report first.");
+                      return;
+                    }
+                  }
                   if (session.claimToken) {
                     try { window.localStorage.setItem("fundme-claim-token", session.claimToken); } catch {}
                   }
@@ -593,6 +619,7 @@ export function FundingReadinessReport() {
                 <p className="flex items-start gap-2 font-semibold"><AlertCircle className="mt-0.5 size-3.5 shrink-0" />Google sign-in isn’t configured for this Preview.</p>
               </div>
             )}
+            {saveStatus ? <p className="mt-3 text-sm text-[var(--status-critical)]" role="alert">{saveStatus}</p> : null}
 
             <Button ref={previewButtonRef} className="mt-3 min-h-12 w-full" onClick={continueWithPreviewProfile} variant={clerkConfigured ? "secondary" : "primary"}>
               Continue with Preview profile

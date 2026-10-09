@@ -48,6 +48,23 @@ test("round-trips a versioned session and recovers from invalid storage", async 
   assert.equal(storage.getItem(adapters.GRILL_STORAGE_KEY), null);
 });
 
+test("browser assessment drafts are isolated by Clerk account", async () => {
+  const { assessmentStorageForViewer, browserKeyForViewer, createInitialSession, loadSession, saveSession } = await loadAdapters();
+  const storage = memoryStorage();
+  const anonymous = createInitialSession("2026-10-09T00:00:00.000Z");
+  anonymous.input.founderName = "Anonymous founder";
+  const accountA = createInitialSession("2026-10-09T00:00:00.000Z");
+  accountA.input.founderName = "Account A founder";
+
+  assert.equal(saveSession(storage, anonymous).ok, true);
+  assert.equal(saveSession(assessmentStorageForViewer(storage, "user_a"), accountA).ok, true);
+  assert.equal(loadSession(storage).input.founderName, "Anonymous founder");
+  assert.equal(loadSession(assessmentStorageForViewer(storage, "user_a")).input.founderName, "Account A founder");
+  assert.equal(loadSession(assessmentStorageForViewer(storage, "user_b")).input.founderName, "");
+  assert.notEqual(browserKeyForViewer("fundme-referral-code", "user_a"), browserKeyForViewer("fundme-referral-code", "user_b"));
+  assert.equal(browserKeyForViewer("fundme-referral-code", null), "fundme-referral-code");
+});
+
 test("serializes a truthful portable report", async () => {
   const { serializeReport } = await loadAdapters();
   const text = serializeReport({

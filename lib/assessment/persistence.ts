@@ -8,6 +8,22 @@ import {
 import { validateEmail } from "./validation.ts";
 
 export const GRILL_STORAGE_KEY = "fundme-grill-preview-v1";
+export const PENDING_ASSESSMENT_SAVE_KEY = "fundme-pending-assessment-save-v1";
+
+export function browserKeyForViewer(key: string, userId: string | null): string {
+  return userId ? `${key}:clerk:${encodeURIComponent(userId)}` : key;
+}
+
+export function assessmentStorageForViewer(storage: StorageLike, userId: string | null): StorageLike {
+  if (!userId) return storage;
+  const scopedKey = browserKeyForViewer(GRILL_STORAGE_KEY, userId);
+  const keyFor = (key: string) => key === GRILL_STORAGE_KEY ? scopedKey : key;
+  return {
+    getItem: (key) => storage.getItem(keyFor(key)),
+    setItem: (key, value) => storage.setItem(keyFor(key), value),
+    removeItem: (key) => storage.removeItem(keyFor(key)),
+  };
+}
 const MAX_STORED_BYTES = 250_000;
 
 export type StorageLike = {
@@ -203,6 +219,7 @@ export function createInitialSession(now = new Date().toISOString(), warning: st
     skippedQuestionIds: [],
     reviewedAt: null,
     report: null,
+    reportOwnerId: null,
     earlyAccess: { email: "", status: "idle", referralCode: null },
     persistenceWarning: warning,
     updatedAt: now,
@@ -222,6 +239,7 @@ function isCurrentSession(value: unknown): value is GrillSession {
     && Array.isArray(value.skippedQuestionIds) && value.skippedQuestionIds.length <= 5 && value.skippedQuestionIds.every((id) => questionIds.has(String(id)))
     && nullableString(value.reviewedAt, 64)
     && validReport(value.report)
+    && (value.reportOwnerId === undefined || nullableString(value.reportOwnerId, 128))
     && validLifecycleState(value)
     && validEarlyAccess(value.earlyAccess)
     && nullableString(value.persistenceWarning, 500)

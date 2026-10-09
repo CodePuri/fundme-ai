@@ -149,7 +149,6 @@ function Header() {
                 {hasSavedAssessment ? "My assessment" : "Dashboard"}
               </Link>
               <UserButton
-                afterSignOutUrl="/"
                 appearance={{
                   elements: {
                     avatarBox: "size-8.5 rounded-full border border-[#d9cbbd]",

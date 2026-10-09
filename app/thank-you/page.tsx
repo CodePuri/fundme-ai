@@ -8,19 +8,30 @@ import Link from "next/link";
 
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { ONBOARDING_DRAFT_KEY } from "@/components/app/demo-provider";
+import { browserKeyForViewer } from "@/lib/assessment/persistence";
 
 export default function ThankYouPage() {
-  const { user } = useUser();
-  const [draftData, setDraftData] = useState<{ name?: string; email?: string } | null>(null);
+  const { isLoaded, user } = useUser();
+  const identityKey = isLoaded ? (user?.id ?? "anonymous") : null;
+  const [draftRecord, setDraftRecord] = useState<{ identityKey: string; data: { name?: string; email?: string } | null } | null>(null);
+  const draftData = draftRecord?.identityKey === identityKey ? draftRecord.data : null;
 
   useEffect(() => {
+    if (identityKey === null) return;
+    let timer: number | undefined;
     try {
-      const saved = window.localStorage.getItem(ONBOARDING_DRAFT_KEY);
+      const saved = window.localStorage.getItem(browserKeyForViewer(ONBOARDING_DRAFT_KEY, user?.id ?? null));
       if (saved) {
-        setDraftData(JSON.parse(saved));
+        const parsed = JSON.parse(saved);
+        timer = window.setTimeout(() => setDraftRecord({ identityKey, data: parsed }), 0);
+      } else {
+        timer = window.setTimeout(() => setDraftRecord({ identityKey, data: null }), 0);
       }
     } catch {}
-  }, []);
+    return () => {
+      if (timer !== undefined) window.clearTimeout(timer);
+    };
+  }, [identityKey, user?.id]);
 
   const firstName = user?.firstName ?? user?.fullName?.split(" ")[0] ?? draftData?.name?.split(" ")[0] ?? null;
   const resolvedEmail = user?.emailAddresses?.[0]?.emailAddress ?? draftData?.email ?? "your submitted email";

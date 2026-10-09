@@ -19,7 +19,7 @@ import { useAssessment } from "@/components/assessment/assessment-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { getBrowserStorage, readStorageItem } from "@/lib/assessment/persistence";
+import { browserKeyForViewer, getBrowserStorage, readStorageItem } from "@/lib/assessment/persistence";
 import type { ArtifactKind } from "@/lib/assessment/types";
 import type { IntakeErrors } from "@/lib/assessment/validation";
 
@@ -93,26 +93,28 @@ function AttachedFile({
 export function IntakeGrid() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { session, updateInput, removeArtifact, submitIntake } = useAssessment();
+  const { session, hasHydrated, viewerId, updateInput, removeArtifact, submitIntake } = useAssessment();
   const [errors, setErrors] = useState<IntakeErrors>({});
 
   useEffect(() => {
+    if (!hasHydrated) return;
     const ref = searchParams.get("ref");
     if (ref) {
       try {
-        window.sessionStorage.setItem("fundme-referral-code", ref);
-        window.localStorage.setItem("fundme-referral-code", ref);
-        trackClientEvent("referral_attributed", { referralCode: ref });
+        const key = browserKeyForViewer("fundme-referral-code", viewerId);
+        window.sessionStorage.setItem(key, ref);
+        window.localStorage.setItem(key, ref);
+        trackClientEvent("referral_attributed", { hasReferral: true });
       } catch {}
     }
     trackClientEvent("assessment_started", { hasReferral: Boolean(ref) });
-  }, [searchParams]);
+  }, [hasHydrated, searchParams, viewerId]);
 
   useEffect(() => {
-    if (session.input.websiteUrl || session.input.startupName) return;
+    if (!hasHydrated || viewerId || session.input.websiteUrl || session.input.startupName) return;
     const homepageWebsite = readStorageItem(getBrowserStorage(window), "fundme-homepage-website");
     if (homepageWebsite.ok && homepageWebsite.value) updateInput("websiteUrl", homepageWebsite.value);
-  }, [session.input.startupName, session.input.websiteUrl, updateInput]);
+  }, [hasHydrated, session.input.startupName, session.input.websiteUrl, updateInput, viewerId]);
 
   function analyze() {
     const validation = submitIntake();

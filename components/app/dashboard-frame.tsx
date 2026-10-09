@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Suspense, useEffect, useMemo } from "react";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import { Bell, CircleUserRound, X } from "lucide-react";
 
 import { ONBOARDING_STEP_KEY, useDemo } from "@/components/app/demo-provider";
@@ -10,6 +11,7 @@ import { Sidebar } from "@/components/app/sidebar";
 import { NavSearch } from "@/components/startup-programs/nav-search";
 import { BrandLockup } from "@/components/ui/brand-lockup";
 import { buildAuthEntryHref } from "@/lib/auth-intent";
+import { browserKeyForViewer, getBrowserStorage, readStorageItem } from "@/lib/assessment/persistence";
 
 const pageTitles: Array<{ match: (pathname: string) => boolean; title: string }> = [
   { match: (pathname) => pathname === "/app/startup-profile", title: "Your Startup" },
@@ -31,6 +33,8 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { state, hasHydrated, dismissResumeBanner, markTrackerVisited } = useDemo();
+  const { user } = useUser();
+  const resumeKey = browserKeyForViewer(ONBOARDING_STEP_KEY, user?.id ?? null);
 
   useEffect(() => {
     if (!hasHydrated || state.isAuthenticated || pathname === "/search" || pathname === "/app/preview") {
@@ -67,8 +71,9 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
     [pathname],
   );
 
-  const resumeStep =
-    hasHydrated && typeof window !== "undefined" ? window.localStorage.getItem(ONBOARDING_STEP_KEY) : null;
+  const resumeRead = hasHydrated && typeof window !== "undefined"
+    ? readStorageItem(getBrowserStorage(window), resumeKey) : null;
+  const resumeStep = resumeRead?.ok ? resumeRead.value : null;
   const showResumeBanner =
     hasHydrated && !state.resumeBannerDismissed && (resumeStep === "2" || resumeStep === "3");
 
@@ -82,7 +87,7 @@ export function DashboardFrame({ children }: { children: React.ReactNode }) {
           <div className="mx-auto flex h-[68px] max-w-[var(--content-max)] items-center justify-between gap-4 px-4 sm:h-[76px] sm:px-6 lg:px-10">
             <Link aria-label="FundMe home" href="/"><BrandLockup size="sm" /></Link>
             <div className="flex items-center gap-2">
-              <Link className="hidden min-h-11 items-center rounded-md px-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:flex" href="/assessment/result">Assessment</Link>
+              <Link className="hidden min-h-11 items-center rounded-md px-2 text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] sm:flex" href="/app/preview#diagnostic">Assessment</Link>
               <Link className="inline-flex min-h-11 items-center rounded-full border border-[var(--border)] bg-white px-4 text-[13px] font-semibold hover:border-[var(--border-strong)]" href="/search">Explore</Link>
               <span aria-label="Preview profile" className="grid size-10 place-items-center rounded-full bg-[#171513] text-white"><CircleUserRound className="size-4" /></span>
             </div>

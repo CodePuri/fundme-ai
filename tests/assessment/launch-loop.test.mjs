@@ -1,7 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { sanitizeAnalyticsProperties } from "../../lib/analytics/events.ts";
 import { createPreviewReferralCode, serializeReport } from "../../lib/assessment/share.ts";
+
+test("Result: source disclaimer does not claim unsubmitted evidence was reviewed", async () => {
+  const source = await readFile(new URL("../../components/assessment/funding-readiness-report.tsx", import.meta.url), "utf8");
+
+  assert.match(source, /Sources you did not submit are treated as missing evidence/);
+  assert.doesNotMatch(source, /Based entirely on your submitted founder profile, website copy, and deck evidence/);
+});
 
 test("Analytics: sanitizes sensitive and private payload keys", () => {
   const dirtyProps = {
@@ -23,10 +31,9 @@ test("Analytics: sanitizes sensitive and private payload keys", () => {
   assert.equal(clean.claimToken, undefined);
   assert.equal(clean.transcript, undefined);
   assert.equal(clean.deck_text, undefined);
-  assert.equal(clean.validMetric, 42);
-  assert.equal(clean.hasDeck, true);
-  assert.ok(typeof clean.safeSummary === "string");
-  assert.ok(clean.safeSummary.length <= 100);
+  assert.equal(clean.validMetric, undefined);
+  assert.equal(clean.hasDeck, undefined);
+  assert.equal(clean.safeSummary, undefined);
 });
 
 test("Share & Referrals: generates stable preview referral code", () => {

@@ -1,17 +1,15 @@
 "use client";
 
 import { ClerkProvider } from "@clerk/nextjs";
-import { usePathname } from "next/navigation";
-
-import { isClerkIndependentPublicPath } from "@/lib/assessment/public-routes";
 
 export function RouteClerkProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
   const clerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
-  if (!clerkConfigured && isClerkIndependentPublicPath(pathname)) return children;
 
+  // Public components read Clerk's hooks for their anonymous UI state. Keep their
+  // context available even in local builds without configured credentials.
   return (
     <ClerkProvider
+      dynamic={clerkConfigured}
       appearance={{
         layout: {
           logoImageUrl: "/fundme-logo.png",
