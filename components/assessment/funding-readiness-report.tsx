@@ -133,6 +133,7 @@ export function FundingReadinessReport() {
   const { session, hasHydrated } = useAssessment();
   const report = session.report;
   const [shareStatus, setShareStatus] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
   const [authOpen, setAuthOpen] = useState(false);
   const authTriggerRef = useRef<HTMLButtonElement>(null);
   const dialogRef = useRef<HTMLElement>(null);
@@ -256,11 +257,11 @@ export function FundingReadinessReport() {
 
   async function handleSaveClick(source: string = "hero") {
     trackClientEvent("save_cta_clicked", { source });
+    setSaveStatus(null);
 
     if (state.isAuthenticated) {
-      // User is ALREADY authenticated in session — save directly and go to workspace
       try {
-        await fetch("/api/assessment/save", {
+        const response = await fetch("/api/assessment/save", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -268,10 +269,13 @@ export function FundingReadinessReport() {
             session,
           }),
         });
-      } catch (err) {
-        console.error("Save assessment error:", err);
+        if (!response.ok || !(await response.json()).ok) {
+          throw new Error("Assessment save was not confirmed");
+        }
+        router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
+      } catch {
+        setSaveStatus("Your assessment could not be saved. Please try again.");
       }
-      router.push(`/app/preview${session.claimToken ? `?claim_token=${session.claimToken}` : ""}`);
       return;
     }
 
@@ -321,6 +325,7 @@ export function FundingReadinessReport() {
                   Save my assessment
                   <ArrowRight className="size-4" />
                 </Button>
+                {saveStatus ? <span className="self-center text-sm text-[var(--status-critical)]" role="alert">{saveStatus}</span> : null}
                 <Button className="min-h-12" onClick={download} variant="secondary">
                   <Download className="size-4" />
                   Download assessment
@@ -384,7 +389,7 @@ export function FundingReadinessReport() {
               : report.conciseVerdict || "Your story has ambition, but an investor’s first pass will scrutinize the gap between current claims and independently verifiable customer evidence."}
           </p>
           <p className="mt-2 text-xs text-[#825345]">
-            Based entirely on your submitted founder profile, website copy, and deck evidence.
+            Based only on the information you provided. Sources you did not submit are treated as missing evidence.
           </p>
         </section>
 

@@ -32,6 +32,8 @@ test("Funding readiness report: authenticated users save directly without redund
 
   assert.match(reportSource, /if\s*\(\s*state\.isAuthenticated\s*\)/);
   assert.match(reportSource, /fetch\("\/api\/assessment\/save"/);
+  assert.match(reportSource, /if \(!response\.ok \|\| !\(await response\.json\(\)\)\.ok\)/);
+  assert.match(reportSource, /Your assessment could not be saved/);
   assert.match(reportSource, /router\.push\(`\/app\/preview/);
 });
 
