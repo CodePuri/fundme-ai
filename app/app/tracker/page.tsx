@@ -249,10 +249,10 @@ export default function TrackerPage() {
       <div className="flex flex-wrap gap-2">
         {statusTabs.map((item) => (
           <button
-            className={`rounded-full border px-3 py-1.5 text-xs ${
+            className={`rounded-full border px-3 py-1.5 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)] ${
               activeTab === item
-                ? "border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] text-[var(--button-primary-text)]"
-                : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)]"
+                ? "border-[var(--button-primary-border)] bg-[var(--button-primary-bg)] text-[var(--button-primary-text)] hover:border-[var(--button-primary-border-hover)] hover:bg-[var(--button-primary-bg-hover)]"
+                : "border-[var(--border)] bg-[var(--surface)] text-[var(--text-muted)] hover:bg-[var(--surface-elevated)]"
             }`}
             key={item}
             onClick={() => setActiveTab(item)}
@@ -340,7 +340,8 @@ export default function TrackerPage() {
                 </div>
               </div>
               <button
-                className="text-[var(--text-muted)] transition-colors hover:text-[var(--text-primary)]"
+                aria-label="Close modal"
+                className="rounded-sm p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--surface-elevated)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--focus-ring)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--focus-ring-offset)]"
                 onClick={() => setModalOpen(false)}
                 type="button"
               >
